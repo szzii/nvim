@@ -1,0 +1,96 @@
+{
+	"java.home": "/usr/lib/jvm/default-runtime/",
+	"java.configuration.maven.userSettings":"/opt/maven/conf/settings.xml",
+	"java.autobuild.enabled": true,
+	"java.debug.vimspector.substitution.adapterPort": "5005",
+    "java.format.settings.url": "/home/szz/.config/coc/extensions/node_modules/redhat.java/eclipse-formatter.xml",
+	"java.jdt.ls.vmargs": "-javaagent:/home/szz/.config/coc/extensions/coc-java-data/lombok.jar",
+
+	"json.format.enable": true,
+	"yaml.format.enable": true,
+	"coc.preferences.colorSupport": false,
+    "diagnostic.displayByAle": true,
+	"translator.enableHover": true,
+	"explorer.sources": [{
+            "name": "buffer",
+            "expand": false
+        },
+        {
+            "name": "file",
+            "expand": true
+        }
+    ],
+	"explorer.quitOnOpen": true,
+	"explorer.git.enable": true,
+    "explorer.git.showIgnored": true,
+    "explorer.file.column.indent.indentLine": true,
+    "explorer.buffer.showHiddenBuffers": false,	
+	"explorer.icon.enableNerdfont": true,
+	"explorer.filename.colored.enable": true,
+	"explorer.keyMappings.global": {
+			"h":false,
+			"il": false,
+			"ic": false,
+			"Il": false,
+			"Ic": false,
+			"II": false,
+			"*": "toggleSelection",
+			"<tab>": "actionMenu",
+			
+			"j": "collapse",
+			"l": "expand",
+			"i": "nodePrev",
+			"k": "nodeNext",
+			"I": "normal:5i",
+			"K": "normal:5k",
+			"o": ["wait", "expanded?", "collapse", "expand"],
+			"<cr>": ["wait", "expandable?", "cd", "open"],
+			"e": "open",
+			"s": "open:split",
+			"v": "open:vsplit",
+			"t": "open:tab",
+			"<bs>": ["wait", "gotoParent"],
+			
+			"yp": "copyFilepath",
+			"yn": "copyFilename",
+			"yy": "copyFile",
+			"dd": "cutFile",
+			"pp": "pasteFile",
+			"dD": "deleteForever",
+			"a": "addFile",
+			"A": "addDirectory",
+			"cw": "rename",
+			
+			"zh": "toggleHidden",
+			"R": "refresh",
+			
+			"?": "help",
+			"q": "quit",
+			"<esc>": "esc",
+			"X": "systemExecute",
+			
+			"f": "search",
+			"F": "searchRecursive",
+			"B": "gotoSource:file",
+			"b": "gotoSource:buffer",
+			"[[": "sourcePrev",
+			"]]": "sourceNext",
+			"[d": "diagnosticPrev",
+			"]d": "diagnosticNext",
+			"[c": "gitPrev",
+			"]c": "gitNext",
+			"<<": "gitStage",
+			">>": "gitUnstage"
+	},
+	"languageserver": {
+		"bash": {
+			"command": "bash-language-server",
+			"args": ["start"],
+			"filetypes": ["sh"],
+			"ignoredRootPaths": []
+		},
+	}
+}
+
+
+
