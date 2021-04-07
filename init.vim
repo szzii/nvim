@@ -196,7 +196,7 @@ call glaive#Install()
 " === AutoFormat
 " ===
 Glaive codefmt plugin[mappings]
-Glaive codefmt google_java_executable="java -jar /home/szz/.config/nvim/google-java-format-1.10.0-all-deps.jar"
+Glaive codefmt google_java_executable="java -jar /home/szz/.config/nvim/format/google-java-format-1.10.0-all-deps.jar"
 
 
 augroup autoformat_settings
@@ -289,7 +289,7 @@ nmap <leader>x  <Plug>(coc-fix-current)
 
 nmap <silent> <LEADER>f <Plug>(coc-definition)
 nmap <silent> <LEADER>d <Plug>(coc-type-definition)
-nmap <silent> <LEADER>m <Plug>(coc-implementation)
+nmap <silent> <LEADER>w <Plug>(coc-implementation)
 nmap <silent> <LEADER>r <Plug>(coc-references)
 
 nmap <silent> <LEADER>[ <Plug>(coc-diagnostic-prev)
