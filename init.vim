@@ -10,6 +10,7 @@
 
 syntax enable
 syntax on
+set nocompatible
 set exrc
 set secure
 set number
@@ -27,9 +28,9 @@ set encoding=utf-8
 set hidden
 set updatetime=100
 set shortmess+=c
-set tabstop=4
-set softtabstop=4
-set shiftwidth=4
+set tabstop=2
+set softtabstop=2
+set shiftwidth=2
 set autoindent
 set smartindent
 set background=dark 
@@ -48,8 +49,7 @@ let g:ale_java_javac_options = "/home/szz/.config/coc/extensions/coc-java-data/l
 " airline
 let g:airline#extensions#ale#enabled = 1
 let g:airline_powerline_fonts = 1
-let g:airline_theme='deus'
-let g:airline_solarized_bg='dark'
+let g:airline_theme='yowish'
 let g:airline#extensions#tabline#enabled = 1
 
 " devicons 
@@ -58,8 +58,19 @@ let g:webdevicons_enable_startify = 1
 let g:webdevicons_enable_flagship_statusline = 1
 
 
-let g:rehash256 = 1
-autocmd vimenter * ++nested colorscheme molokai
+" themes
+let java_highlight_functions = 1
+let java_highlight_all = 1
+" If you are trying this at runtime, you need to reload the syntax file
+set filetype=java
+
+" Some more highlights, in addition to those suggested by cmcginty
+highlight link javaScopeDecl Statement
+highlight link javaType Type
+highlight link javaDocTags PreProc
+set termguicolors
+autocmd vimenter * ++nested colorscheme base16-woodland
+
 
 au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 exec "nohlsearch"
@@ -110,7 +121,7 @@ noremap I 5k
 noremap K 5j
 noremap <C-h> 5<C-y>
 noremap <C-k> 5<C-e>
-noremap <silent> <LEADER>lg  :table :term lazygit<CR>
+noremap <silent> <LEADER>g  :table :term lazygit<CR>
 
 nnoremap - <PageUp>
 nnoremap = <PageDown>
@@ -119,7 +130,7 @@ nnoremap TT :CocCommand explorer<CR>
 nnoremap < <<
 nnoremap > >>
 
-inoremap <c-h> <Up>
+inoremap <C-i> <Up>
 inoremap <C-j> <Left>
 inoremap <C-k> <Down>
 inoremap <C-l> <Right>
@@ -153,6 +164,9 @@ Plug 'w0rp/ale'
 Plug 'morhetz/gruvbox'
 Plug 'ryanoasis/vim-devicons'
 Plug 'tomasr/molokai'
+Plug 'KabbAmine/yowish.vim'
+Plug 'chriskempson/base16-vim'
+
 
 Plug 'sbdchd/neoformat'
 
@@ -163,6 +177,7 @@ Plug 'iamcco/markdown-preview.nvim', {'do': 'cd app && yarn install'  }
 Plug 'puremourning/vimspector'
 
 " search
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
 " git
@@ -187,7 +202,9 @@ Plug 'google/vim-glaive'
 Plug 'elzr/vim-json'
 Plug 'neoclide/jsonc.vim'
 
+Plug 'jiangmiao/auto-pairs'
 
+Plug 'sheerun/vim-polyglot'
 
 call plug#end()
 call glaive#Install()
@@ -219,6 +236,7 @@ augroup END
 " === vimspector
 " ===
 let g:vimspector_enable_mappings = 'HUMAN'
+nmap <F1> :CocCommand java.debug.vimspector.start<CR>
 function! s:read_template_into_buffer(template)
     " has to be a function to avoid the extra space fzf#run insers otherwise
     execute '0r ~/.config/nvim/vimspector_json/'.a:template
@@ -229,9 +247,6 @@ command! -bang -nargs=* LoadVimSpectorJsonTemplate call fzf#run({
             \   'sink': function('<sid>read_template_into_buffer')
             \ })
 noremap <leader>vs :tabe .vimspector.json<CR>:LoadVimSpectorJsonTemplate<CR>
-sign define vimspectorBP text=🛑 texthl=Normal
-sign define vimspectorBPDisabled text=🚫 texthl=Normal
-sign define vimspectorPC text=👉 texthl=SpellBad
 
 
 
@@ -248,7 +263,6 @@ let g:coc_global_extensions = [
 			\"coc-json",
 			\"coc-html",
 			\"coc-yaml",
-			\"coc-pairs",
 			\"coc-translator",
 			\"coc-highlight"]
 
@@ -270,7 +284,7 @@ inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
 
 
 " document
-nnoremap <silent> <C-d> :call <SID>show_documentation()<CR>
+nnoremap <silent> <LEADER>m :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
@@ -289,7 +303,7 @@ nmap <leader>x  <Plug>(coc-fix-current)
 
 nmap <silent> <LEADER>f <Plug>(coc-definition)
 nmap <silent> <LEADER>d <Plug>(coc-type-definition)
-nmap <silent> <LEADER>w <Plug>(coc-implementation)
+nmap <silent> <LEADER>e <Plug>(coc-implementation)
 nmap <silent> <LEADER>r <Plug>(coc-references)
 
 nmap <silent> <LEADER>[ <Plug>(coc-diagnostic-prev)
@@ -305,8 +319,8 @@ set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 " 翻译
 nmap <Leader>t <Plug>(coc-translator-p)
 vmap <Leader>t <Plug>(coc-translator-pv)
-nmap <Leader>e <Plug>(coc-translator-e)
-vmap <Leader>e <Plug>(coc-translator-ev)
+nmap <Leader>w <Plug>(coc-translator-e)
+vmap <Leader>w <Plug>(coc-translator-ev)
 "nmap <Leader>r <Plug>(coc-translator-r)
 "vmap <Leader>r <Plug>(coc-translator-rv)
 
@@ -319,7 +333,7 @@ vmap <Leader>e <Plug>(coc-translator-ev)
 " ===
 let g:rnvimr_urc_path = "/home/szz/.config/ranger/"
 highlight link RnvimrNormal CursorLine
-nnoremap <silent> <LEADER>ra :RnvimrToggle<CR><C-\><C-n>:RnvimrResize 0<CR>
+nnoremap <silent> <C-a> :RnvimrToggle<CR><C-\><C-n>:RnvimrResize 1<CR>
 
 
 
@@ -339,4 +353,43 @@ let g:gitgutter_git_executable = '/usr/bin/git'
 " === markdown
 " ===
 nmap <C-m> :MarkdownPreviewToggle<CR>
+
+
+
+
+
+" ===
+" === FZF
+" ===
+" noremap <silent> <C-p> :Files<CR>
+noremap <silent> <C-f> :Rg<CR>
+noremap <silent> <C-h> :History<CR>
+"noremap <C-t> :BTags<CR>
+"noremap <silent> <C-l> :Lines<CR>
+noremap <silent> <C-b> :Buffers<CR>
+noremap <leader>; :History:<CR>
+
+let g:fzf_preview_window = 'right:60%'
+let g:fzf_commits_log_options = '--graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
+
+function! s:list_buffers()
+  redir => list
+  silent ls
+  redir END
+  return split(list, "\n")
+endfunction
+
+function! s:delete_buffers(lines)
+  execute 'bwipeout' join(map(a:lines, {_, line -> split(line)[0]}))
+endfunction
+
+command! BD call fzf#run(fzf#wrap({
+  \ 'source': s:list_buffers(),
+  \ 'sink*': { lines -> s:delete_buffers(lines) },
+  \ 'options': '--multi --reverse --bind ctrl-a:select-all+accept'
+\ }))
+
+noremap <c-b> :BD<CR>
+
+let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.8 } }
 

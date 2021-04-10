@@ -2,7 +2,6 @@
 	"java.home": "/usr/lib/jvm/default-runtime/",
 	"java.configuration.maven.userSettings":"/opt/maven/conf/settings.xml",
 	"java.autobuild.enabled": true,
-	"java.debug.vimspector.substitution.adapterPort": "5005",
     "java.format.settings.url": "/home/szz/.config/coc/extensions/node_modules/redhat.java/eclipse-formatter.xml",
 	"java.jdt.ls.vmargs": "-javaagent:/home/szz/.config/coc/extensions/coc-java-data/lombok.jar",
 
