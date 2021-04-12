@@ -1,3 +1,5 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhistcnt =1
+let g:netrw_dirhistcnt =3
+let g:netrw_dirhist_3='/home/szz/github/course-service'
+let g:netrw_dirhist_2='/etc/pacman.d'
 let g:netrw_dirhist_1='/home/szz/.config/nvim/colors'

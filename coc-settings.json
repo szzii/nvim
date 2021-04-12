@@ -2,7 +2,7 @@
 	"java.home": "/usr/lib/jvm/default-runtime/",
 	"java.configuration.maven.userSettings":"/opt/maven/conf/settings.xml",
 	"java.autobuild.enabled": true,
-    "java.format.settings.url": "/home/szz/.config/coc/extensions/node_modules/redhat.java/eclipse-formatter.xml",
+  "java.format.settings.url": "/home/szz/.config/coc/extensions/node_modules/redhat.java/eclipse-formatter.xml",
 	"java.jdt.ls.vmargs": "-javaagent:/home/szz/.config/coc/extensions/coc-java-data/lombok.jar",
 
 	"json.format.enable": true,
@@ -21,9 +21,9 @@
     ],
 	"explorer.quitOnOpen": true,
 	"explorer.git.enable": true,
-    "explorer.git.showIgnored": true,
-    "explorer.file.column.indent.indentLine": true,
-    "explorer.buffer.showHiddenBuffers": false,	
+	"explorer.git.showIgnored": true,
+  "explorer.file.column.indent.indentLine": true,
+  "explorer.buffer.showHiddenBuffers": false,	
 	"explorer.icon.enableNerdfont": true,
 	"explorer.filename.colored.enable": true,
 	"explorer.keyMappings.global": {

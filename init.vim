@@ -119,8 +119,10 @@ noremap J 7h
 noremap L 7l
 noremap I 5k
 noremap K 5j
-noremap <C-h> 5<C-y>
 noremap <C-k> 5<C-e>
+noremap ; :
+noremap ` ~
+noremap <LEADER>rc :e ~/.config/nvim/init.vim<CR>
 noremap <silent> <LEADER>g  :table :term lazygit<CR>
 
 nnoremap - <PageUp>
@@ -130,16 +132,83 @@ nnoremap TT :CocCommand explorer<CR>
 nnoremap < <<
 nnoremap > >>
 
-inoremap <C-i> <Up>
 inoremap <C-j> <Left>
-inoremap <C-k> <Down>
 inoremap <C-l> <Right>
-inoremap <C-d> <DELETE>
 inoremap <C-b> <BS>
 inoremap <C-c> <ESC>
 
+nnoremap Y y$
 vnoremap Y "+y
 
+func! StartDebugServer()
+	exec "w"
+	if &filetype == 'java'
+		set splitbelow
+		:sp
+		:res -13
+		let l:dir = FindRootDirectory()
+		if l:dir != ""
+			exec "!echo ".l:dir." > /home/szz/.rooter "
+			:term  cd (cat /home/szz/.rooter) && mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
+		else
+			exec "!echo % > .debug-info "
+			exec "!javac -g %"
+			:term java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=5005,suspend=y (cat .debug-info)
+		endif
+	endif
+endfunc
+
+" Compile function
+noremap r :call CompileRunGcc()<CR>
+func! CompileRunGcc()
+	exec "w"
+	if &filetype == 'c'
+		exec "!g++ % -o %<"
+		exec "!time ./%<"
+	elseif &filetype == 'cpp'
+		set splitbelow
+		exec "!g++ -std=c++11 % -Wall -o %<"
+		:sp
+		:res -15
+		:term ./%<
+	elseif &filetype == 'java'
+		set splitbelow
+		:sp
+		:res -13
+		let l:dir = FindRootDirectory()
+		if l:dir != ""
+			exec "!echo ".l:dir." > /home/szz/.rooter "
+			:term  cd (cat /home/szz/.rooter) && mvn clean spring-boot:run 
+		else
+			exec "!javac %"
+			exec "!time java %<"
+		endif
+	elseif &filetype == 'sh'
+		:!time bash %
+	elseif &filetype == 'python'
+		set splitbelow
+		:sp
+		:term python3 %
+	elseif &filetype == 'html'
+		silent! exec "!".g:mkdp_browser." % &"
+	elseif &filetype == 'markdown'
+		exec "InstantMarkdownPreview"
+	elseif &filetype == 'tex'
+		silent! exec "VimtexStop"
+		silent! exec "VimtexCompile"
+	elseif &filetype == 'dart'
+		exec "CocCommand flutter.run -d ".g:flutter_default_device." ".g:flutter_run_args
+		silent! exec "CocCommand flutter.dev.openDevLog"
+	elseif &filetype == 'javascript'
+		set splitbelow
+		:sp
+		:term export DEBUG="INFO,ERROR,WARNING"; node --trace-warnings .
+	elseif &filetype == 'go'
+		set splitbelow
+		:sp
+		:term go run .
+	endif
+endfunc
 	
 
 
@@ -205,6 +274,13 @@ Plug 'neoclide/jsonc.vim'
 Plug 'jiangmiao/auto-pairs'
 
 Plug 'sheerun/vim-polyglot'
+
+Plug 'airblade/vim-rooter'
+
+Plug 'tpope/vim-surround'
+Plug 'preservim/nerdcommenter'
+Plug 'terryma/vim-multiple-cursors'
+
 
 call plug#end()
 call glaive#Install()
@@ -364,6 +440,7 @@ nmap <C-m> :MarkdownPreviewToggle<CR>
 " noremap <silent> <C-p> :Files<CR>
 noremap <silent> <C-f> :Rg<CR>
 noremap <silent> <C-h> :History<CR>
+noremap <silent> <C-g> :GFiles?<CR>
 "noremap <C-t> :BTags<CR>
 "noremap <silent> <C-l> :Lines<CR>
 noremap <silent> <C-b> :Buffers<CR>
@@ -393,3 +470,12 @@ noremap <c-b> :BD<CR>
 
 let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.8 } }
 
+
+let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
+let g:vista#renderer#enable_icon = 1
+let g:vista#renderer#icons = {
+\   "function": "\uf794",
+\   "variable": "\uf71b",
+\  }
+
+nnoremap <silent> <LEADER>p :Vista!!<CR>
