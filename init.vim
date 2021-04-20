@@ -34,6 +34,8 @@ set shiftwidth=2
 set autoindent
 set smartindent
 set background=dark 
+set guifont=FiraCode\ Nerd\ Font:h16
+let g:neovide_cursor_vfx_mode = "railgun"
 
 let mapleader = ' '
 let &t_SI = "\<Esc>]50;CursorShape=1\x7"
@@ -41,6 +43,7 @@ let &t_SR = "\<Esc>]50;CursorShape=2\x7"
 let &t_EI = "\<Esc>]50;CursorShape=0\x7"
 
 " ale 
+let g:airline#extensions#ale#enabled = 1
 let g:ale_sign_error = '✗'
 let g:ale_sign_warning = '⚡'
 let g:ale_disable_lsp = 1
@@ -123,7 +126,7 @@ noremap <C-k> 5<C-e>
 noremap ; :
 noremap ` ~
 noremap <LEADER>rc :e ~/.config/nvim/init.vim<CR>
-noremap <silent> <LEADER>g  :table :term lazygit<CR>
+
 
 nnoremap - <PageUp>
 nnoremap = <PageDown>
@@ -131,6 +134,7 @@ nnoremap tt :CocCommand explorer<CR>
 nnoremap TT :CocCommand explorer<CR>
 nnoremap < <<
 nnoremap > >>
+nnoremap <C-s> :Startify<CR>
 
 inoremap <C-j> <Left>
 inoremap <C-l> <Right>
@@ -204,9 +208,7 @@ func! CompileRunGcc()
 		:sp
 		:term export DEBUG="INFO,ERROR,WARNING"; node --trace-warnings .
 	elseif &filetype == 'go'
-		set splitbelow
-		:sp
-		:term go run .
+		:GoRun
 	endif
 endfunc
 	
@@ -240,7 +242,10 @@ Plug 'chriskempson/base16-vim'
 Plug 'sbdchd/neoformat'
 
 " markdown
-Plug 'iamcco/markdown-preview.nvim', {'do': 'cd app && yarn install'  }
+Plug 'suan/vim-instant-markdown', {'for': 'markdown'}
+Plug 'dhruvasagar/vim-table-mode', { 'on': 'TableModeToggle', 'for': ['text', 'markdown', 'vim-plug'] }
+Plug 'mzlogin/vim-markdown-toc', { 'for': ['gitignore', 'markdown', 'vim-plug'] }
+Plug 'dkarter/bullets.vim'
 
 " debug
 Plug 'puremourning/vimspector'
@@ -267,9 +272,13 @@ Plug 'google/vim-codefmt'
 Plug 'google/vim-maktaba'
 Plug 'google/vim-glaive'
 
-" json
+" HTML, CSS, JavaScript, Typescript, PHP, JSON, etc.
 Plug 'elzr/vim-json'
 Plug 'neoclide/jsonc.vim'
+Plug 'othree/html5.vim'
+Plug 'alvan/vim-closetag'
+Plug 'yuezk/vim-js', { 'for': ['vim-plug', 'php', 'html', 'javascript', 'css', 'less'] }
+
 
 Plug 'jiangmiao/auto-pairs'
 
@@ -280,7 +289,13 @@ Plug 'airblade/vim-rooter'
 Plug 'tpope/vim-surround'
 Plug 'preservim/nerdcommenter'
 Plug 'terryma/vim-multiple-cursors'
+Plug 'kdheepak/lazygit.vim', { 'branch': 'nvim-v0.4.3' }
 
+Plug 'itchyny/calendar.vim'
+
+
+" Go
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
 call plug#end()
 call glaive#Install()
@@ -420,16 +435,12 @@ nnoremap <silent> <C-a> :RnvimrToggle<CR><C-\><C-n>:RnvimrResize 1<CR>
 " === git
 " ===
 let g:gitgutter_git_executable = '/usr/bin/git'
-
-
-
-
-
-" ===
-" === markdown
-" ===
-nmap <C-m> :MarkdownPreviewToggle<CR>
-
+nnoremap <silent> <C-g> :LazyGit<CR>
+let g:lazygit_floating_window_winblend = 0 
+let g:lazygit_floating_window_scaling_factor = 0.9 
+let g:lazygit_floating_window_corner_chars = ['╭', '╮', '╰', '╯'] 
+let g:lazygit_floating_window_use_plenary = 0 
+let g:lazygit_use_neovim_remote = 1 
 
 
 
@@ -440,7 +451,7 @@ nmap <C-m> :MarkdownPreviewToggle<CR>
 " noremap <silent> <C-p> :Files<CR>
 noremap <silent> <C-f> :Rg<CR>
 noremap <silent> <C-h> :History<CR>
-noremap <silent> <C-g> :GFiles?<CR>
+"noremap <silent> <C-g> :GFiles?<CR>
 "noremap <C-t> :BTags<CR>
 "noremap <silent> <C-l> :Lines<CR>
 noremap <silent> <C-b> :Buffers<CR>
@@ -479,3 +490,41 @@ let g:vista#renderer#icons = {
 \  }
 
 nnoremap <silent> <LEADER>p :Vista!!<CR>
+
+
+
+
+
+" ===
+" === vim-go
+" ===
+let g:go_echo_go_info = 0
+let g:go_doc_popup_window = 1
+let g:go_def_mapping_enabled = 0
+let g:go_template_autocreate = 0
+let g:go_textobj_enabled = 0
+let g:go_auto_type_info = 1
+let g:go_def_mapping_enabled = 0
+let g:go_highlight_array_whitespace_error = 1
+let g:go_highlight_build_constraints = 1
+let g:go_highlight_chan_whitespace_error = 1
+let g:go_highlight_extra_types = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_format_strings = 1
+let g:go_highlight_function_calls = 1
+let g:go_highlight_function_parameters = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_generate_tags = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_space_tab_error = 1
+let g:go_highlight_string_spellcheck = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_trailing_whitespace_error = 1
+let g:go_highlight_types = 1
+let g:go_highlight_variable_assignments = 0
+let g:go_highlight_variable_declarations = 0
+let g:go_doc_keywordprg_enabled = 0
+
+nnoremap <LEADER>g :GoImport 
+

@@ -4,11 +4,10 @@
 	"java.autobuild.enabled": true,
   "java.format.settings.url": "/home/szz/.config/coc/extensions/node_modules/redhat.java/eclipse-formatter.xml",
 	"java.jdt.ls.vmargs": "-javaagent:/home/szz/.config/coc/extensions/coc-java-data/lombok.jar",
-
 	"json.format.enable": true,
 	"yaml.format.enable": true,
 	"coc.preferences.colorSupport": false,
-    "diagnostic.displayByAle": true,
+  "diagnostic.displayByAle": true,
 	"translator.enableHover": true,
 	"explorer.sources": [{
             "name": "buffer",
@@ -88,7 +87,18 @@
 			"filetypes": ["sh"],
 			"ignoredRootPaths": []
 		},
-	}
+  		"golang": {
+			"command": "gopls",
+			"rootPatterns": ["go.mod"],
+			"filetypes": ["go"],
+			"initializationOptions": {
+				"gocodeCompletionEnabled": true,
+				"diagnosticsEnabled": true,
+				"lintTool": "golint"
+			}
+		}
+  },
+  "clangd.path": "/home/szz/.config/coc/extensions/coc-clangd-data/install/11.0.0/clangd_11.0.0/bin/clangd"
 }
 
 
