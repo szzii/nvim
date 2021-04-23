@@ -35,8 +35,11 @@ set autoindent
 set smartindent
 set background=dark 
 set guifont=FiraCode\ Nerd\ Font:h16
+set complete-=i 
+set complete-=t
 let g:neovide_cursor_vfx_mode = "railgun"
-
+autocmd InsertLeave,WinEnter * set cursorline
+autocmd InsertEnter,WinLeave * set nocursorline
 let mapleader = ' '
 let &t_SI = "\<Esc>]50;CursorShape=1\x7"
 let &t_SR = "\<Esc>]50;CursorShape=2\x7"
@@ -48,6 +51,7 @@ let g:ale_sign_error = '✗'
 let g:ale_sign_warning = '⚡'
 let g:ale_disable_lsp = 1
 let g:ale_java_javac_options = "/home/szz/.config/coc/extensions/coc-java-data/lombok.jar"
+nnoremap <LEADER>a :ALEComplete<CR>
 
 " airline
 let g:airline#extensions#ale#enabled = 1
@@ -115,8 +119,8 @@ noremap i k
 noremap k j
 noremap H I
 noremap h i
-noremap <C-l> $
-noremap <C-J> 0
+noremap <C-l> g_
+noremap <C-j> 0
 noremap <LEADER><CR> :nohlsearch<CR> 
 noremap J 7h
 noremap L 7l
@@ -143,6 +147,11 @@ inoremap <C-c> <ESC>
 
 nnoremap Y y$
 vnoremap Y "+y
+
+cnoremap <c-k> <down>
+cnoremap <c-i> <up>
+nnoremap <c-i>  :<c-u>execute 'move -1-'. v:count1<cr>
+nnoremap <c-k>  :<c-u>execute 'move +'. v:count1<cr>
 
 func! StartDebugServer()
 	exec "w"
@@ -293,7 +302,7 @@ Plug 'kdheepak/lazygit.vim', { 'branch': 'nvim-v0.4.3' }
 
 Plug 'itchyny/calendar.vim'
 
-
+Plug 'mbbill/undotree'
 " Go
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
@@ -338,6 +347,9 @@ command! -bang -nargs=* LoadVimSpectorJsonTemplate call fzf#run({
             \   'sink': function('<sid>read_template_into_buffer')
             \ })
 noremap <leader>vs :tabe .vimspector.json<CR>:LoadVimSpectorJsonTemplate<CR>
+sign define vimspectorBP text=☛ texthl=Normal
+sign define vimspectorBPDisabled text=☞ texthl=Normal
+sign define vimspectorPC text=🔶 texthl=SpellBad
 
 
 
@@ -527,4 +539,23 @@ let g:go_highlight_variable_declarations = 0
 let g:go_doc_keywordprg_enabled = 0
 
 nnoremap <LEADER>g :GoImport 
+
+
+
+" ===
+" === undotree
+" ===
+nnoremap U :UndotreeToggle<CR>
+if has("persistent_undo")
+   let target_path = expand('~/.undodir')
+
+    " create the directory and any parent directories
+    " if the location does not exist.
+    if !isdirectory(target_path)
+        call mkdir(target_path, "p", 0700)
+    endif
+
+    let &undodir=target_path
+    set undofile
+endif
 
