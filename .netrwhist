@@ -1,5 +1,9 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhistcnt =3
+let g:netrw_dirhistcnt =7
+let g:netrw_dirhist_7='/home/szz/.vim'
+let g:netrw_dirhist_6='/home/szz/go/src/hello'
+let g:netrw_dirhist_5='/home/szz/javacode/course-service/doc'
+let g:netrw_dirhist_4='/home/szz/go/src/go-admin/docs'
 let g:netrw_dirhist_3='/home/szz/github/course-service'
 let g:netrw_dirhist_2='/etc/pacman.d'
 let g:netrw_dirhist_1='/home/szz/.config/nvim/colors'

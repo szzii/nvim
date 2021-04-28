@@ -37,6 +37,10 @@ set background=dark
 set guifont=FiraCode\ Nerd\ Font:h16
 set complete-=i 
 set complete-=t
+set timeout           
+set timeoutlen=1000   
+set ttimeout          
+set ttimeoutlen=10    
 let g:neovide_cursor_vfx_mode = "railgun"
 autocmd InsertLeave,WinEnter * set cursorline
 autocmd InsertEnter,WinLeave * set nocursorline
@@ -44,13 +48,18 @@ let mapleader = ' '
 let &t_SI = "\<Esc>]50;CursorShape=1\x7"
 let &t_SR = "\<Esc>]50;CursorShape=2\x7"
 let &t_EI = "\<Esc>]50;CursorShape=0\x7"
+let g:suda_smart_edit = 1
 
 " ale 
 let g:airline#extensions#ale#enabled = 1
 let g:ale_sign_error = '✗'
 let g:ale_sign_warning = '⚡'
 let g:ale_disable_lsp = 1
-let g:ale_java_javac_options = "/home/szz/.config/coc/extensions/coc-java-data/lombok.jar"
+let g:ale_hover_cursor=1
+let g:ale_hover_to_preview=1
+let g:ale_hover_to_floating_preview=1
+let g:ale_floating_window_border = ['│', '─', '╭', '╮', '╯', '╰']
+"let g:ale_java_javac_options = "/home/szz/.config/coc/extensions/coc-java-data/lombok.jar"
 nnoremap <LEADER>a :ALEComplete<CR>
 
 " airline
@@ -66,12 +75,13 @@ let g:webdevicons_enable_flagship_statusline = 1
 
 
 " themes
-let java_highlight_functions = 1
-let java_highlight_all = 1
-" If you are trying this at runtime, you need to reload the syntax file
-set filetype=java
 
-" Some more highlights, in addition to those suggested by cmcginty
+set filetype=java
+"let java_highlight_functions = 1
+"let java_highlight_all = 1
+highlight link javaIdentifier NONE
+"highlight link javaDelimiter NONE
+
 highlight link javaScopeDecl Statement
 highlight link javaType Type
 highlight link javaDocTags PreProc
@@ -111,8 +121,6 @@ map <LEADER>L <C-w>l
 map tu :tabe<CR>
 map tl :+tabnext<CR>
 map tj :-tabnext<CR>
-map <C-p> :set paste<CR>
-map <C-n> :set nopaste<CR>
 
 noremap j h
 noremap i k
@@ -148,28 +156,9 @@ inoremap <C-c> <ESC>
 nnoremap Y y$
 vnoremap Y "+y
 
-cnoremap <c-k> <down>
-cnoremap <c-i> <up>
-nnoremap <c-i>  :<c-u>execute 'move -1-'. v:count1<cr>
-nnoremap <c-k>  :<c-u>execute 'move +'. v:count1<cr>
+nnoremap <c-I>  :<c-u>execute 'move -1-'. v:count1<cr>
+nnoremap <c-K>  :<c-u>execute 'move +'. v:count1<cr>
 
-func! StartDebugServer()
-	exec "w"
-	if &filetype == 'java'
-		set splitbelow
-		:sp
-		:res -13
-		let l:dir = FindRootDirectory()
-		if l:dir != ""
-			exec "!echo ".l:dir." > /home/szz/.rooter "
-			:term  cd (cat /home/szz/.rooter) && mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
-		else
-			exec "!echo % > .debug-info "
-			exec "!javac -g %"
-			:term java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=5005,suspend=y (cat .debug-info)
-		endif
-	endif
-endfunc
 
 " Compile function
 noremap r :call CompileRunGcc()<CR>
@@ -266,6 +255,8 @@ Plug 'junegunn/fzf.vim'
 " git
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
+Plug 'APZelos/blamer.nvim'
+
 
 " 对称行
 Plug 'Yggdroot/indentLine'
@@ -293,18 +284,38 @@ Plug 'jiangmiao/auto-pairs'
 
 Plug 'sheerun/vim-polyglot'
 
+" 根目录搜索
 Plug 'airblade/vim-rooter'
 
+" 环绕增强
 Plug 'tpope/vim-surround'
+Plug 'gcmt/wildfire.vim'
+
 Plug 'preservim/nerdcommenter'
 Plug 'terryma/vim-multiple-cursors'
 Plug 'kdheepak/lazygit.vim', { 'branch': 'nvim-v0.4.3' }
 
+"没用的日历
 Plug 'itchyny/calendar.vim'
 
+"undo
 Plug 'mbbill/undotree'
+
 " Go
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+
+"sudo write
+Plug 'lambdalisue/suda.vim' " do stuff like :sudowrite
+
+" copy manager
+Plug 'junegunn/vim-peekaboo'
+
+Plug 'yuttie/comfortable-motion.vim'
+
+"Plug 'scrooloose/syntastic'
+
+Plug 'uiiaoo/java-syntax.vim'
+
 
 call plug#end()
 call glaive#Install()
@@ -338,18 +349,58 @@ augroup END
 let g:vimspector_enable_mappings = 'HUMAN'
 nmap <F1> :CocCommand java.debug.vimspector.start<CR>
 function! s:read_template_into_buffer(template)
-    " has to be a function to avoid the extra space fzf#run insers otherwise
-    execute '0r ~/.config/nvim/vimspector_json/'.a:template
+	" has to be a function to avoid the extra space fzf#run insers otherwise
+	execute '0r ~/.config/nvim/sample_vimspector_json/'.a:template
 endfunction
 command! -bang -nargs=* LoadVimSpectorJsonTemplate call fzf#run({
-            \   'source': 'ls -1 ~/.config/nvim/vimspector_json',
-            \   'down': 20,
-            \   'sink': function('<sid>read_template_into_buffer')
-            \ })
+			\   'source': 'ls -1 ~/.config/nvim/sample_vimspector_json',
+			\   'down': 20,
+			\   'sink': function('<sid>read_template_into_buffer')
+			\ })
 noremap <leader>vs :tabe .vimspector.json<CR>:LoadVimSpectorJsonTemplate<CR>
+nmap <Leader>vi <Plug>VimspectorBalloonEval
+xmap <Leader>vi <Plug>VimspectorBalloonEval
+
 sign define vimspectorBP text=☛ texthl=Normal
 sign define vimspectorBPDisabled text=☞ texthl=Normal
 sign define vimspectorPC text=🔶 texthl=SpellBad
+
+func! StartDebugServer()
+	exec "w"
+	if &filetype == 'java'
+		exec "!openssl rand -base64 8 > /home/szz/.javastdout"
+		let l:dir = FindRootDirectory()
+		"set splitbelow
+		":sp
+		":res -13
+		if l:dir != ""
+			exec "!echo ".l:dir." > /home/szz/.rooter "
+			exec "!cp ~/.config/nvim/vimspector_json/java_debug.json  ".l:dir."/.vimspector.json"
+			exec "!cd (cat /home/szz/.rooter) && mvn spring-boot:run -Dspring-boot.run.jvmArguments=\"-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005\" > /tmp/(cat /home/szz/.javastdout) & "
+		else
+			"exec "!echo % > .debug-info "
+			exec "!cp ~/.config/nvim/vimspector_json/java_debug.json ."
+			exec "!javac -g %"
+			:term java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=5005,suspend=y (cat .debug-info)
+		endif
+	exec "!sleep 10"
+	exec "CocCommand java.debug.vimspector.start"
+	endif
+endfunc
+
+
+func! StartDebugServer2()
+	if &filetype == 'java'
+		set splitbelow
+		:sp
+		:res -13
+		exec "term  tail -f /tmp/(cat /home/szz/.javastdout)"
+	endif
+endfunc
+
+nmap <Leader>vi <Plug>VimspectorBalloonEval
+
+
 
 
 
@@ -367,10 +418,17 @@ let g:coc_global_extensions = [
 			\"coc-html",
 			\"coc-yaml",
 			\"coc-translator",
-			\"coc-highlight"]
+			\"coc-highlight",
+			\"coc-yank"]
 
 
-" <TAB>键代码补全
+if has("patch-8.1.1564")
+  " Recently vim can merge signcolumn and number column into one
+  set signcolumn=number
+else
+  set signcolumn=yes
+endif
+
 inoremap <silent><expr> <TAB>
       \ pumvisible() ? "\<C-n>" :
       \ <SID>check_back_space() ? "\<TAB>" :
@@ -414,7 +472,22 @@ nmap <silent> <LEADER>] <Plug>(coc-diagnostic-next)
 
 nmap <leader>n <Plug>(coc-rename)
 
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder.
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
 autocmd CursorHold * silent call CocActionAsync('highlight')
+
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
 set termguicolors
 
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
@@ -428,7 +501,8 @@ vmap <Leader>w <Plug>(coc-translator-ev)
 "vmap <Leader>r <Plug>(coc-translator-rv)
 
 
-
+" 剪切版
+nnoremap <silent> <space>y  :<C-u>CocList -A --normal yank<cr>
 
 
 " ===
@@ -453,6 +527,11 @@ let g:lazygit_floating_window_scaling_factor = 0.9
 let g:lazygit_floating_window_corner_chars = ['╭', '╮', '╰', '╯'] 
 let g:lazygit_floating_window_use_plenary = 0 
 let g:lazygit_use_neovim_remote = 1 
+let g:blamer_enabled = 1
+let g:blamer_show_in_insert_modes = 0
+
+
+
 
 
 
@@ -558,4 +637,11 @@ if has("persistent_undo")
     let &undodir=target_path
     set undofile
 endif
+
+
+let g:comfortable_motion_no_default_key_mappings = 1
+nnoremap <silent> <C-k> :call comfortable_motion#flick(100)<CR>
+nnoremap <silent> <C-i> :call comfortable_motion#flick(-100)<CR>
+
+
 
