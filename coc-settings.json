@@ -1,6 +1,6 @@
 {
 	"java.home": "/usr/lib/jvm/default-runtime/",
-	"java.configuration.maven.userSettings":"/opt/maven/conf/settings.xml",
+	"java.configuration.maven.userSettings":"/usr/local/maven/conf/settings.xml",
 	"java.autobuild.enabled": true,
   "java.format.settings.url": "/home/szz/.config/coc/extensions/node_modules/redhat.java/eclipse-formatter.xml",
 	"java.jdt.ls.vmargs": "-javaagent:/home/szz/.config/coc/extensions/coc-java-data/lombok.jar",
@@ -97,8 +97,7 @@
 				"lintTool": "golint"
 			}
 		}
-  },
-  "clangd.path": "/home/szz/.config/coc/extensions/coc-clangd-data/install/11.0.0/clangd_11.0.0/bin/clangd"
+  }
 }
 
 

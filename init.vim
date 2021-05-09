@@ -42,8 +42,8 @@ set timeoutlen=1000
 set ttimeout          
 set ttimeoutlen=10    
 let g:neovide_cursor_vfx_mode = "railgun"
-autocmd InsertLeave,WinEnter * set cursorline
-autocmd InsertEnter,WinLeave * set nocursorline
+"autocmd InsertLeave,WinEnter * set cursorline
+"autocmd InsertEnter,WinLeave * set nocursorline
 let mapleader = ' '
 let &t_SI = "\<Esc>]50;CursorShape=1\x7"
 let &t_SR = "\<Esc>]50;CursorShape=2\x7"
@@ -59,13 +59,13 @@ let g:ale_hover_cursor=1
 let g:ale_hover_to_preview=1
 let g:ale_hover_to_floating_preview=1
 let g:ale_floating_window_border = ['│', '─', '╭', '╮', '╯', '╰']
-"let g:ale_java_javac_options = "/home/szz/.config/coc/extensions/coc-java-data/lombok.jar"
+let g:ale_java_javac_options = "/home/szz/.config/coc/extensions/coc-java-data/lombok.jar"
 nnoremap <LEADER>a :ALEComplete<CR>
 
 " airline
 let g:airline#extensions#ale#enabled = 1
 let g:airline_powerline_fonts = 1
-let g:airline_theme='yowish'
+let g:airline_theme='vorange'
 let g:airline#extensions#tabline#enabled = 1
 
 " devicons 
@@ -77,8 +77,8 @@ let g:webdevicons_enable_flagship_statusline = 1
 " themes
 
 set filetype=java
-"let java_highlight_functions = 1
-"let java_highlight_all = 1
+let java_highlight_functions = 1
+let java_highlight_all = 1
 highlight link javaIdentifier NONE
 "highlight link javaDelimiter NONE
 
@@ -86,7 +86,9 @@ highlight link javaScopeDecl Statement
 highlight link javaType Type
 highlight link javaDocTags PreProc
 set termguicolors
-autocmd vimenter * ++nested colorscheme base16-woodland
+autocmd vimenter * ++nested colorscheme  vorange
+
+
 
 
 au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
@@ -174,13 +176,13 @@ func! CompileRunGcc()
 		:res -15
 		:term ./%<
 	elseif &filetype == 'java'
-		set splitbelow
-		:sp
-		:res -13
 		let l:dir = FindRootDirectory()
 		if l:dir != ""
+			set splitbelow
+			:sp
+			:res -13
 			exec "!echo ".l:dir." > /home/szz/.rooter "
-			:term  cd (cat /home/szz/.rooter) && mvn clean spring-boot:run 
+			:term  cd $(cat /home/szz/.rooter) && mvn clean spring-boot:run 
 		else
 			exec "!javac %"
 			exec "!time java %<"
@@ -230,12 +232,10 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'w0rp/ale'
 
 " themes
-Plug 'morhetz/gruvbox'
 Plug 'ryanoasis/vim-devicons'
-Plug 'tomasr/molokai'
-Plug 'KabbAmine/yowish.vim'
-Plug 'chriskempson/base16-vim'
-
+"Plug 'liuchengxu/space-vim-dark'
+"Plug 'beikome/cosme.vim'
+Plug 'Marfisc/vorange'
 
 Plug 'sbdchd/neoformat'
 
@@ -295,9 +295,6 @@ Plug 'preservim/nerdcommenter'
 Plug 'terryma/vim-multiple-cursors'
 Plug 'kdheepak/lazygit.vim', { 'branch': 'nvim-v0.4.3' }
 
-"没用的日历
-Plug 'itchyny/calendar.vim'
-
 "undo
 Plug 'mbbill/undotree'
 
@@ -323,8 +320,8 @@ call glaive#Install()
 " ===
 " === AutoFormat
 " ===
-Glaive codefmt plugin[mappings]
-Glaive codefmt google_java_executable="java -jar /home/szz/.config/nvim/format/google-java-format-1.10.0-all-deps.jar"
+"Glaive codefmt plugin[mappings]
+"Glaive codefmt google_java_executable="java -jar /home/szz/.config/nvim/format/google-java-format-1.10.0-all-deps.jar"
 
 
 augroup autoformat_settings
@@ -333,8 +330,8 @@ augroup autoformat_settings
 	" autocmd FileType dart AutoFormatBuffer dartfmt
 	" autocmd FileType go AutoFormatBuffer gofmt
 	" autocmd FileType gn AutoFormatBuffer gn
-	autocmd FileType html,css,sass,scss,less,json AutoFormatBuffer js-beautify
-	autocmd FileType java AutoFormatBuffer google-java-format
+	"autocmd FileType html,css,sass,scss,less,json AutoFormatBuffer js-beautify
+	"autocmd FileType java AutoFormatBuffer google-java-format
 	" autocmd FileType python AutoFormatBuffer yapf
 	" Alternative: autocmd FileType python AutoFormatBuffer autopep8
 	" autocmd FileType rust AutoFormatBuffer rustfmt
@@ -347,6 +344,13 @@ augroup END
 " === vimspector
 " ===
 let g:vimspector_enable_mappings = 'HUMAN'
+nmap da <Plug>VimspectorToggleBreakpoint
+nmap dk <Plug>VimspectorStepOver
+nmap dl <Plug>VimspectorStepInto
+nmap di <Plug>VimspectorStepOut
+nmap dc <Plug>VimspectorBalloonEval
+xmap dc <Plug>VimspectorBalloonEval
+
 nmap <F1> :CocCommand java.debug.vimspector.start<CR>
 function! s:read_template_into_buffer(template)
 	" has to be a function to avoid the extra space fzf#run insers otherwise
@@ -376,15 +380,15 @@ func! StartDebugServer()
 		if l:dir != ""
 			exec "!echo ".l:dir." > /home/szz/.rooter "
 			exec "!cp ~/.config/nvim/vimspector_json/java_debug.json  ".l:dir."/.vimspector.json"
-			exec "!cd (cat /home/szz/.rooter) && mvn spring-boot:run -Dspring-boot.run.jvmArguments=\"-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005\" > /tmp/(cat /home/szz/.javastdout) & "
+			exec "!setsid sh /home/szz/scripts/java-debug-server.sh "
 		else
 			"exec "!echo % > .debug-info "
 			exec "!cp ~/.config/nvim/vimspector_json/java_debug.json ."
 			exec "!javac -g %"
 			:term java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=5005,suspend=y (cat .debug-info)
 		endif
-	exec "!sleep 10"
-	exec "CocCommand java.debug.vimspector.start"
+	"exec "!sleep 5"
+	"exec "CocCommand java.debug.vimspector.start"
 	endif
 endfunc
 
@@ -394,7 +398,7 @@ func! StartDebugServer2()
 		set splitbelow
 		:sp
 		:res -13
-		exec "term  tail -f /tmp/(cat /home/szz/.javastdout)"
+		exec "term  tail -f /tmp/$(cat /home/szz/.javastdout)"
 	endif
 endfunc
 
