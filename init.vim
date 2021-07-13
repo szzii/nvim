@@ -7,10 +7,16 @@
 "
 
 
-
+filetype on
+filetype indent on
+filetype plugin on
+filetype plugin indent on
 syntax enable
 syntax on
+
+set autochdir
 set nocompatible
+set signcolumn=yes
 set exrc
 set secure
 set number
@@ -27,6 +33,7 @@ set scrolloff=10
 set encoding=utf-8
 set hidden
 set updatetime=100
+set noexpandtab
 set shortmess+=c
 set tabstop=2
 set softtabstop=2
@@ -34,16 +41,32 @@ set shiftwidth=2
 set autoindent
 set smartindent
 set background=dark 
+set tw=0
+set indentexpr=
+set foldmethod=indent
+set viewoptions=cursor,folds,slash,unix
+set foldlevel=99
+set listchars=tab:\|\ ,trail:▫
+set foldenable
+set list
+set formatoptions-=tc
+set splitright
+set splitbelow
+set noshowmode
 set guifont=FiraCode\ Nerd\ Font:h16
 set complete-=i 
 set complete-=t
 set timeout           
-set timeoutlen=1000   
 set ttimeout          
 set ttimeoutlen=10    
+set colorcolumn=100
+set virtualedit=block
+set completeopt=longest,noinsert,menuone,noselect,preview
+set ttyfast "should make scrolling faster
+set lazyredraw "same as above
+set visualbell
+set t_Co=256
 let g:neovide_cursor_vfx_mode = "railgun"
-"autocmd InsertLeave,WinEnter * set cursorline
-"autocmd InsertEnter,WinLeave * set nocursorline
 let mapleader = ' '
 let &t_SI = "\<Esc>]50;CursorShape=1\x7"
 let &t_SR = "\<Esc>]50;CursorShape=2\x7"
@@ -59,7 +82,7 @@ let g:ale_hover_cursor=1
 let g:ale_hover_to_preview=1
 let g:ale_hover_to_floating_preview=1
 let g:ale_floating_window_border = ['│', '─', '╭', '╮', '╯', '╰']
-let g:ale_java_javac_options = "/home/szz/.config/coc/extensions/coc-java-data/lombok.jar"
+let g:ale_java_javac_options = "~/.config/coc/extensions/coc-java-data/lombok.jar"
 nnoremap <LEADER>a :ALEComplete<CR>
 
 " airline
@@ -89,77 +112,87 @@ set termguicolors
 autocmd vimenter * ++nested colorscheme  vorange
 
 
-
-
 au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 exec "nohlsearch"
 
-filetype on
-filetype indent on
-filetype plugin on
-filetype plugin indent on
 
 map <TAB> <nop>
+
+" Save & quit
 map s :<nop>
 map S :w<CR>
 map Q :q<CR>
-"map R :source $MYNVIMRC<CR>
-map sl :set splitright<CR>:vsplit<CR>
-map sj :set nosplitright<CR>:vsplit<CR>
-map si :set nosplitbelow<CR>:split<CR>
-map sk :set splitbelow<CR>:split<CR>
-map <LEADER>j <C-w>h 
-map <LEADER>i <C-w>k
-map <LEADER>k <C-w>j
-map <LEADER>l <C-w>l
-map <LEADER>J <C-w>h 
-map <LEADER>I <C-w>k
-map <LEADER>K <C-w>j
-map <LEADER>L <C-w>l
-"map <UP> :res +5<CR>
-"map <down> :res -5<CR>
-"map <left> :vertical resize-5<CR>
-"map <right> :vertical resize+5<CR>
-map tu :tabe<CR>
-map tl :+tabnext<CR>
-map tj :-tabnext<CR>
 
-noremap j h
-noremap i k
-noremap k j
-noremap H I
+" Undo operations
+noremap l u
+
+" Insert Key
 noremap h i
-noremap <C-l> g_
-noremap <C-j> 0
-noremap <LEADER><CR> :nohlsearch<CR> 
-noremap J 7h
-noremap L 7l
-noremap I 5k
-noremap K 5j
-noremap <C-k> 5<C-e>
+noremap H I
+
+" make Y to copy till the end of the line
+nnoremap Y y$
+
+" Copy to system clipboard
+vnoremap Y "+y
+
+
+"map R :source $MYNVIMRC<CR>
+map si :set splitright<CR>:vsplit<CR>
+map sn :set nosplitright<CR>:vsplit<CR>
+map su :set nosplitbelow<CR>:split<CR>
+map se :set splitbelow<CR>:split<CR>
+map <LEADER>n <C-w>h 
+map <LEADER>u <C-w>k
+map <LEADER>e <C-w>j
+map <LEADER>i <C-w>l
+map <LEADER>N <C-w>h 
+map <LEADER>U <C-w>k
+map <LEADER>E <C-w>j
+map <LEADER>I <C-w>l
+map tu :tabe<CR>
+map ti :+tabnext<CR>
+map tn :-tabnext<CR>
+
+
+"     ^
+"     u
+" < n   i >
+"     e
+"     v
+noremap <silent> n h
+noremap <silent> e j
+noremap <silent> i l
+noremap <silent> u k
+noremap N 7h
+noremap I 7l
+noremap U 5k
+noremap E 5j
+
+" ===
+" === Searching
+" ===
+noremap K N
+noremap k n
+
 noremap ; :
 noremap ` ~
 noremap <LEADER>rc :e ~/.config/nvim/init.vim<CR>
 
+" N key: go to the start of the line
+noremap <silent> <C-n> 0
+" I key: go to the end of the line
+noremap <silent> <C-i> $
+
 
 nnoremap - <PageUp>
 nnoremap = <PageDown>
-nnoremap tt :CocCommand explorer<CR>
-nnoremap TT :CocCommand explorer<CR>
 nnoremap < <<
 nnoremap > >>
+noremap <LEADER><CR> :nohlsearch<CR> 
+nnoremap tt :CocCommand explorer<CR>
 nnoremap <C-s> :Startify<CR>
 
-inoremap <C-j> <Left>
-inoremap <C-l> <Right>
-inoremap <C-b> <BS>
-inoremap <C-c> <ESC>
-
-nnoremap Y y$
-vnoremap Y "+y
-
-nnoremap <c-I>  :<c-u>execute 'move -1-'. v:count1<cr>
-nnoremap <c-K>  :<c-u>execute 'move +'. v:count1<cr>
 
 
 " Compile function
@@ -181,8 +214,8 @@ func! CompileRunGcc()
 			set splitbelow
 			:sp
 			:res -13
-			exec "!echo ".l:dir." > /home/szz/.rooter "
-			:term  cd $(cat /home/szz/.rooter) && mvn clean spring-boot:run 
+			exec "!echo ".l:dir." > ~/.rooter "
+			:term  cd $(cat ~/.rooter) && mvn clean spring-boot:run 
 		else
 			exec "!javac %"
 			exec "!time java %<"
@@ -240,10 +273,10 @@ Plug 'Marfisc/vorange'
 Plug 'sbdchd/neoformat'
 
 " markdown
-Plug 'suan/vim-instant-markdown', {'for': 'markdown'}
-Plug 'dhruvasagar/vim-table-mode', { 'on': 'TableModeToggle', 'for': ['text', 'markdown', 'vim-plug'] }
-Plug 'mzlogin/vim-markdown-toc', { 'for': ['gitignore', 'markdown', 'vim-plug'] }
-Plug 'dkarter/bullets.vim'
+"Plug 'suan/vim-instant-markdown', {'for': 'markdown'}
+"Plug 'dhruvasagar/vim-table-mode', { 'on': 'TableModeToggle', 'for': ['text', 'markdown', 'vim-plug'] }
+"Plug 'mzlogin/vim-markdown-toc', { 'for': ['gitignore', 'markdown', 'vim-plug'] }
+"Plug 'dkarter/bullets.vim'
 
 " debug
 Plug 'puremourning/vimspector'
@@ -252,7 +285,7 @@ Plug 'puremourning/vimspector'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
-" git
+"" git
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 Plug 'APZelos/blamer.nvim'
@@ -292,7 +325,8 @@ Plug 'tpope/vim-surround'
 Plug 'gcmt/wildfire.vim'
 
 Plug 'preservim/nerdcommenter'
-Plug 'terryma/vim-multiple-cursors'
+"Plug 'terryma/vim-multiple-cursors'
+
 Plug 'kdheepak/lazygit.vim', { 'branch': 'nvim-v0.4.3' }
 
 "undo
@@ -313,6 +347,8 @@ Plug 'yuttie/comfortable-motion.vim'
 
 Plug 'uiiaoo/java-syntax.vim'
 
+Plug 'mg979/vim-xtabline'
+
 
 call plug#end()
 call glaive#Install()
@@ -321,7 +357,7 @@ call glaive#Install()
 " === AutoFormat
 " ===
 "Glaive codefmt plugin[mappings]
-"Glaive codefmt google_java_executable="java -jar /home/szz/.config/nvim/format/google-java-format-1.10.0-all-deps.jar"
+"Glaive codefmt google_java_executable="java -jar ~/.config/nvim/format/google-java-format-1.10.0-all-deps.jar"
 
 
 augroup autoformat_settings
@@ -344,12 +380,12 @@ augroup END
 " === vimspector
 " ===
 let g:vimspector_enable_mappings = 'HUMAN'
-nmap da <Plug>VimspectorToggleBreakpoint
-nmap dk <Plug>VimspectorStepOver
-nmap dl <Plug>VimspectorStepInto
-nmap di <Plug>VimspectorStepOut
-nmap dc <Plug>VimspectorBalloonEval
-xmap dc <Plug>VimspectorBalloonEval
+nmap ba <Plug>VimspectorToggleBreakpoint
+nmap be <Plug>VimspectorStepOver
+nmap bi <Plug>VimspectorStepInto
+nmap bu <Plug>VimspectorStepOut
+nmap bc <Plug>VimspectorBalloonEval
+xmap bc <Plug>VimspectorBalloonEval
 
 nmap <F1> :CocCommand java.debug.vimspector.start<CR>
 function! s:read_template_into_buffer(template)
@@ -372,15 +408,15 @@ sign define vimspectorPC text=🔶 texthl=SpellBad
 func! StartDebugServer()
 	exec "w"
 	if &filetype == 'java'
-		exec "!openssl rand -base64 8 > /home/szz/.javastdout"
+		exec "!openssl rand -base64 8 > ~/.javastdout"
 		let l:dir = FindRootDirectory()
 		"set splitbelow
 		":sp
 		":res -13
 		if l:dir != ""
-			exec "!echo ".l:dir." > /home/szz/.rooter "
+			exec "!echo ".l:dir." > ~/.rooter "
 			exec "!cp ~/.config/nvim/vimspector_json/java_debug.json  ".l:dir."/.vimspector.json"
-			exec "!setsid sh /home/szz/scripts/java-debug-server.sh "
+			exec "!setsid sh ~/scripts/java-debug-server.sh "
 		else
 			"exec "!echo % > .debug-info "
 			exec "!cp ~/.config/nvim/vimspector_json/java_debug.json ."
@@ -398,7 +434,7 @@ func! StartDebugServer2()
 		set splitbelow
 		:sp
 		:res -13
-		exec "term  tail -f /tmp/$(cat /home/szz/.javastdout)"
+		exec "term  tail -f /tmp/$(cat ~/.javastdout)"
 	endif
 endfunc
 
@@ -449,7 +485,7 @@ inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
 
 
 " document
-nnoremap <silent> <LEADER>m :call <SID>show_documentation()<CR>
+nnoremap <silent> <LEADER>c :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
@@ -468,13 +504,13 @@ nmap <leader>x  <Plug>(coc-fix-current)
 
 nmap <silent> <LEADER>f <Plug>(coc-definition)
 nmap <silent> <LEADER>d <Plug>(coc-type-definition)
-nmap <silent> <LEADER>e <Plug>(coc-implementation)
+nmap <silent> <LEADER>v <Plug>(coc-implementation)
 nmap <silent> <LEADER>r <Plug>(coc-references)
 
 nmap <silent> <LEADER>[ <Plug>(coc-diagnostic-prev)
 nmap <silent> <LEADER>] <Plug>(coc-diagnostic-next)
 
-nmap <leader>n <Plug>(coc-rename)
+nmap <leader>c <Plug>(coc-rename)
 
 augroup mygroup
   autocmd!
@@ -509,12 +545,23 @@ vmap <Leader>w <Plug>(coc-translator-ev)
 nnoremap <silent> <space>y  :<C-u>CocList -A --normal yank<cr>
 
 
+
 " ===
 " === rnvimr
 " ===
-let g:rnvimr_urc_path = "/home/szz/.config/ranger/"
+let g:rnvimr_ex_enable = 1
+let g:rnvimr_pick_enable = 1
+let g:rnvimr_draw_border = 0
+" let g:rnvimr_bw_enable = 1
 highlight link RnvimrNormal CursorLine
-nnoremap <silent> <C-a> :RnvimrToggle<CR><C-\><C-n>:RnvimrResize 1<CR>
+nnoremap <silent> R :RnvimrToggle<CR><C-\><C-n>:RnvimrResize 0<CR>
+let g:rnvimr_action = {
+            \ '<C-t>': 'NvimEdit tabedit',
+            \ '<C-x>': 'NvimEdit split',
+            \ '<C-v>': 'NvimEdit vsplit',
+            \ 'gw': 'JumpNvimCwd',
+            \ 'yw': 'EmitRangerCwd'
+            \ }
 
 
 
@@ -525,6 +572,7 @@ nnoremap <silent> <C-a> :RnvimrToggle<CR><C-\><C-n>:RnvimrResize 1<CR>
 " === git
 " ===
 let g:gitgutter_git_executable = '/usr/bin/git'
+let g:gitgutter_map_keys = 0
 nnoremap <silent> <C-g> :LazyGit<CR>
 let g:lazygit_floating_window_winblend = 0 
 let g:lazygit_floating_window_scaling_factor = 0.9 
@@ -628,7 +676,7 @@ nnoremap <LEADER>g :GoImport
 " ===
 " === undotree
 " ===
-nnoremap U :UndotreeToggle<CR>
+nnoremap L :UndotreeToggle<CR>
 if has("persistent_undo")
    let target_path = expand('~/.undodir')
 
@@ -644,8 +692,28 @@ endif
 
 
 let g:comfortable_motion_no_default_key_mappings = 1
-nnoremap <silent> <C-k> :call comfortable_motion#flick(100)<CR>
-nnoremap <silent> <C-i> :call comfortable_motion#flick(-100)<CR>
+nnoremap <silent> <C-e> :call comfortable_motion#flick(100)<CR>
+nnoremap <silent> <C-u> :call comfortable_motion#flick(-100)<CR>
+
+
+" ===
+" === vim-rooter
+" ===
+let g:rooter_patterns = ['.git', 'Makefile', '*.sln', 'pom.xml']
 
 
 
+" ===
+" === multi_cursor
+" ===
+let g:multi_cursor_use_default_mapping=0
+
+" Default mapping
+let g:multi_cursor_start_word_key      = '<C-k>'
+let g:multi_cursor_select_all_word_key = '<A-n>'
+let g:multi_cursor_start_key           = 'g<C-n>'
+let g:multi_cursor_select_all_key      = 'g<A-n>'
+let g:multi_cursor_next_key            = '<C-n>'
+let g:multi_cursor_prev_key            = '<C-p>'
+let g:multi_cursor_skip_key            = '<C-x>'
+let g:multi_cursor_quit_key            = '<Esc>'

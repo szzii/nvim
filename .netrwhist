@@ -1,5 +1,6 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhistcnt =1
+let g:netrw_dirhistcnt =2
+let g:netrw_dirhist_2='/Users/szz/Library/Application Support/lazygit/config'
 let g:netrw_dirhist_1='/home/szz/go/src/ding-reboot'
 let g:netrw_dirhist_0='/home/szz/go/src/ding-reboot/api'
 let g:netrw_dirhist_9='/etc'
@@ -9,4 +10,3 @@ let g:netrw_dirhist_6='/home/szz/go/src/hello'
 let g:netrw_dirhist_5='/home/szz/javacode/course-service/doc'
 let g:netrw_dirhist_4='/home/szz/go/src/go-admin/docs'
 let g:netrw_dirhist_3='/home/szz/github/course-service'
-let g:netrw_dirhist_2='/etc/pacman.d'
