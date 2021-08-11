@@ -46,19 +46,18 @@ set indentexpr=
 set foldmethod=indent
 set viewoptions=cursor,folds,slash,unix
 set foldlevel=99
-set listchars=tab:\|\ ,trail:▫
 set foldenable
-set list
+"set list
 set formatoptions-=tc
 set splitright
 set splitbelow
 set noshowmode
 set guifont=FiraCode\ Nerd\ Font:h16
-set complete-=i 
+set complete-=i
 set complete-=t
-set timeout           
-set ttimeout          
-set ttimeoutlen=10    
+set timeout
+set ttimeout
+set ttimeoutlen=10
 set colorcolumn=100
 set virtualedit=block
 set completeopt=longest,noinsert,menuone,noselect,preview
@@ -73,17 +72,6 @@ let &t_SR = "\<Esc>]50;CursorShape=2\x7"
 let &t_EI = "\<Esc>]50;CursorShape=0\x7"
 let g:suda_smart_edit = 1
 
-" ale 
-let g:airline#extensions#ale#enabled = 1
-let g:ale_sign_error = '✗'
-let g:ale_sign_warning = '⚡'
-let g:ale_disable_lsp = 1
-let g:ale_hover_cursor=1
-let g:ale_hover_to_preview=1
-let g:ale_hover_to_floating_preview=1
-let g:ale_floating_window_border = ['│', '─', '╭', '╮', '╯', '╰']
-let g:ale_java_javac_options = "~/.config/coc/extensions/coc-java-data/lombok.jar"
-nnoremap <LEADER>a :ALEComplete<CR>
 
 " airline
 let g:airline#extensions#ale#enabled = 1
@@ -255,28 +243,16 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
+" themes
+Plug 'ryanoasis/vim-devicons'
+Plug 'Marfisc/vorange'
+
 " vim 开始导航
 Plug 'mhinz/vim-startify'
 
 " Coc系列
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
-" Error checking
-Plug 'w0rp/ale'
-
-" themes
-Plug 'ryanoasis/vim-devicons'
-"Plug 'liuchengxu/space-vim-dark'
-"Plug 'beikome/cosme.vim'
-Plug 'Marfisc/vorange'
-
-Plug 'sbdchd/neoformat'
-
-" markdown
-"Plug 'suan/vim-instant-markdown', {'for': 'markdown'}
-"Plug 'dhruvasagar/vim-table-mode', { 'on': 'TableModeToggle', 'for': ['text', 'markdown', 'vim-plug'] }
-"Plug 'mzlogin/vim-markdown-toc', { 'for': ['gitignore', 'markdown', 'vim-plug'] }
-"Plug 'dkarter/bullets.vim'
 
 " debug
 Plug 'puremourning/vimspector'
@@ -297,13 +273,16 @@ Plug 'Yggdroot/indentLine'
 " 文件管理
 Plug 'kevinhwang91/rnvimr'
 
+
 " 语法树
 Plug 'liuchengxu/vista.vim'
+
 
 " autoformat
 Plug 'google/vim-codefmt'
 Plug 'google/vim-maktaba'
 Plug 'google/vim-glaive'
+
 
 " HTML, CSS, JavaScript, Typescript, PHP, JSON, etc.
 Plug 'elzr/vim-json'
@@ -333,7 +312,7 @@ Plug 'kdheepak/lazygit.vim', { 'branch': 'nvim-v0.4.3' }
 Plug 'mbbill/undotree'
 
 " Go
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'fatih/vim-go' , { 'for': ['go', 'vim-plug'], 'tag': '*' }
 
 "sudo write
 Plug 'lambdalisue/suda.vim' " do stuff like :sudowrite
@@ -348,6 +327,13 @@ Plug 'yuttie/comfortable-motion.vim'
 Plug 'uiiaoo/java-syntax.vim'
 
 Plug 'mg979/vim-xtabline'
+Plug 'wincent/terminus'
+
+
+" DB
+Plug 'tpope/vim-dadbod'
+Plug 'kristijanhusak/vim-dadbod-ui'
+
 
 
 call plug#end()
@@ -356,18 +342,20 @@ call glaive#Install()
 " ===
 " === AutoFormat
 " ===
-"Glaive codefmt plugin[mappings]
-"Glaive codefmt google_java_executable="java -jar ~/.config/nvim/format/google-java-format-1.10.0-all-deps.jar"
+Glaive codefmt plugin[mappings]
+Glaive codefmt google_java_executable="java -jar /Users/szz/.config/nvim/format/google-java-format-1.10.0-all-deps.jar"
+
+
 
 
 augroup autoformat_settings
 	" autocmd FileType bzl AutoFormatBuffer buildifier
 	" autocmd FileType c,cpp,proto,javascript,arduino AutoFormatBuffer clang-format
 	" autocmd FileType dart AutoFormatBuffer dartfmt
-	" autocmd FileType go AutoFormatBuffer gofmt
+	autocmd FileType go AutoFormatBuffer gofmt
 	" autocmd FileType gn AutoFormatBuffer gn
 	"autocmd FileType html,css,sass,scss,less,json AutoFormatBuffer js-beautify
-	"autocmd FileType java AutoFormatBuffer google-java-format
+	autocmd FileType java AutoFormatBuffer google-java-format
 	" autocmd FileType python AutoFormatBuffer yapf
 	" Alternative: autocmd FileType python AutoFormatBuffer autopep8
 	" autocmd FileType rust AutoFormatBuffer rustfmt
@@ -457,8 +445,11 @@ let g:coc_global_extensions = [
 			\"coc-json",
 			\"coc-html",
 			\"coc-yaml",
+			\"coc-vimlsp",
 			\"coc-translator",
 			\"coc-highlight",
+			\"coc-db",
+			\"coc-docker",
 			\"coc-yank"]
 
 
@@ -485,7 +476,7 @@ inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
 
 
 " document
-nnoremap <silent> <LEADER>c :call <SID>show_documentation()<CR>
+nnoremap <silent> <LEADER>m :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
@@ -646,7 +637,7 @@ let g:go_doc_popup_window = 1
 let g:go_def_mapping_enabled = 0
 let g:go_template_autocreate = 0
 let g:go_textobj_enabled = 0
-let g:go_auto_type_info = 1
+let g:go_auto_type_info = 0
 let g:go_def_mapping_enabled = 0
 let g:go_highlight_array_whitespace_error = 1
 let g:go_highlight_build_constraints = 1
@@ -668,8 +659,16 @@ let g:go_highlight_types = 1
 let g:go_highlight_variable_assignments = 0
 let g:go_highlight_variable_declarations = 0
 let g:go_doc_keywordprg_enabled = 0
+let g:go_fmt_autosave = 0
+let g:go_imports_autosave = 0
+let g:go_mod_fmt_autosave = 0
+let g:go_auto_sameids = 0
+
+
+
 
 nnoremap <LEADER>g :GoImport 
+"autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
 
 
 
@@ -717,3 +716,24 @@ let g:multi_cursor_next_key            = '<C-n>'
 let g:multi_cursor_prev_key            = '<C-p>'
 let g:multi_cursor_skip_key            = '<C-x>'
 let g:multi_cursor_quit_key            = '<Esc>'
+
+
+let g:dbs = {
+\ 'local': 'mysql://root:12345678@localhost',
+\ }
+let g:db_ui_use_nerd_fonts=1
+
+
+" ===
+" === xtabline
+" ===
+let g:xtabline_settings = {}
+let g:xtabline_settings.enable_mappings = 0
+let g:xtabline_settings.tabline_modes = ['tabs', 'buffers']
+let g:xtabline_settings.enable_persistance = 0
+let g:xtabline_settings.last_open_first = 1
+let g:xtabline_settings.use_devicons = 1
+let g:xtabline_settings.theme = 'slate'
+noremap to :XTabCycleMode<CR>
+noremap \p :echo expand('%:p')<CRL
+
