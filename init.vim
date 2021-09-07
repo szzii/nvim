@@ -15,6 +15,7 @@ syntax enable
 syntax on
 
 set autochdir
+set autowrite
 set nocompatible
 set signcolumn=yes
 set exrc
@@ -40,7 +41,6 @@ set softtabstop=2
 set shiftwidth=2
 set autoindent
 set smartindent
-set background=dark 
 set tw=0
 set indentexpr=
 set foldmethod=indent
@@ -86,7 +86,6 @@ let g:webdevicons_enable_flagship_statusline = 1
 
 
 " themes
-
 set filetype=java
 let java_highlight_functions = 1
 let java_highlight_all = 1
@@ -96,8 +95,14 @@ highlight link javaIdentifier NONE
 highlight link javaScopeDecl Statement
 highlight link javaType Type
 highlight link javaDocTags PreProc
+
+
+let g:rehash256 = 1
+set background=dark 
 set termguicolors
-autocmd vimenter * ++nested colorscheme  vorange
+set guicursor+=v:vCursor
+autocmd vimenter * ++nested colorscheme vorange
+
 
 
 au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
@@ -165,7 +170,9 @@ noremap k n
 
 noremap ; :
 noremap ` ~
-noremap <LEADER>rc :e ~/.config/nvim/init.vim<CR>
+
+" Open the vimrc file anytime
+noremap <LEADER>rc :e $HOME/.config/nvim/init.vim<CR>
 
 " N key: go to the start of the line
 noremap <silent> <C-n> 0
@@ -246,6 +253,10 @@ Plug 'vim-airline/vim-airline-themes'
 " themes
 Plug 'ryanoasis/vim-devicons'
 Plug 'Marfisc/vorange'
+Plug 'fatih/molokai'
+Plug 'flazz/vim-colorschemes'
+
+
 
 " vim 开始导航
 Plug 'mhinz/vim-startify'
@@ -306,13 +317,13 @@ Plug 'gcmt/wildfire.vim'
 Plug 'preservim/nerdcommenter'
 "Plug 'terryma/vim-multiple-cursors'
 
-Plug 'kdheepak/lazygit.vim', { 'branch': 'nvim-v0.4.3' }
+Plug 'kdheepak/lazygit.vim'
 
 "undo
 Plug 'mbbill/undotree'
 
 " Go
-Plug 'fatih/vim-go' , { 'for': ['go', 'vim-plug'], 'tag': '*' }
+Plug 'fatih/vim-go' 
 
 "sudo write
 Plug 'lambdalisue/suda.vim' " do stuff like :sudowrite
@@ -334,6 +345,8 @@ Plug 'wincent/terminus'
 Plug 'tpope/vim-dadbod'
 Plug 'kristijanhusak/vim-dadbod-ui'
 
+Plug 'sbdchd/neoformat'
+
 
 
 call plug#end()
@@ -352,10 +365,10 @@ augroup autoformat_settings
 	" autocmd FileType bzl AutoFormatBuffer buildifier
 	" autocmd FileType c,cpp,proto,javascript,arduino AutoFormatBuffer clang-format
 	" autocmd FileType dart AutoFormatBuffer dartfmt
-	autocmd FileType go AutoFormatBuffer gofmt
+	"autocmd FileType go AutoFormatBuffer gofmt
 	" autocmd FileType gn AutoFormatBuffer gn
 	"autocmd FileType html,css,sass,scss,less,json AutoFormatBuffer js-beautify
-	autocmd FileType java AutoFormatBuffer google-java-format
+	"autocmd FileType java AutoFormatBuffer google-java-format
 	" autocmd FileType python AutoFormatBuffer yapf
 	" Alternative: autocmd FileType python AutoFormatBuffer autopep8
 	" autocmd FileType rust AutoFormatBuffer rustfmt
@@ -368,12 +381,17 @@ augroup END
 " === vimspector
 " ===
 let g:vimspector_enable_mappings = 'HUMAN'
+nmap bb <Plug>VimspectorContinue	
 nmap ba <Plug>VimspectorToggleBreakpoint
+nmap bx <Plug>VimspectorRunToCursor	
 nmap be <Plug>VimspectorStepOver
 nmap bi <Plug>VimspectorStepInto
 nmap bu <Plug>VimspectorStepOut
 nmap bc <Plug>VimspectorBalloonEval
 xmap bc <Plug>VimspectorBalloonEval
+nmap <Leader>vi <Plug>VimspectorBalloonEval
+xmap <Leader>vi <Plug>VimspectorBalloonEval
+nmap <Leader>b :CocList mainClassListRun<CR>
 
 nmap <F1> :CocCommand java.debug.vimspector.start<CR>
 function! s:read_template_into_buffer(template)
@@ -386,47 +404,13 @@ command! -bang -nargs=* LoadVimSpectorJsonTemplate call fzf#run({
 			\   'sink': function('<sid>read_template_into_buffer')
 			\ })
 noremap <leader>vs :tabe .vimspector.json<CR>:LoadVimSpectorJsonTemplate<CR>
-nmap <Leader>vi <Plug>VimspectorBalloonEval
-xmap <Leader>vi <Plug>VimspectorBalloonEval
+
 
 sign define vimspectorBP text=☛ texthl=Normal
 sign define vimspectorBPDisabled text=☞ texthl=Normal
 sign define vimspectorPC text=🔶 texthl=SpellBad
 
-func! StartDebugServer()
-	exec "w"
-	if &filetype == 'java'
-		exec "!openssl rand -base64 8 > ~/.javastdout"
-		let l:dir = FindRootDirectory()
-		"set splitbelow
-		":sp
-		":res -13
-		if l:dir != ""
-			exec "!echo ".l:dir." > ~/.rooter "
-			exec "!cp ~/.config/nvim/vimspector_json/java_debug.json  ".l:dir."/.vimspector.json"
-			exec "!setsid sh ~/scripts/java-debug-server.sh "
-		else
-			"exec "!echo % > .debug-info "
-			exec "!cp ~/.config/nvim/vimspector_json/java_debug.json ."
-			exec "!javac -g %"
-			:term java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=5005,suspend=y (cat .debug-info)
-		endif
-	"exec "!sleep 5"
-	"exec "CocCommand java.debug.vimspector.start"
-	endif
-endfunc
 
-
-func! StartDebugServer2()
-	if &filetype == 'java'
-		set splitbelow
-		:sp
-		:res -13
-		exec "term  tail -f /tmp/$(cat ~/.javastdout)"
-	endif
-endfunc
-
-nmap <Leader>vi <Plug>VimspectorBalloonEval
 
 
 
@@ -440,7 +424,7 @@ let g:coc_global_extensions = [
 			\"coc-markdownlint",
 			\"coc-explorer",
 			\"coc-java",
-			\"coc-java-debug",
+			\"coc-java-vimspector",
 			\"coc-xml",
 			\"coc-json",
 			\"coc-html",
@@ -450,6 +434,7 @@ let g:coc_global_extensions = [
 			\"coc-highlight",
 			\"coc-db",
 			\"coc-docker",
+			\"coc-go",
 			\"coc-yank"]
 
 
@@ -545,7 +530,7 @@ let g:rnvimr_pick_enable = 1
 let g:rnvimr_draw_border = 0
 " let g:rnvimr_bw_enable = 1
 highlight link RnvimrNormal CursorLine
-nnoremap <silent> R :RnvimrToggle<CR><C-\><C-n>:RnvimrResize 0<CR>
+nnoremap <silent> <LEADER>2 :RnvimrToggle<CR><C-\><C-n>:RnvimrResize 0<CR>
 let g:rnvimr_action = {
             \ '<C-t>': 'NvimEdit tabedit',
             \ '<C-x>': 'NvimEdit split',
@@ -564,14 +549,19 @@ let g:rnvimr_action = {
 " ===
 let g:gitgutter_git_executable = '/usr/bin/git'
 let g:gitgutter_map_keys = 0
-nnoremap <silent> <C-g> :LazyGit<CR>
-let g:lazygit_floating_window_winblend = 0 
-let g:lazygit_floating_window_scaling_factor = 0.9 
-let g:lazygit_floating_window_corner_chars = ['╭', '╮', '╰', '╯'] 
-let g:lazygit_floating_window_use_plenary = 0 
-let g:lazygit_use_neovim_remote = 1 
 let g:blamer_enabled = 1
 let g:blamer_show_in_insert_modes = 0
+nnoremap <silent> <LEADER>1 :LazyGit<CR>
+let g:lazygit_floating_window_winblend = 0 " transparency of floating window
+let g:lazygit_floating_window_scaling_factor = 1.0 " scaling factor for floating window
+let g:lazygit_floating_window_corner_chars = ['╭', '╮', '╰', '╯'] " customize lazygit popup window corner characters
+let g:lazygit_use_neovim_remote = 1 " for neovim-remote support
+
+"let g:lazygit_floating_window_winblend = 0 
+"let g:lazygit_floating_window_scaling_factor = 0.9 
+"let g:lazygit_floating_window_corner_chars = ['╭', '╮', '╰', '╯'] 
+"let g:lazygit_floating_window_use_plenary = 0 
+"let g:lazygit_use_neovim_remote = 1 
 
 
 
@@ -628,7 +618,6 @@ nnoremap <silent> <LEADER>p :Vista!!<CR>
 
 
 
-
 " ===
 " === vim-go
 " ===
@@ -637,7 +626,7 @@ let g:go_doc_popup_window = 1
 let g:go_def_mapping_enabled = 0
 let g:go_template_autocreate = 0
 let g:go_textobj_enabled = 0
-let g:go_auto_type_info = 0
+let g:go_auto_type_info = 1
 let g:go_def_mapping_enabled = 0
 let g:go_highlight_array_whitespace_error = 1
 let g:go_highlight_build_constraints = 1
@@ -659,15 +648,36 @@ let g:go_highlight_types = 1
 let g:go_highlight_variable_assignments = 0
 let g:go_highlight_variable_declarations = 0
 let g:go_doc_keywordprg_enabled = 0
-let g:go_fmt_autosave = 0
-let g:go_imports_autosave = 0
-let g:go_mod_fmt_autosave = 0
-let g:go_auto_sameids = 0
+let g:go_fmt_command = "gopls"
+let g:go_test_timeout = '20s'
+let g:go_gopls_enabled = 1
+let g:go_info_mode = 'guru'
+
+
+
+"let g:go_fmt_fail_silently = 1
+
+
+" key mapping
+autocmd FileType go nmap gr  <Plug>(go-test)
+autocmd FileType go nmap gb  <Plug>(go-build)
+autocmd FileType go nmap gc  <Plug>(go-coverage-toggle)
+" tags
+autocmd FileType go nmap gta :CocCommand go.tags.add 
+autocmd FileType go nmap gtl :CocCommand go.tags.line 
+autocmd FileType go nmap gtr :CocCommand go.tags.remove 
+autocmd FileType go nmap gtd :CocCommand go.tags.remove.line 
+autocmd FileType go nmap gtc :CocCommand go.tags.clear<cr>
+" test
+autocmd FileType go nmap <LEADER>g :CocCommand go.test.generate.function<cr>
+autocmd FileType go nmap <LEADER><LEADER> :CocCommand go.test.toggle<cr>
 
 
 
 
-nnoremap <LEADER>g :GoImport 
+
+
+"nnoremap <LEADER>g :GoImport 
 "autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
 
 
@@ -708,18 +718,18 @@ let g:rooter_patterns = ['.git', 'Makefile', '*.sln', 'pom.xml']
 let g:multi_cursor_use_default_mapping=0
 
 " Default mapping
-let g:multi_cursor_start_word_key      = '<C-k>'
-let g:multi_cursor_select_all_word_key = '<A-n>'
-let g:multi_cursor_start_key           = 'g<C-n>'
-let g:multi_cursor_select_all_key      = 'g<A-n>'
-let g:multi_cursor_next_key            = '<C-n>'
-let g:multi_cursor_prev_key            = '<C-p>'
-let g:multi_cursor_skip_key            = '<C-x>'
-let g:multi_cursor_quit_key            = '<Esc>'
+"let g:multi_cursor_start_word_key      = '<C-k>'
+"let g:multi_cursor_select_all_word_key = '<A-n>'
+"let g:multi_cursor_start_key           = 'g<C-n>'
+"let g:multi_cursor_select_all_key      = 'g<A-n>'
+"let g:multi_cursor_next_key            = '<C-n>'
+"let g:multi_cursor_prev_key            = '<C-p>'
+"let g:multi_cursor_skip_key            = '<C-x>'
+"let g:multi_cursor_quit_key            = '<Esc>'
 
 
 let g:dbs = {
-\ 'local': 'mysql://root:12345678@localhost',
+\ 'local': 'mysql://root:123456@localhost',
 \ }
 let g:db_ui_use_nerd_fonts=1
 
@@ -737,3 +747,8 @@ let g:xtabline_settings.theme = 'slate'
 noremap to :XTabCycleMode<CR>
 noremap \p :echo expand('%:p')<CRL
 
+
+
+" ===
+" === format
+-" ===

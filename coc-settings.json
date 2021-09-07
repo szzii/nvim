@@ -4,7 +4,7 @@
 	"suggest.enablePreselect": false,
 	"suggest.triggerAfterInsertEnter": true,
 	"suggest.autoTrigger": "always",
-	"suggest.timeout": 5000,
+	"suggest.timeout": 2000,
 	"suggest.enablePreview": true,
 	"suggest.floatEnable": true,
 	"suggest.detailField": "preview",
@@ -39,10 +39,10 @@
 		"variable": "\ue71b"
 	},
 	"diagnostic.enable": true,
-	"diagnostic.checkCurrentLine": true,
-	"diagnostic.refreshOnInsertMode": false,
+	"diagnostic.checkCurrentLine": false,
+	"diagnostic.refreshOnInsertMode": true,
 	"diagnostic.displayByAle": false,
-	//"diagnostic.virtualText": true,
+	"diagnostic.virtualText": true,
 	"diagnostic.virtualTextPrefix": " ❯❯❯ ",
 	"diagnostic.errorSign": "\uf467",
 	"diagnostic.warningSign": "\uf071",
@@ -74,9 +74,9 @@
 	"importCost.showCalculatingDecoration": true,
 	"importCost.debug": false,
 	"java.home": "/usr/local/jdk-11.0.11.jdk/Contents/Home",
-	"java.configuration.maven.userSettings":"/usr/local/apache-maven-3.8.1/conf/settings.xml",
+	"java.configuration.maven.userSettings":"/Users/szz/.m2/setting.xml",
 	"java.autobuild.enabled": true,
-	"java.jdt.ls.vmargs": "-javaagent:/Users/szz/.config/coc/extensions/coc-java-data/lombok.jar",
+	"java.jdt.ls.vmargs": "-javaagent:/Users/szz/.config/coc/extensions/lombok.jar",
 	"json.format.enable": true,
 	"yaml.format.enable": true,
 	"translator.enableHover": true,
@@ -152,12 +152,12 @@
 			">>": "gitUnstage"
 	},
 	"languageserver": {
-		"bash": {
-			"command": "bash-language-server",
-			"args": ["start"],
-			"filetypes": ["sh"],
-			"ignoredRootPaths": []
-		}
+		"sql": {
+			"command": "sql-language-server",
+			"args" : ["up", "--method", "stdio"],
+			"filetypes": ["sql", "mysql"]
+    }
+		
   }
 }
 
