@@ -89,7 +89,7 @@ let g:webdevicons_enable_flagship_statusline = 1
 set filetype=java
 let java_highlight_functions = 1
 let java_highlight_all = 1
-highlight link javaIdentifier NONE
+"highlight link javaIdentifier NONE
 "highlight link javaDelimiter NONE
 
 highlight link javaScopeDecl Statement
@@ -186,7 +186,7 @@ nnoremap < <<
 nnoremap > >>
 noremap <LEADER><CR> :nohlsearch<CR> 
 nnoremap tt :CocCommand explorer<CR>
-nnoremap <C-s> :Startify<CR>
+nnoremap <LEADER>3 :Startify<CR>
 
 
 
@@ -751,4 +751,4 @@ noremap \p :echo expand('%:p')<CRL
 
 " ===
 " === format
--" ===
+" ===

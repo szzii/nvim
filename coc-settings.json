@@ -157,7 +157,6 @@
 			"args" : ["up", "--method", "stdio"],
 			"filetypes": ["sql", "mysql"]
     }
-		
   }
 }
 
