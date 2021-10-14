@@ -86,23 +86,23 @@ let g:webdevicons_enable_flagship_statusline = 1
 
 
 " themes
-set filetype=java
-let java_highlight_functions = 1
-let java_highlight_all = 1
-"highlight link javaIdentifier NONE
-"highlight link javaDelimiter NONE
+"set filetype=java
+"let java_highlight_functions = 1
+"let java_highlight_all = 1
+highlight link javaIdentifier NONE
+highlight link javaDelimiter NONE
 
-highlight link javaScopeDecl Statement
-highlight link javaType Type
-highlight link javaDocTags PreProc
+"highlight link javaScopeDecl Statement
+"highlight link javaType Type
+"highlight link javaDocTags PreProc
 
 
 let g:rehash256 = 1
-set background=dark 
 set termguicolors
 set guicursor+=v:vCursor
+set background=dark
+let g:gruvbox_italic=1
 autocmd vimenter * ++nested colorscheme vorange
-
 
 
 au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
@@ -135,14 +135,10 @@ map si :set splitright<CR>:vsplit<CR>
 map sn :set nosplitright<CR>:vsplit<CR>
 map su :set nosplitbelow<CR>:split<CR>
 map se :set splitbelow<CR>:split<CR>
-map <LEADER>n <C-w>h 
+noremap <LEADER>n <C-w>h 
 map <LEADER>u <C-w>k
 map <LEADER>e <C-w>j
 map <LEADER>i <C-w>l
-map <LEADER>N <C-w>h 
-map <LEADER>U <C-w>k
-map <LEADER>E <C-w>j
-map <LEADER>I <C-w>l
 map tu :tabe<CR>
 map ti :+tabnext<CR>
 map tn :-tabnext<CR>
@@ -243,7 +239,6 @@ endfunc
 
 
 
-
 call plug#begin('~/.config/nvim/plugged')
 
 " 底部状态栏
@@ -253,8 +248,8 @@ Plug 'vim-airline/vim-airline-themes'
 " themes
 Plug 'ryanoasis/vim-devicons'
 Plug 'Marfisc/vorange'
-Plug 'fatih/molokai'
-Plug 'flazz/vim-colorschemes'
+Plug 'uiiaoo/java-syntax.vim'
+Plug 'lifepillar/vim-solarized8'
 
 
 
@@ -314,8 +309,11 @@ Plug 'airblade/vim-rooter'
 Plug 'tpope/vim-surround'
 Plug 'gcmt/wildfire.vim'
 
+" 注视
 Plug 'preservim/nerdcommenter'
-"Plug 'terryma/vim-multiple-cursors'
+
+" 多光标
+Plug 'mg979/vim-visual-multi'
 
 Plug 'kdheepak/lazygit.vim'
 
@@ -331,11 +329,10 @@ Plug 'lambdalisue/suda.vim' " do stuff like :sudowrite
 " copy manager
 Plug 'junegunn/vim-peekaboo'
 
+"平滑滚动！
 Plug 'yuttie/comfortable-motion.vim'
 
-"Plug 'scrooloose/syntastic'
 
-Plug 'uiiaoo/java-syntax.vim'
 
 Plug 'mg979/vim-xtabline'
 Plug 'wincent/terminus'
@@ -347,6 +344,8 @@ Plug 'kristijanhusak/vim-dadbod-ui'
 
 Plug 'sbdchd/neoformat'
 
+
+Plug 'folke/which-key.nvim'
 
 
 call plug#end()
@@ -440,7 +439,7 @@ let g:coc_global_extensions = [
 
 if has("patch-8.1.1564")
   " Recently vim can merge signcolumn and number column into one
-  set signcolumn=number
+	set signcolumn=number
 else
   set signcolumn=yes
 endif
@@ -715,21 +714,18 @@ let g:rooter_patterns = ['.git', 'Makefile', '*.sln', 'pom.xml']
 " ===
 " === multi_cursor
 " ===
-let g:multi_cursor_use_default_mapping=0
+let g:VM_default_mappings = 0
+"let g:VM_leader = ','
+let g:VM_maps = {}
+let g:VM_maps['Find Under']                  = '<C-k>'
+let g:VM_maps['Find Subword Under']          = '<C-k>'
 
-" Default mapping
-"let g:multi_cursor_start_word_key      = '<C-k>'
-"let g:multi_cursor_select_all_word_key = '<A-n>'
-"let g:multi_cursor_start_key           = 'g<C-n>'
-"let g:multi_cursor_select_all_key      = 'g<A-n>'
-"let g:multi_cursor_next_key            = '<C-n>'
-"let g:multi_cursor_prev_key            = '<C-p>'
-"let g:multi_cursor_skip_key            = '<C-x>'
-"let g:multi_cursor_quit_key            = '<Esc>'
+
 
 
 let g:dbs = {
-\ 'local': 'mysql://root:123456@localhost',
+\ 'local-mysql': 'mysql://root:123456@localhost',
+\ 'local-mongo': 'mongodb://192.168.116.8:27017/test',
 \ }
 let g:db_ui_use_nerd_fonts=1
 
@@ -749,6 +745,3 @@ noremap \p :echo expand('%:p')<CRL
 
 
 
-" ===
-" === format
-" ===
