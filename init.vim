@@ -58,14 +58,13 @@ set complete-=t
 set timeout
 set ttimeout
 set ttimeoutlen=10
-set colorcolumn=100
 set virtualedit=block
 set completeopt=longest,noinsert,menuone,noselect,preview
 set ttyfast "should make scrolling faster
 set lazyredraw "same as above
 set visualbell
+
 set t_Co=256
-let g:neovide_cursor_vfx_mode = "railgun"
 let mapleader = ' '
 let &t_SI = "\<Esc>]50;CursorShape=1\x7"
 let &t_SR = "\<Esc>]50;CursorShape=2\x7"
@@ -76,7 +75,7 @@ let g:suda_smart_edit = 1
 " airline
 let g:airline#extensions#ale#enabled = 1
 let g:airline_powerline_fonts = 1
-let g:airline_theme='vorange'
+"let g:airline_theme='vorange'
 let g:airline#extensions#tabline#enabled = 1
 
 " devicons 
@@ -87,22 +86,22 @@ let g:webdevicons_enable_flagship_statusline = 1
 
 " themes
 "set filetype=java
-"let java_highlight_functions = 1
-"let java_highlight_all = 1
+let java_highlight_functions = 1
+let java_highlight_all = 1
 highlight link javaIdentifier NONE
 highlight link javaDelimiter NONE
 
-"highlight link javaScopeDecl Statement
-"highlight link javaType Type
-"highlight link javaDocTags PreProc
+highlight link javaScopeDecl Statement
+highlight link javaType Type
+highlight link javaDocTags PreProc
 
 
-let g:rehash256 = 1
+"let g:rehash256 = 1
 set termguicolors
-set guicursor+=v:vCursor
-set background=dark
-let g:gruvbox_italic=1
-autocmd vimenter * ++nested colorscheme vorange
+"set background=dark
+autocmd vimenter * ++nested colorscheme one-nvim
+"colorscheme deus
+
 
 
 au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
@@ -189,53 +188,53 @@ nnoremap <LEADER>3 :Startify<CR>
 " Compile function
 noremap r :call CompileRunGcc()<CR>
 func! CompileRunGcc()
-	exec "w"
-	if &filetype == 'c'
-		exec "!g++ % -o %<"
-		exec "!time ./%<"
-	elseif &filetype == 'cpp'
-		set splitbelow
-		exec "!g++ -std=c++11 % -Wall -o %<"
-		:sp
-		:res -15
-		:term ./%<
-	elseif &filetype == 'java'
-		let l:dir = FindRootDirectory()
-		if l:dir != ""
-			set splitbelow
-			:sp
-			:res -13
-			exec "!echo ".l:dir." > ~/.rooter "
-			:term  cd $(cat ~/.rooter) && mvn clean spring-boot:run 
-		else
-			exec "!javac %"
-			exec "!time java %<"
-		endif
-	elseif &filetype == 'sh'
-		:!time bash %
-	elseif &filetype == 'python'
-		set splitbelow
-		:sp
-		:term python3 %
-	elseif &filetype == 'html'
-		silent! exec "!".g:mkdp_browser." % &"
-	elseif &filetype == 'markdown'
-		exec "InstantMarkdownPreview"
-	elseif &filetype == 'tex'
-		silent! exec "VimtexStop"
-		silent! exec "VimtexCompile"
-	elseif &filetype == 'dart'
-		exec "CocCommand flutter.run -d ".g:flutter_default_device." ".g:flutter_run_args
-		silent! exec "CocCommand flutter.dev.openDevLog"
-	elseif &filetype == 'javascript'
-		set splitbelow
-		:sp
-		:term export DEBUG="INFO,ERROR,WARNING"; node --trace-warnings .
-	elseif &filetype == 'go'
-		:GoRun
-	endif
+       exec "w"
+       if &filetype == 'c'
+       	exec "!g++ % -o %<"
+       	exec "!time ./%<"
+       elseif &filetype == 'cpp'
+       	set splitbelow
+       	exec "!g++ -std=c++11 % -Wall -o %<"
+       	:sp
+       	:res -15
+       	:term ./%<
+       elseif &filetype == 'java'
+       	let l:dir = FindRootDirectory()
+       	if l:dir != ""
+       		set splitbelow
+       		:sp
+       		:res -13
+       		exec "!echo ".l:dir." > ~/.rooter "
+       		:term  cd $(cat ~/.rooter) && mvn clean spring-boot:run 
+       	else
+       		exec "!javac %"
+       		exec "!time java %<"
+       	endif
+       elseif &filetype == 'sh'
+       	:!time bash %
+       elseif &filetype == 'python'
+       	set splitbelow
+       	:sp
+       	:term python3 %
+       elseif &filetype == 'html'
+       	silent! exec "!".g:mkdp_browser." % &"
+       elseif &filetype == 'markdown'
+       	exec "InstantMarkdownPreview"
+       elseif &filetype == 'tex'
+       	silent! exec "VimtexStop"
+       	silent! exec "VimtexCompile"
+       elseif &filetype == 'dart'
+       	exec "CocCommand flutter.run -d ".g:flutter_default_device." ".g:flutter_run_args
+       	silent! exec "CocCommand flutter.dev.openDevLog"
+       elseif &filetype == 'javascript'
+       	set splitbelow
+       	:sp
+       	:term export DEBUG="INFO,ERROR,WARNING"; node --trace-warnings .
+       elseif &filetype == 'go'
+       	:GoRun
+       endif
 endfunc
-	
+       
 
 
 
@@ -247,9 +246,12 @@ Plug 'vim-airline/vim-airline-themes'
 
 " themes
 Plug 'ryanoasis/vim-devicons'
-Plug 'Marfisc/vorange'
 Plug 'uiiaoo/java-syntax.vim'
-Plug 'lifepillar/vim-solarized8'
+Plug 'Iron-E/nvim-highlite'
+Plug 'Th3Whit3Wolf/one-nvim'
+Plug 'tandy1229/nvim-deus'
+
+
 
 
 
@@ -257,7 +259,8 @@ Plug 'lifepillar/vim-solarized8'
 Plug 'mhinz/vim-startify'
 
 " Coc系列
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
+
 
 
 " debug
@@ -271,6 +274,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 Plug 'APZelos/blamer.nvim'
+
 
 
 " 对称行
@@ -345,7 +349,6 @@ Plug 'kristijanhusak/vim-dadbod-ui'
 Plug 'sbdchd/neoformat'
 
 
-Plug 'folke/which-key.nvim'
 
 
 call plug#end()
@@ -361,17 +364,17 @@ Glaive codefmt google_java_executable="java -jar /Users/szz/.config/nvim/format/
 
 
 augroup autoformat_settings
-	" autocmd FileType bzl AutoFormatBuffer buildifier
-	" autocmd FileType c,cpp,proto,javascript,arduino AutoFormatBuffer clang-format
-	" autocmd FileType dart AutoFormatBuffer dartfmt
-	"autocmd FileType go AutoFormatBuffer gofmt
-	" autocmd FileType gn AutoFormatBuffer gn
-	"autocmd FileType html,css,sass,scss,less,json AutoFormatBuffer js-beautify
-	"autocmd FileType java AutoFormatBuffer google-java-format
-	" autocmd FileType python AutoFormatBuffer yapf
-	" Alternative: autocmd FileType python AutoFormatBuffer autopep8
-	" autocmd FileType rust AutoFormatBuffer rustfmt
-	" autocmd FileType vue AutoFormatBuffer prettier
+       "" autocmd FileType bzl AutoFormatBuffer buildifier
+       "" autocmd FileType c,cpp,proto,javascript,arduino AutoFormatBuffer clang-format
+       "" autocmd FileType dart AutoFormatBuffer dartfmt
+       ""autocmd FileType go AutoFormatBuffer gofmt
+       "" autocmd FileType gn AutoFormatBuffer gn
+       ""autocmd FileType html,css,sass,scss,less,json AutoFormatBuffer js-beautify
+      "autocmd FileType java AutoFormatBuffer google-java-format
+       "" autocmd FileType python AutoFormatBuffer yapf
+       "" Alternative: autocmd FileType python AutoFormatBuffer autopep8
+       "" autocmd FileType rust AutoFormatBuffer rustfmt
+       "" autocmd FileType vue AutoFormatBuffer prettier
 augroup END
 
 
@@ -394,14 +397,14 @@ nmap <Leader>b :CocList mainClassListRun<CR>
 
 nmap <F1> :CocCommand java.debug.vimspector.start<CR>
 function! s:read_template_into_buffer(template)
-	" has to be a function to avoid the extra space fzf#run insers otherwise
-	execute '0r ~/.config/nvim/sample_vimspector_json/'.a:template
+       "" has to be a function to avoid the extra space fzf#run insers otherwise
+       "execute '0r ~/.config/nvim/sample_vimspector_json/'.a:template
 endfunction
 command! -bang -nargs=* LoadVimSpectorJsonTemplate call fzf#run({
-			\   'source': 'ls -1 ~/.config/nvim/sample_vimspector_json',
-			\   'down': 20,
-			\   'sink': function('<sid>read_template_into_buffer')
-			\ })
+       		"\   'source': 'ls -1 ~/.config/nvim/sample_vimspector_json',
+       		"\   'down': 20,
+       		"\   'sink': function('<sid>read_template_into_buffer')
+       		"\ })
 noremap <leader>vs :tabe .vimspector.json<CR>:LoadVimSpectorJsonTemplate<CR>
 
 
@@ -420,56 +423,58 @@ sign define vimspectorPC text=🔶 texthl=SpellBad
 " === coc
 " ===
 let g:coc_global_extensions = [
-			\"coc-markdownlint",
-			\"coc-explorer",
-			\"coc-java",
-			\"coc-java-vimspector",
-			\"coc-xml",
-			\"coc-json",
-			\"coc-html",
-			\"coc-yaml",
-			\"coc-vimlsp",
-			\"coc-translator",
-			\"coc-highlight",
-			\"coc-db",
-			\"coc-docker",
-			\"coc-go",
-			\"coc-yank"]
+       		\"coc-markdownlint",
+       		\"coc-explorer",
+       		\"coc-java",
+       		\"coc-java-vimspector",
+       		\"coc-xml",
+       		\"coc-json",
+       		\"coc-html",
+       		\"coc-yaml",
+       		\"coc-vimlsp",
+       		\"coc-translator",
+       		\"coc-highlight",
+       		\"coc-snippets",
+       		\"coc-db",
+       		\"coc-sh",
+       		\"coc-docker",
+       		\"coc-go",
+       		\"coc-yank"]
 
 
 if has("patch-8.1.1564")
-  " Recently vim can merge signcolumn and number column into one
-	set signcolumn=number
+" Recently vim can merge signcolumn and number column into one
+  set signcolumn=number
 else
   set signcolumn=yes
 endif
 
 inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
+     \ pumvisible() ? "\<C-n>" :
+     \ <SID>check_back_space() ? "\<TAB>" :
+     \ coc#refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
 function! s:check_back_space() abort
-	  let col = col('.') - 1
-	  return !col || getline('.')[col - 1]  =~# '\s'
+       	let col = col('.') - 1
+       	return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
-                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+                             \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 
 " document
 nnoremap <silent> <LEADER>m :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  elseif (coc#rpc#ready())
-    call CocActionAsync('doHover')
-  else
-    execute '!' . &keywordprg . " " . expand('<cword>')
-  endif
+ if (index(['vim','help'], &filetype) >= 0)
+   execute 'h '.expand('<cword>')
+ elseif (coc#rpc#ready())
+   call CocActionAsync('doHover')
+ else
+   execute '!' . &keywordprg . " " . expand('<cword>')
+ endif
 endfunction
 
 inoremap <silent><expr> <c-@> coc#refresh()
@@ -488,11 +493,11 @@ nmap <silent> <LEADER>] <Plug>(coc-diagnostic-next)
 nmap <leader>c <Plug>(coc-rename)
 
 augroup mygroup
-  autocmd!
-  " Setup formatexpr specified filetype(s).
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-  " Update signature help on jump placeholder.
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+ autocmd!
+ " Setup formatexpr specified filetype(s).
+ autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+ " Update signature help on jump placeholder.
+ autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
 autocmd CursorHold * silent call CocActionAsync('highlight')
@@ -531,12 +536,12 @@ let g:rnvimr_draw_border = 0
 highlight link RnvimrNormal CursorLine
 nnoremap <silent> <LEADER>2 :RnvimrToggle<CR><C-\><C-n>:RnvimrResize 0<CR>
 let g:rnvimr_action = {
-            \ '<C-t>': 'NvimEdit tabedit',
-            \ '<C-x>': 'NvimEdit split',
-            \ '<C-v>': 'NvimEdit vsplit',
-            \ 'gw': 'JumpNvimCwd',
-            \ 'yw': 'EmitRangerCwd'
-            \ }
+           \ '<C-t>': 'NvimEdit tabedit',
+           \ '<C-x>': 'NvimEdit split',
+           \ '<C-v>': 'NvimEdit vsplit',
+           \ 'gw': 'JumpNvimCwd',
+           \ 'yw': 'EmitRangerCwd'
+           \ }
 
 
 
@@ -584,20 +589,20 @@ let g:fzf_preview_window = 'right:60%'
 let g:fzf_commits_log_options = '--graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
 
 function! s:list_buffers()
-  redir => list
-  silent ls
-  redir END
-  return split(list, "\n")
+ redir => list
+ silent ls
+ redir END
+ return split(list, "\n")
 endfunction
 
 function! s:delete_buffers(lines)
-  execute 'bwipeout' join(map(a:lines, {_, line -> split(line)[0]}))
+ execute 'bwipeout' join(map(a:lines, {_, line -> split(line)[0]}))
 endfunction
 
 command! BD call fzf#run(fzf#wrap({
-  \ 'source': s:list_buffers(),
-  \ 'sink*': { lines -> s:delete_buffers(lines) },
-  \ 'options': '--multi --reverse --bind ctrl-a:select-all+accept'
+ \ 'source': s:list_buffers(),
+ \ 'sink*': { lines -> s:delete_buffers(lines) },
+ \ 'options': '--multi --reverse --bind ctrl-a:select-all+accept'
 \ }))
 
 noremap <c-b> :BD<CR>
@@ -686,16 +691,16 @@ autocmd FileType go nmap <LEADER><LEADER> :CocCommand go.test.toggle<cr>
 " ===
 nnoremap L :UndotreeToggle<CR>
 if has("persistent_undo")
-   let target_path = expand('~/.undodir')
+  let target_path = expand('~/.undodir')
 
-    " create the directory and any parent directories
-    " if the location does not exist.
-    if !isdirectory(target_path)
-        call mkdir(target_path, "p", 0700)
-    endif
+   " create the directory and any parent directories
+   " if the location does not exist.
+   if !isdirectory(target_path)
+       call mkdir(target_path, "p", 0700)
+   endif
 
-    let &undodir=target_path
-    set undofile
+   let &undodir=target_path
+   set undofile
 endif
 
 
