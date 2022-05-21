@@ -189,13 +189,9 @@ nnoremap <LEADER>3 :Startify<CR>
 noremap r :call CompileRunGcc()<CR>
 func! CompileRunGcc()
        exec "w"
-       if &filetype == 'asm'
-       	exec "!as % -o %<.o"
-       	exec "!ld %<.o -o %< -L /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib -lSystem  -lSystem"
-        exec "!./%<"
-      elseif &filetype == 'c'
-       	exec "!gcc % -o %<"
-       	exec "!./%<"
+       if &filetype == 'c'
+       	exec "!g++ % -o %<"
+       	exec "!time ./%<"
        elseif &filetype == 'cpp'
        	set splitbelow
        	exec "!g++ -std=c++11 % -Wall -o %<"
@@ -462,7 +458,6 @@ let g:coc_global_extensions = [
           \"coc-sumneko-lua",
        		\"coc-go",
        		\"coc-translator",
-       		\"coc-cmake",
        		\"coc-yank"]
 
 
