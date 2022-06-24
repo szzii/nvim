@@ -79,6 +79,9 @@
 	"importCost.showCalculatingDecoration": true,
 	"importCost.debug": false,
 	"clangd.semanticHighlighting": true,
+	"rust-analyzer.inlayHints.refreshOnInsertMode": true,
+	"rust-analyzer.lens.enable": true,
+	"rust-analyzer.cargo.autoreload": true,
 	"java.home": "/Users/szz/.javahome/jdk-11.0.13.jdk/Contents/Home",
 	"java.import.maven.enabled": true,
 	"java.configuration.maven.userSettings":"/Users/szz/.m2/settings.xml",
@@ -108,7 +111,6 @@
 	],
 	"json.format.enable": true,
 	"yaml.format.enable": true,
-	"translator.enableHover": true,
 	"explorer.sources": [{
             "name": "buffer",
             "expand": false

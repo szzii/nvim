@@ -17,10 +17,10 @@ syntax on
 set autochdir
 set autowrite
 set nocompatible
-set signcolumn=yes
 set exrc
 set secure
 set number
+"set cursorline
 set relativenumber
 set wrap
 set showcmd
@@ -96,13 +96,15 @@ highlight link javaType Type
 "highlight link javaDocTags PreProc
 
 
-"let g:rehash256 = 1
+let g:rehash256 = 1
 set termguicolors
-"set background=dark
+set background=dark
 autocmd vimenter * ++nested colorscheme jellybeans
-"colorscheme deus
+let g:jellybeans_overrides = {
+\    'background': { 'guibg': '1a0e0d' },
+\}
 
-
+let g:jellybeans_use_lowcolor_black = 1
 
 au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 exec "nohlsearch"
@@ -170,9 +172,9 @@ noremap ` ~
 noremap <LEADER>rc :e $HOME/.config/nvim/init.vim<CR>
 
 " N key: go to the start of the line
-noremap <silent> <C-n> 0
+noremap <silent> N 0
 " I key: go to the end of the line
-noremap <silent> <C-i> $
+noremap <silent> I $
 
 
 nnoremap - <PageUp>
@@ -194,7 +196,7 @@ func! CompileRunGcc()
        	exec "!ld %<.o -o %< -L /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib -lSystem  -lSystem"
         exec "!./%<"
       elseif &filetype == 'c'
-       	exec "!gcc % -o %<"
+       	exec "!clang % -o %<"
        	exec "!./%<"
        elseif &filetype == 'cpp'
        	set splitbelow
@@ -348,6 +350,7 @@ Plug 'mbbill/undotree'
 " Go
 Plug 'fatih/vim-go' 
 
+
 "sudo write
 Plug 'lambdalisue/suda.vim' " do stuff like :sudowrite
 
@@ -355,7 +358,7 @@ Plug 'lambdalisue/suda.vim' " do stuff like :sudowrite
 Plug 'junegunn/vim-peekaboo'
 
 "平滑滚动！
-Plug 'yuttie/comfortable-motion.vim'
+"Plug 'yuttie/comfortable-motion.vim'
 
 
 
@@ -369,6 +372,8 @@ Plug 'kristijanhusak/vim-dadbod-ui'
 
 Plug 'sbdchd/neoformat'
 
+" 二进制编辑 
+Plug 'Shougo/vinarise.vim'
 
 
 
@@ -388,7 +393,7 @@ augroup autoformat_settings
        "" autocmd FileType bzl AutoFormatBuffer buildifier
        "" autocmd FileType c,cpp,proto,javascript,arduino AutoFormatBuffer clang-format
        "" autocmd FileType dart AutoFormatBuffer dartfmt
-       ""autocmd FileType go AutoFormatBuffer gofmt
+       "autocmd FileType go AutoFormatBuffer gofmt
        "" autocmd FileType gn AutoFormatBuffer gn
        ""autocmd FileType html,css,sass,scss,less,json AutoFormatBuffer js-beautify
         autocmd FileType java AutoFormatBuffer google-java-format
@@ -451,6 +456,7 @@ let g:coc_global_extensions = [
        		\"coc-xml",
        		\"coc-html",
        		\"coc-yaml",
+       		\"coc-json",
        		\"coc-vimlsp",
        		\"coc-highlight",
        		\"coc-db",
@@ -459,10 +465,11 @@ let g:coc_global_extensions = [
        		\"coc-docker",
           \"coc-rust-analyzer",
        		\"coc-clangd",
-          \"coc-sumneko-lua",
        		\"coc-go",
-       		\"coc-translator",
+          \"coc-sumneko-lua",
+          \"@yaegassy/coc-nginx",
        		\"coc-cmake",
+       		\"coc-snippets",
        		\"coc-yank"]
 
 
@@ -477,6 +484,7 @@ endif
 
 inoremap <silent><expr> <TAB>
      \ pumvisible() ? "\<C-n>" :
+     \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
      \ <SID>check_back_space() ? "\<TAB>" :
      \ coc#refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
@@ -521,7 +529,7 @@ nmap <leader>k <Plug>(coc-rename)
 augroup mygroup
  autocmd!
  " Setup formatexpr specified filetype(s).
- autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+ "autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
  " Update signature help on jump placeholder.
  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
@@ -604,11 +612,11 @@ let g:lazygit_use_neovim_remote = 1 " for neovim-remote support
 " ===
 " noremap <silent> <C-p> :Files<CR>
 noremap <silent> <C-f> :Rg<CR>
-noremap <silent> <C-h> :History<CR>
+"noremap <silent> <C-h> :History<CR>
 "noremap <silent> <C-g> :GFiles?<CR>
 "noremap <C-t> :BTags<CR>
 "noremap <silent> <C-l> :Lines<CR>
-noremap <silent> <C-b> :Buffers<CR>
+"noremap <silent> <C-b> :Buffers<CR>
 noremap <leader>; :History:<CR>
 
 let g:fzf_preview_window = 'right:60%'
@@ -678,14 +686,41 @@ let g:go_highlight_types = 1
 let g:go_highlight_variable_assignments = 0
 let g:go_highlight_variable_declarations = 0
 let g:go_doc_keywordprg_enabled = 0
-let g:go_fmt_command = "gopls"
 let g:go_test_timeout = '20s'
-let g:go_gopls_enabled = 1
+let g:go_gopls_enabled = 0
 let g:go_info_mode = 'guru'
+let g:go_fmt_fail_silently = 0
+let g:go_fmt_command = "goimports"
+let g:go_auto_sameids = 1
 
+let g:tagbar_type_go = {
+	\ 'ctagstype' : 'go',
+	\ 'kinds'     : [
+		\ 'p:package',
+		\ 'i:imports:1',
+		\ 'c:constants',
+		\ 'v:variables',
+		\ 't:types',
+		\ 'n:interfaces',
+		\ 'w:fields',
+		\ 'e:embedded',
+		\ 'm:methods',
+		\ 'r:constructor',
+		\ 'f:functions'
+	\ ],
+	\ 'sro' : '.',
+	\ 'kind2scope' : {
+		\ 't' : 'ctype',
+		\ 'n' : 'ntype'
+	\ },
+	\ 'scope2kind' : {
+		\ 'ctype' : 't',
+		\ 'ntype' : 'n'
+	\ },
+	\ 'ctagsbin'  : 'gotags',
+	\ 'ctagsargs' : '-sort -silent'
+\ }
 
-
-"let g:go_fmt_fail_silently = 1
 
 
 " key mapping
@@ -700,7 +735,8 @@ autocmd FileType go nmap gtd :CocCommand go.tags.remove.line
 autocmd FileType go nmap gtc :CocCommand go.tags.clear<cr>
 " test
 autocmd FileType go nmap <LEADER>g :CocCommand go.test.generate.function<cr>
-autocmd FileType go nmap <LEADER><LEADER> :CocCommand go.test.toggle<cr>
+autocmd FileType go nmap <LEADER><LEADER> :GoAlternate<cr>
+autocmd FileType go nmap <LEADER>r :GoTestFunc<cr>
 
 
 
@@ -746,7 +782,7 @@ let g:rooter_patterns = ['.git', 'Makefile', '*.sln', 'pom.xml','Cargo.toml']
 " === multi_cursor
 " ===
 let g:VM_default_mappings = 0
-"let g:VM_leader = ','
+let g:VM_leader = ','
 let g:VM_maps = {}
 let g:VM_maps['Find Under']                  = '<C-k>'
 let g:VM_maps['Find Subword Under']          = '<C-k>'
@@ -777,7 +813,12 @@ noremap \p :echo expand('%:p')<CRL
 
 
 
+" ===
+" === coc-snippet
+" ===
 xmap <leader>s  <Plug>(coc-convert-snippet)
+
+let g:coc_snippet_next = '<tab>'
 
 
 
