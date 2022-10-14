@@ -11,6 +11,7 @@ filetype plugin indent on
 syntax enable
 set backup
 set backupdir=~/.backup
+set patchmode=.orig
 set list
 set autoindent
 set noshowcmd
@@ -395,6 +396,9 @@ Plug 'github/copilot.vim'
 " Esc insert Mod switch to  abc Keyborad
 Plug 'yaocccc/vim-fcitx2en'
 
+" transtlor
+Plug 'voldikss/vim-translator'
+
 "lua
 Plug 'rktjmp/lush.nvim'
 
@@ -494,8 +498,6 @@ let g:coc_global_extensions = [
           \"coc-sumneko-lua",
        		\"coc-cmake",
        		\"coc-snippets",
-       		\"coc-pyright",
-       		\"coc-tsserver",
        		\"coc-yank"]
 
 
@@ -570,12 +572,10 @@ set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 set termguicolors
 
-
-
 " 翻译
 " Echo translation in the cmdline
-nmap <LEADER>t <Plug>(coc-translator-p)
-
+nmap <silent> <Leader>t <Plug>Translate
+vmap <silent> <Leader>t <Plug>TranslateV
 
 
 

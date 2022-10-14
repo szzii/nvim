@@ -1,21 +1,23 @@
 {
+	"translator.engines": [
+		"youdao"
+	],
+	"hover.floatConfig": {"border": true, "rounded": true },
+	"suggest.floatConfig": { "border": true, "rounded": true},
 	"coc.source.around.enable": false,
 	"coc.source.buffer.enable": false,
 	"coc.source.syntax.enable": false,
 	"yank.enableCompletion": false,
-	"suggest.detailMaxLength": 60,
+	"suggest.labelMaxLength": 60,
 	"suggest.noselect": true,
 	"suggest.enablePreselect": false,
 	"suggest.triggerAfterInsertEnter": true,
 	"suggest.autoTrigger": "always",
 	"suggest.timeout": 2000,
-	"suggest.enablePreview": true,
-	"suggest.floatEnable": true,
 	"suggest.detailField": "preview",
 	"suggest.snippetIndicator": "~",
-	"suggest.triggerCompletionWait": 100,
-	"clangd.path":"/usr/bin/clangd",
-	"suggest.echodocSupport": true,
+	"suggest.triggerCompletionWait": 50,
+	"clangd.path":"/usr/local/clangd_14.0.3/bin/clangd",
 	"suggest.completionItemKindLabels": {
 		"class": "\uf0e8",
 		"color": "\ue22b",
@@ -57,8 +59,6 @@
 	"list.previewHighlightGroup": "Statement",
 	"list.nextKeymap": "<C-e>",
 	"list.previousKeymap": "<C-u>",
-	"coc.preferences.enableFloatHighlight": true,
-	"coc.preferences.snippetStatusText": "Ⓢ ",
 	"coc.preferences.extensionUpdateCheck": "daily",
 	"coc.preferences.messageLevel": "error",
 	"coc.preferences.formatOnSaveFiletypes": [
@@ -78,8 +78,6 @@
 	"importCost.javascriptExtensions": ["\\.jsx?$"],
 	"importCost.showCalculatingDecoration": true,
 	"importCost.debug": false,
-	"clangd.semanticHighlighting": true,
-	"rust-analyzer.inlayHints.refreshOnInsertMode": true,
 	"rust-analyzer.lens.enable": true,
 	"rust-analyzer.cargo.autoreload": true,
 	"java.home": "/Users/szz/.javahome/jdk-11.0.13.jdk/Contents/Home",
@@ -123,11 +121,17 @@
 	"explorer.git.enable": true,
 	"explorer.git.showIgnored": true,
 	"explorer.toggle": true,
+	"explorer.mouseMode": "singleclick",
   "explorer.file.column.indent.indentLine": true,
   "explorer.buffer.showHiddenBuffers": false,
 	"explorer.icon.enableNerdfont": true,
 	"explorer.filename.colored.enable": true,
+	"explorer.openAction.strategy": "tab",
 	"explorer.quitOnOpen":false,
+	"explorer.position": "floating",
+	"explorer.floating.position": "right-center",
+	"explorer.floating.width": -80,
+	"explorer.floating.height": 0,
 	"explorer.keyMappings.global": {
 			//"h":false,
 			"il": false,
@@ -188,8 +192,20 @@
 			"command": "sql-language-server",
 			"args" : ["up", "--method", "stdio"],
 			"filetypes": ["sql", "mysql"]
+    },
+		"asm-lsp": {
+			"command": "asm-lsp",
+			"filetypes": [
+					"asm", "s", "S"
+			]
+		},
+		"nginx-language-server": {
+      "command": "nginx-language-server",
+      "filetypes": ["nginx"],
+      "rootPatterns": ["nginx.conf", ".git"]
     }
-  }
+  },
+  "Lua.telemetry.enable": true
 }
 
 

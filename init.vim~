@@ -7,30 +7,33 @@
 "
 
 
+filetype on
+filetype indent on
+filetype plugin on
 filetype plugin indent on
 syntax enable
-set backup
-set backupdir=~/.backup
-set list
+syntax on
+
 set autoindent
-set noshowcmd
-set incsearch
+"set backup   " open backup
+set showcmd
 set autochdir
 set autowrite
-set scrolloff=10
 set nocompatible
-set wrap
 set exrc
 set secure
 set number
 "set cursorline
 set relativenumber
+set wrap
+set showcmd
 set wildmenu
 set hlsearch
 set incsearch
 set ignorecase
 set smartcase
 set mouse+=a
+set scrolloff=10
 set encoding=utf-8
 set hidden
 set updatetime=100
@@ -46,6 +49,7 @@ set foldmethod=indent
 set viewoptions=cursor,folds,slash,unix
 set foldlevel=99
 set foldenable
+"set list
 set formatoptions-=tc
 set splitright
 set splitbelow
@@ -93,20 +97,26 @@ highlight link javaScopeDecl Statement
 highlight link javaType Type
 "highlight link javaDocTags PreProc
 
+
 let g:rehash256 = 1
 set termguicolors
 set background=dark
-autocmd vimenter * ++nested colorscheme jellybeans-nvim
+autocmd vimenter * ++nested colorscheme jellybeans
+let g:jellybeans_use_term_italics = 1
+let g:jellybeans_use_lowcolor_black = 1
+let g:jellybeans_overrides = {
+\    'background': { 'guibg': '000000' },
+\    'NormalFloat': { 'guibg':'LightBlue'},
+\    'TermCursor': { 'guibg':'LightBlue'},
+\    'CurSearch': { 'guibg':'LightBlue'},
+\}
 
 
-" last-position-jump
-autocmd BufRead * autocmd FileType <buffer> ++once
-      \ if &ft !~# 'commit\|rebase' && line("'\"") > 1 && line("'\"") <= line("$") | exe 'normal! g`"' | endif
+au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 exec "nohlsearch"
 
 
 map <TAB> <nop>
-map \c h{<Esc>ea}<Esc>
 
 " Save & quit
 map s :<nop>
@@ -154,10 +164,6 @@ noremap N 7h
 noremap I 7l
 noremap U 5k
 noremap E 5j
-
-" move line
-map  <C-u> dduP
-map  <C-e> ddp
 
 " ===
 " === Searching
@@ -252,6 +258,7 @@ func! CompileRunGcc()
        	:GoRun
        endif
 endfunc
+       
 
 
 
@@ -266,7 +273,12 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'ryanoasis/vim-devicons'
 Plug 'uiiaoo/java-syntax.vim'
 Plug 'Iron-E/nvim-highlite'
-Plug 'metalelf0/jellybeans-nvim'
+"Plug 'Th3Whit3Wolf/one-nvim'
+"Plug 'tandy1229/nvim-deus'
+"Plug 'theniceboy/nvim-deus'
+Plug 'szzii/jellybeans.vim'
+Plug 'tomasr/molokai'
+Plug 'yunlingz/ci_dark'
 
 
 
@@ -300,7 +312,8 @@ Plug 'APZelos/blamer.nvim'
 
 
 " 对称行
-Plug 'Yggdroot/indentLine'
+"Plug 'Yggdroot/indentLine'
+Plug 'yaocccc/nvim-hlchunk'
 
 "chinese vimdoc
 Plug 'yianwillis/vimcdoc'
@@ -394,9 +407,6 @@ Plug 'github/copilot.vim'
 
 " Esc insert Mod switch to  abc Keyborad
 Plug 'yaocccc/vim-fcitx2en'
-
-"lua
-Plug 'rktjmp/lush.nvim'
 
 call plug#end()
 call glaive#Install()
@@ -494,8 +504,6 @@ let g:coc_global_extensions = [
           \"coc-sumneko-lua",
        		\"coc-cmake",
        		\"coc-snippets",
-       		\"coc-pyright",
-       		\"coc-tsserver",
        		\"coc-yank"]
 
 
@@ -544,8 +552,8 @@ nmap <leader>x  <Plug>(coc-fix-current)
 
 nmap <silent> <LEADER>f <Plug>(coc-definition)
 nmap <silent> <LEADER>d <Plug>(coc-type-definition)
-nmap <silent> <LEADER>r <Plug>(coc-references)
 nmap <silent> <LEADER>v <Plug>(coc-implementation)
+nmap <silent> <LEADER>r <Plug>(coc-references)
 
 nmap <silent> <LEADER>[ <Plug>(coc-diagnostic-prev)
 nmap <silent> <LEADER>] <Plug>(coc-diagnostic-next)
@@ -570,13 +578,15 @@ set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 set termguicolors
 
-
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 " 翻译
-" Echo translation in the cmdline
-nmap <LEADER>t <Plug>(coc-translator-p)
-
-
+nmap <Leader>t <Plug>(coc-translator-p)
+vmap <Leader>t <Plug>(coc-translator-pv)
+nmap <Leader>w <Plug>(coc-translator-e)
+vmap <Leader>w <Plug>(coc-translator-ev)
+"nmap <Leader>r <Plug>(coc-translator-r)
+"vmap <Leader>r <Plug>(coc-translator-rv)
 
 
 " 剪切版
@@ -790,8 +800,8 @@ endif
 
 
 let g:comfortable_motion_no_default_key_mappings = 1
-"nnoremap <silent> <C-e> :call comfortable_motion#flick(80)<CR>
-"nnoremap <silent> <C-u> :call comfortable_motion#flick(-80)<CR>
+nnoremap <silent> <C-e> :call comfortable_motion#flick(80)<CR>
+nnoremap <silent> <C-u> :call comfortable_motion#flick(-80)<CR>
 let g:comfortable_motion_friction = 200.0
 let g:comfortable_motion_air_drag = 0.0
 
