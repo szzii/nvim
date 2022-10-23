@@ -5,35 +5,43 @@
 "| |  | | | |   | |\  | \ V /  | || |  | |  _ <| |___
 "|_|  |_| |_|   |_| \_|  \_/  |___|_|  |_|_| \_\\____|
 "
+"
+" Author: @szzii 
+" 
 
 
-filetype on
-filetype indent on
-filetype plugin on
+
+" ==================== Auto load for first time uses ====================
+if empty(glob($HOME.'/.config/nvim/autoload/plug.vim'))
+	silent !curl -fLo $HOME/.config/nvim/autoload/plug.vim --create-dirs
+				\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
 filetype plugin indent on
 syntax enable
-syntax on
-
+set backup
+set backupdir=~/.backup
+set list
 set autoindent
-"set backup   " open backup
-set showcmd
+set noshowcmd
+set incsearch
 set autochdir
 set autowrite
+set scrolloff=10
 set nocompatible
+set wrap
 set exrc
 set secure
 set number
 "set cursorline
 set relativenumber
-set wrap
-set showcmd
 set wildmenu
 set hlsearch
 set incsearch
 set ignorecase
 set smartcase
 set mouse+=a
-set scrolloff=10
 set encoding=utf-8
 set hidden
 set updatetime=100
@@ -49,7 +57,6 @@ set foldmethod=indent
 set viewoptions=cursor,folds,slash,unix
 set foldlevel=99
 set foldenable
-"set list
 set formatoptions-=tc
 set splitright
 set splitbelow
@@ -59,7 +66,7 @@ set complete-=i
 set complete-=t
 set timeout
 set ttimeout
-set ttimeoutlen=10
+set timeoutlen=10
 set virtualedit=block
 set completeopt=longest,noinsert,menuone,noselect,preview
 set ttyfast "should make scrolling faster
@@ -97,26 +104,20 @@ highlight link javaScopeDecl Statement
 highlight link javaType Type
 "highlight link javaDocTags PreProc
 
-
 let g:rehash256 = 1
 set termguicolors
 set background=dark
-autocmd vimenter * ++nested colorscheme jellybeans
-let g:jellybeans_use_term_italics = 1
-let g:jellybeans_use_lowcolor_black = 1
-let g:jellybeans_overrides = {
-\    'background': { 'guibg': '000000' },
-\    'NormalFloat': { 'guibg':'LightBlue'},
-\    'TermCursor': { 'guibg':'LightBlue'},
-\    'CurSearch': { 'guibg':'LightBlue'},
-\}
+autocmd vimenter * ++nested colorscheme jellybeans-nvim
 
 
-au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+" last-position-jump
+autocmd BufRead * autocmd FileType <buffer> ++once
+      \ if &ft !~# 'commit\|rebase' && line("'\"") > 1 && line("'\"") <= line("$") | exe 'normal! g`"' | endif
 exec "nohlsearch"
 
 
 map <TAB> <nop>
+map \c h{<Esc>ea}<Esc>
 
 " Save & quit
 map s :<nop>
@@ -164,6 +165,10 @@ noremap N 7h
 noremap I 7l
 noremap U 5k
 noremap E 5j
+
+" move line
+map  <C-u> dduP
+map  <C-e> ddp
 
 " ===
 " === Searching
@@ -258,7 +263,6 @@ func! CompileRunGcc()
        	:GoRun
        endif
 endfunc
-       
 
 
 
@@ -273,12 +277,7 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'ryanoasis/vim-devicons'
 Plug 'uiiaoo/java-syntax.vim'
 Plug 'Iron-E/nvim-highlite'
-"Plug 'Th3Whit3Wolf/one-nvim'
-"Plug 'tandy1229/nvim-deus'
-"Plug 'theniceboy/nvim-deus'
-Plug 'szzii/jellybeans.vim'
-Plug 'tomasr/molokai'
-Plug 'yunlingz/ci_dark'
+Plug 'metalelf0/jellybeans-nvim'
 
 
 
@@ -305,15 +304,14 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
 "" git
-Plug 'tpope/vim-fugitive'
+"Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 Plug 'APZelos/blamer.nvim'
 
 
 
 " 对称行
-"Plug 'Yggdroot/indentLine'
-Plug 'yaocccc/nvim-hlchunk'
+Plug 'Yggdroot/indentLine'
 
 "chinese vimdoc
 Plug 'yianwillis/vimcdoc'
@@ -341,7 +339,8 @@ Plug 'alvan/vim-closetag'
 Plug 'yuezk/vim-js', { 'for': ['vim-plug', 'php', 'html', 'javascript', 'css', 'less'] }
 
 
-Plug 'sheerun/vim-polyglot'
+" 自动缩进
+"Plug 'sheerun/vim-polyglot'
 
 " 根目录搜索
 Plug 'airblade/vim-rooter'
@@ -350,7 +349,7 @@ Plug 'airblade/vim-rooter'
 Plug 'tpope/vim-surround'
 Plug 'gcmt/wildfire.vim'
 
-" 注视
+" 注释
 Plug 'preservim/nerdcommenter'
 
 " 多光标
@@ -362,28 +361,26 @@ Plug 'kdheepak/lazygit.vim'
 Plug 'mbbill/undotree'
 
 " Go
-Plug 'fatih/vim-go' 
+Plug 'fatih/vim-go'
 
 
 "sudo write
 Plug 'lambdalisue/suda.vim' " do stuff like :sudowrite
 
-" copy manager
+"copy manager
 Plug 'junegunn/vim-peekaboo'
 
 "平滑滚动！
 "Plug 'yuttie/comfortable-motion.vim'
 
 
-
 Plug 'mg979/vim-xtabline'
-Plug 'wincent/terminus'
-
 
 " DB + UI
 Plug 'tpope/vim-dadbod'
 Plug 'kristijanhusak/vim-dadbod-ui'
 
+" TODO wait change
 Plug 'sbdchd/neoformat'
 
 " 二进制编辑 
@@ -394,19 +391,17 @@ Plug 'Shougo/vinarise.vim'
 Plug 'skywind3000/asyncrun.vim'
 
 "平滑滚动
-Plug 'yuttie/comfortable-motion.vim'
+"Plug 'yuttie/comfortable-motion.vim'
 
 " lsp manager
 Plug 'williamboman/nvim-lsp-installer'
 Plug 'neovim/nvim-lspconfig'
 
-
 " AI edit code by now hot 
 Plug 'github/copilot.vim'
 
-
-" Esc insert Mod switch to  abc Keyborad
-Plug 'yaocccc/vim-fcitx2en'
+"lua
+Plug 'rktjmp/lush.nvim'
 
 call plug#end()
 call glaive#Install()
@@ -504,6 +499,8 @@ let g:coc_global_extensions = [
           \"coc-sumneko-lua",
        		\"coc-cmake",
        		\"coc-snippets",
+       		\"coc-pyright",
+       		\"coc-tsserver",
        		\"coc-yank"]
 
 
@@ -552,8 +549,8 @@ nmap <leader>x  <Plug>(coc-fix-current)
 
 nmap <silent> <LEADER>f <Plug>(coc-definition)
 nmap <silent> <LEADER>d <Plug>(coc-type-definition)
-nmap <silent> <LEADER>v <Plug>(coc-implementation)
 nmap <silent> <LEADER>r <Plug>(coc-references)
+nmap <silent> <LEADER>v <Plug>(coc-implementation)
 
 nmap <silent> <LEADER>[ <Plug>(coc-diagnostic-prev)
 nmap <silent> <LEADER>] <Plug>(coc-diagnostic-next)
@@ -578,15 +575,13 @@ set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 set termguicolors
 
-set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
 
 " 翻译
-nmap <Leader>t <Plug>(coc-translator-p)
-vmap <Leader>t <Plug>(coc-translator-pv)
-nmap <Leader>w <Plug>(coc-translator-e)
-vmap <Leader>w <Plug>(coc-translator-ev)
-"nmap <Leader>r <Plug>(coc-translator-r)
-"vmap <Leader>r <Plug>(coc-translator-rv)
+" Echo translation in the cmdline
+nmap <LEADER>t <Plug>(coc-translator-p)
+
+
 
 
 " 剪切版
@@ -800,8 +795,8 @@ endif
 
 
 let g:comfortable_motion_no_default_key_mappings = 1
-nnoremap <silent> <C-e> :call comfortable_motion#flick(80)<CR>
-nnoremap <silent> <C-u> :call comfortable_motion#flick(-80)<CR>
+"nnoremap <silent> <C-e> :call comfortable_motion#flick(80)<CR>
+"nnoremap <silent> <C-u> :call comfortable_motion#flick(-80)<CR>
 let g:comfortable_motion_friction = 200.0
 let g:comfortable_motion_air_drag = 0.0
 
