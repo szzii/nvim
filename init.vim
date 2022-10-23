@@ -195,9 +195,9 @@ Plug 'edkolev/tmuxline.vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 " git
-"Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 Plug 'APZelos/blamer.nvim'
+Plug 'lambdalisue/gina.vim'
 
 
 
@@ -283,6 +283,15 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:airline#extensions#tabline#formatter = 'unique_tail'
+let g:airline_extensions = ['branch', 'tabline']
+let g:airline#extensions#branch#enabled = 1
+let g:airline#extensions#branch#format = 2
+
+
+
+
+
+
 let g:tmuxline_separators = {
     \ 'left' : '',
     \ 'left_alt': '>',
@@ -308,11 +317,14 @@ let g:gitgutter_map_keys = 0
 let g:gitgutter_sign_allow_clobber = 0
 let g:gitgutter_preview_win_floating = 1
 let g:gitgutter_set_sign_backgrounds = 1
+" Thanks for @theniceboy
 let g:gitgutter_sign_added = '▎'
 let g:gitgutter_sign_modified = '░'
 let g:gitgutter_sign_removed = '▏'
 let g:gitgutter_sign_removed_first_line = '▔'
 let g:gitgutter_sign_modified_removed = '▒'
+
+
 
 
 let g:blamer_enabled = 1
