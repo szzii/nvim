@@ -3,12 +3,21 @@
 
 " ======= basic set ======= 
 
+" ==================== Auto load for first time uses ====================
+"if empty(glob('~/.config/nvim' . '/autoload/plug.vim'))
+"	silent execute '!curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+"	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+"endif
+
 
 
 let mapleader = ' '
 
 filetype plugin on
 syntax on
+set termguicolors " enable true colors support
+let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+
 
 set nocompatible
 set autoread
@@ -32,18 +41,16 @@ set hlsearch
 set incsearch
 set ignorecase
 set smartcase
-
-if has("nvim")
-	set inccommand=split
-endif
+set inccommand=split
 
 " indent 
 set autoindent
+set smartindent
+set indentexpr=
 set tabstop=2
 set shiftwidth=2
 set softtabstop=2
 set noexpandtab
-set smartindent
 set foldmethod=indent
 set nofoldenable
 
@@ -53,6 +60,7 @@ set nosplitbelow
 
 " system
 set mouse=a
+set concealcursor=nc
 set hidden
 set signcolumn=yes
 set noshowcmd
@@ -65,6 +73,7 @@ set virtualedit=block
 set ttyfast 
 set tw=0
 set viewoptions=cursor,folds,unix
+set laststatus=2
 
 augroup QuickNotes
 	au!
@@ -74,7 +83,9 @@ augroup END
 
 
 
+map <TAB> <nop>
 exec "nohlsearch"
+
 
 
 " ======= basic keymap ======= 
@@ -156,7 +167,6 @@ nmap tn :-tabnext<CR>
 
 " insert mode
 inoremap <C-a> <ESC>A
-noremap  <C-a> A
 inoremap <C-o> <ESC>A {}<ESC>i<CR><ESC>ko
 
 " command mode 
@@ -171,7 +181,6 @@ inoremap <C-o> <ESC>A {}<ESC>i<CR><ESC>ko
 
 " other
 noremap <LEADER><CR> :nohlsearch<CR>
-map <TAB> <nop>
 noremap <LEADER><LEADER> zz
 
 
@@ -179,50 +188,106 @@ noremap <LEADER><LEADER> zz
 " ================ plugin =============== 
 call plug#begin('~/.config/nvim/plugged')
 
-" themes
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'ryanoasis/vim-devicons'
-Plug 'nanotech/jellybeans.vim'
-
-" I favorite
+" start
 Plug 'mhinz/vim-startify'
 
-" tmux line
+" themes
+Plug 'szzii/eleline.vim'
+Plug 'ryanoasis/vim-devicons'
+Plug 'szzii/jellybeans.vim'
+
+
+"indentline
+Plug 'Yggdroot/indentLine'
+
+" scrollbar
+Plug 'petertriho/nvim-scrollbar'
+
+" tmux
 Plug 'edkolev/tmuxline.vim'
+Plug 'wellle/tmux-complete.vim'
+
+" git
+Plug 'airblade/vim-gitgutter'
+Plug 'kdheepak/lazygit.nvim'
+"Plug 'APZelos/blamer.nvim'
+
+"chinese vimdoc
+Plug 'yianwillis/vimcdoc', {'for': 'vim'}
+
+"comment
+Plug 'preservim/nerdcommenter'
+
+"undo tree
+Plug 'mbbill/undotree'
+
+"sudo write
+Plug 'lambdalisue/suda.vim' " do stuff like :sudowrite
+
+"copy manager
+Plug 'junegunn/vim-peekaboo'
 
 " code Completion
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
-" git
-Plug 'airblade/vim-gitgutter'
-Plug 'APZelos/blamer.nvim'
-Plug 'lambdalisue/gina.vim'
+" fzf search
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+
+" pair range
+Plug 'tpope/vim-surround'
+Plug 'gcmt/wildfire.vim'
+
+" mulit cursor
+Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 
 
-
-
-"chinese vimdoc
-Plug 'yianwillis/vimcdoc'
 
 call plug#end()
 
-
+" colorsheme
+"let g:jellybeans_overrides = {
+"\    'background': { 'guibg': '000000' },
+"\}
+"let g:jellybeans_use_term_italics = 1
+colorscheme jellybeans
 
 "===================
 "====== coc configration ======
 "===================
-inoremap <silent><expr> <TAB>
-     \ pumvisible() ? "\<C-n>" :
-     \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-     \ <SID>check_back_space() ? "\<TAB>" :
-     \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+let g:coc_global_extensions = [
+       		\"coc-explorer",
+       		\"coc-highlight",
+       		\"coc-java",
+       		\"coc-json",
+       		\"coc-xml",
+       		\"coc-yaml",
+       		\"coc-html",
+          \"coc-pairs",
+					\"coc-yank",
+          \"coc-translator",
+       		\"coc-clangd",
+       		\"coc-pyright",
+       		\"coc-sh",
+          \"coc-sumneko-lua",
+       		\"coc-vimlsp",
+          \"coc-marketplace"]
 
-function! s:check_back_space() abort
-       	let col = col('.') - 1
-       	return !col || getline('.')[col - 1]  =~# '\s'
+
+inoremap <silent><expr> <TAB>
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+function! CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
+
 
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
@@ -241,8 +306,6 @@ function! s:show_documentation()
  endif
 endfunction
 
-
-inoremap <silent><expr> <c-@> coc#refresh()
 nmap <leader>z  <Plug>(coc-codeaction)
 nmap <leader>x  <Plug>(coc-fix-current)
 nmap <leader>k  <Plug>(coc-rename)
@@ -267,31 +330,49 @@ command! -nargs=? Fold :call     CocAction('fold', <f-args>)
 
 command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
 
-set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-
-" colorsheme
-let g:jellybeans_overrides = {
-\    'background': { 'guibg': '000000' },
-\    'SignColumn': { 'guibg': '000000' },
-\}
-colorscheme jellybeans
-
-
-" airline
-let g:airline_theme='dark'
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#left_sep = ' '
-let g:airline#extensions#tabline#left_alt_sep = '|'
-let g:airline#extensions#tabline#formatter = 'unique_tail'
-let g:airline_extensions = ['branch', 'tabline']
-let g:airline#extensions#branch#enabled = 1
-let g:airline#extensions#branch#format = 2
+"set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 
 
+" coc-plugin keymaps
+autocmd! FileType json syntax match Comment +\/\/.\+$+
+autocmd! VimLeavePre * if get(g:, 'coc_process_pid', 0)
+		\	| call system('kill -9 '.g:coc_process_pid) | endif
+map <LEADER>t <Plug>(coc-translator-p)
+nnoremap tt :CocCommand explorer<CR>
+nnoremap <silent> <space>y  :<C-u>CocList -A --normal yank<cr>
+
+
+" indentline
+let g:indentLine_char_list = ['|', '¦', '┆', '┊']
+augroup MyIndentLine 
+	au!
+	autocmd User StartifyReady :IndentLinesDisable
+	autocmd BufEnter * call AutoDisableIndentLines()
+augroup END
+
+function AutoDisableIndentLines() 
+	if &filetype == 'json' || &filetype == 'markdown'  || &filetype == 'coc-explorer'
+		:IndentLinesDisable
+	else 
+		:IndentLinesEnable
+	endif
+endfunction
 
 
 
+
+"let g:VM_maps['k'] = 'i'
+"let g:VM_maps['K'] = 'I'
+"let g:VM_maps['o'] = 'i'
+"let g:VM_maps['O'] = 'I'
+" eleline
+let g:eleline_powerline_fonts = 1
+"let g:eleline_background = 264
+
+
+
+" tmuxline
 let g:tmuxline_separators = {
     \ 'left' : '',
     \ 'left_alt': '>',
@@ -303,12 +384,6 @@ let g:tmuxline_preset = {
       \'win'  : '#I #W',
       \'cwin' : '#I #W #F',
       \'x'    : '%Y-%m-%d %H:%M:%S'}
-
-
- 
-
-" coc-trnaslator
-map <LEADER>t <Plug>(coc-translator-p)
 
 
 " git
@@ -323,13 +398,104 @@ let g:gitgutter_sign_modified = '░'
 let g:gitgutter_sign_removed = '▏'
 let g:gitgutter_sign_removed_first_line = '▔'
 let g:gitgutter_sign_modified_removed = '▒'
-
-
-
-
+"--
 let g:blamer_enabled = 1
 let g:blamer_date_format = '%Y-%m-%d %H:%M'
 let g:blamer_template = '<committer>: <committer-time> (<summary>)'
+"--
+nnoremap <silent> <LEADER>1 :LazyGit<CR>
+let g:lazygit_floating_window_winblend = 0 " transparency of floating window
+let g:lazygit_floating_window_scaling_factor = 1.0 " scaling factor for floating window
+let g:lazygit_floating_window_corner_chars = ['╭', '╮', '╰', '╯'] " customize lazygit popup window corner characters
+let g:lazygit_use_neovim_remote = 1 " for neovim-remote support
 
+
+
+" commenter
+let g:NERDCreateDefaultMappings = 0
+let g:NERDDefaultAlign = 'left'
+nnoremap  <Space>c <Plug>NERDCommenterToggle
+xnoremap  <Space>c <Plug>NERDCommenterToggle
+
+
+
+
+" undotree
+nnoremap L :UndotreeToggle<CR>
+let g:undotree_WindowLayout = 3
+let g:undotree_RelativeTimestamp = 1
+let g:undotree_HelpLine = 1
+let g:undotree_ShortIndicators = 1
+let g:undotree_SetFocusWhenToggle = 1
+let g:undotree_DiffCommand = "diff"
+"--
+function g:Undotree_CustomMap()
+    nmap <buffer> u <plug>UndotreeNextState
+    nmap <buffer> e <plug>UndotreePreviousState
+	  nmap <buffer> U <plug>UndotreeNextSavedState
+    nmap <buffer> E <plug>UndotreePreviousSavedState
+    nmap <buffer> q <plug>UndotreeClose
+endfunc
+"--
+if has("persistent_undo")
+  let target_path = expand('~/.undodir')
+
+   " create the directory and any parent directories
+   " if the location does not exist.
+   if !isdirectory(target_path)
+       call mkdir(target_path, "p", 0700)
+   endif
+
+   let &undodir=target_path
+   set undofile
+endif
+
+
+
+" fzf
+noremap <leader>2 :Rg<CR>
+noremap <leader>; :History:<CR>
+let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.9} }
+
+
+" startify
+nnoremap <LEADER>3 :Startify<CR>
+let g:startify_custom_header = [
+        \ '                                 ________  __ __        ',
+        \ '            __                  /\_____  \/\ \\ \       ',
+        \ '    __  __ /\_\    ___ ___      \/___//''/''\ \ \\ \    ',
+        \ '   /\ \/\ \\/\ \ /'' __` __`\        /'' /''  \ \ \\ \_ ',
+        \ '   \ \ \_/ |\ \ \/\ \/\ \/\ \      /'' /''__  \ \__ ,__\',
+        \ '    \ \___/  \ \_\ \_\ \_\ \_\    /\_/ /\_\  \/_/\_\_/  ',
+        \ '     \/__/    \/_/\/_/\/_/\/_/    \//  \/_/     \/_/    ',
+        \ ]
+
+
+
+" ==================== nvim-scrollbar ====================
+lua <<EOF
+require("scrollbar").setup({
+		 set_highlights = false
+   })
+EOF
+
+
+
+" wildfire
+let g:wildfire_objects = { "*" : ["i'", 'i"', "i)", "i]", "i}","i>"] }
+
+" multi
+let g:VM_leader = ','
+let g:VM_maps = {}
+
+let g:VM_maps['i'] = 'k'
+let g:VM_maps['I'] = 'K'
+
+let g:VM_maps['Find Under']							= '<C-k>'
+let g:VM_maps['Find Subword Under']			= '<C-k>'
+let g:VM_maps['Select All']  						= '<C-f>'
+let g:VM_maps['Visual All']  						= '<C-f>'
+let g:VM_maps['Skip Region']						= '<c-n>'
+let g:VM_maps['Remove Region']					= 'q'
 
 

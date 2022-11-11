@@ -293,6 +293,7 @@ Plug 'mhinz/vim-startify'
 
 " Coc系列
 Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
+Plug 'wellle/tmux-complete.vim'
 
 
 
@@ -307,7 +308,6 @@ Plug 'junegunn/fzf.vim'
 "Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 Plug 'APZelos/blamer.nvim'
-
 
 
 " 对称行
@@ -400,8 +400,6 @@ Plug 'neovim/nvim-lspconfig'
 " AI edit code by now hot 
 Plug 'github/copilot.vim'
 
-"lua
-Plug 'rktjmp/lush.nvim'
 
 call plug#end()
 call glaive#Install()
