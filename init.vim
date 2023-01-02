@@ -75,11 +75,16 @@ set tw=0
 set viewoptions=cursor,folds,unix
 set laststatus=2
 
-augroup QuickNotes
-	au!
-	autocmd BufWinLeave *.* execute "mkview! " . "~/.vim/view" . "/" . expand('<afile>:t') . ".view"
-	autocmd BufWinEnter *.* execute "silent! source " . "~/.vim/view" . "/" . expand('%:t') . ".view"
-augroup END 
+"augroup QuickNotes
+"  au!
+"  autocmd BufWinLeave *.* execute "mkview! " . "~/.vim/view" . "/" . expand('<afile>:t') . ".view"
+"  autocmd BufWinEnter *.* execute "silent! source " . "~/.vim/view" . "/" . expand('%:t') . ".view"
+"augroup END 
+" last-position-jump
+autocmd BufRead * autocmd FileType <buffer> ++once
+      \ if &ft !~# 'commit\|rebase' && line("'\"") > 1 && line("'\"") <= line("$") | exe 'normal! g`"' | endif
+exec "nohlsearch"
+
 
 
 
@@ -118,10 +123,6 @@ map s :<nop>
 map S :w<CR>
 map Q :q<CR>
 
-" move line
-nnoremap  <C-u> ddkP
-nnoremap  <C-e> ddp
-
 " Undo operations
 nnoremap l u
 
@@ -159,7 +160,6 @@ noremap <left> :vertical resize-5<CR>
 noremap <right> :vertical resize+5<CR>
 
 
-
 " switch tab
 nmap tu :tabe<CR>
 nmap ti :+tabnext<CR>
@@ -188,20 +188,26 @@ noremap <LEADER><LEADER> zz
 " ================ plugin =============== 
 call plug#begin('~/.config/nvim/plugged')
 
-" start
+" Base Tools
 Plug 'mhinz/vim-startify'
+Plug 'junegunn/vim-peekaboo'
+Plug 'lambdalisue/suda.vim' " do stuff like :sudowrite
+Plug 'Yggdroot/indentLine'
+Plug 'mbbill/undotree'
+Plug 'petertriho/nvim-scrollbar'
+Plug 'preservim/nerdcommenter'
+Plug 'yianwillis/vimcdoc', {'for': 'vim'}
+
+" switch keyboard layout only on macos 
+Plug 'ybian/smartim'
 
 " themes
 Plug 'szzii/eleline.vim'
 Plug 'ryanoasis/vim-devicons'
 Plug 'szzii/jellybeans.vim'
+Plug 'uiiaoo/java-syntax.vim'
 
 
-"indentline
-Plug 'Yggdroot/indentLine'
-
-" scrollbar
-Plug 'petertriho/nvim-scrollbar'
 
 " tmux
 Plug 'edkolev/tmuxline.vim'
@@ -212,23 +218,11 @@ Plug 'airblade/vim-gitgutter'
 Plug 'kdheepak/lazygit.nvim'
 "Plug 'APZelos/blamer.nvim'
 
-"chinese vimdoc
-Plug 'yianwillis/vimcdoc', {'for': 'vim'}
-
-"comment
-Plug 'preservim/nerdcommenter'
-
-"undo tree
-Plug 'mbbill/undotree'
-
-"sudo write
-Plug 'lambdalisue/suda.vim' " do stuff like :sudowrite
-
-"copy manager
-Plug 'junegunn/vim-peekaboo'
 
 " code Completion
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'SirVer/ultisnips'
+
 
 " fzf search
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
@@ -241,6 +235,9 @@ Plug 'gcmt/wildfire.vim'
 " mulit cursor
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 
+" language
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'rust-lang/rust.vim'
 
 
 call plug#end()
@@ -250,7 +247,22 @@ call plug#end()
 "\    'background': { 'guibg': '000000' },
 "\}
 "let g:jellybeans_use_term_italics = 1
+
+
 colorscheme jellybeans
+hi link javaIdentifier NONE
+hi link javaDelimiter NONE
+hi link javaOperator NONE
+hi link javaPreProc Function
+hi link javaNumber NONE
+hi link javaCharacter javaString
+hi! javaConstant guifg=NONE guibg=NONE gui=bold
+
+
+
+
+
+"highlight link javaFunction NONE
 
 "===================
 "====== coc configration ======
@@ -261,6 +273,7 @@ let g:coc_global_extensions = [
        		\"coc-java",
        		\"coc-json",
        		\"coc-xml",
+       		\"coc-rust-analyzer",
        		\"coc-yaml",
        		\"coc-html",
           \"coc-pairs",
@@ -271,6 +284,8 @@ let g:coc_global_extensions = [
        		\"coc-sh",
           \"coc-sumneko-lua",
        		\"coc-vimlsp",
+       		\"coc-ultisnips",
+       		\"coc-diagnostic",
           \"coc-marketplace"]
 
 
@@ -278,6 +293,7 @@ inoremap <silent><expr> <TAB>
       \ coc#pum#visible() ? coc#pum#next(1) :
       \ CheckBackspace() ? "\<Tab>" :
       \ coc#refresh()
+
 inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
 
 inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
@@ -288,50 +304,64 @@ function! CheckBackspace() abort
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
-
-inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
-                             \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-
-
 " document
-nnoremap <silent> <LEADER>m :call <SID>show_documentation()<CR>
+"nnoremap <silent> <LEADER>m :call ShowDocumentation()<CR>
+"function! ShowDocumentation()
+"  if CocAction('hasProvider', 'hover')
+"    call CocActionAsync('doHover')
+"  else
+"    call feedkeys('K', 'in')
+"  endif
+"endfunction
 
+nnoremap <silent> <LEADER>m :call <SID>show_documentation()<CR>
 function! s:show_documentation()
  if (index(['vim','help'], &filetype) >= 0)
-   execute 'h '.expand('<cword>')
+	 execute 'h '.expand('<cword>')
  elseif (coc#rpc#ready())
-   call CocActionAsync('doHover')
+	 call CocActionAsync('doHover')
  else
-   execute '!' . &keywordprg . " " . expand('<cword>')
+	 execute '!' . &keywordprg . " " . expand('<cword>')
  endif
 endfunction
 
-nmap <leader>z  <Plug>(coc-codeaction)
-nmap <leader>x  <Plug>(coc-fix-current)
-nmap <leader>k  <Plug>(coc-rename)
+
+
+nmap <LEADER>z  <Plug>(coc-codeaction)
+nmap <LEADER>x  <Plug>(coc-fix-current)
+nmap <LEADER>k  <Plug>(coc-rename)
+nmap <silent> <LEADER>b <Plug>(coc-refactor)
 nmap <silent> <LEADER>f <Plug>(coc-definition)
 nmap <silent> <LEADER>d <Plug>(coc-type-definition)
 nmap <silent> <LEADER>r <Plug>(coc-references)
 nmap <silent> <LEADER>v <Plug>(coc-implementation)
 nmap <silent> <LEADER>[ <Plug>(coc-diagnostic-prev)
 nmap <silent> <LEADER>] <Plug>(coc-diagnostic-next)
+nmap <silent> <LEADER>p :CocOutline<CR>
+
+
+" Remap <C-f> and <C-b> to scroll float windows/popups
+if has('nvim-0.4.0') || has('patch-8.2.0750')
+  nnoremap <silent><nowait><expr> <C-e> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+  nnoremap <silent><nowait><expr> <C-u> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+  inoremap <silent><nowait><expr> <C-e> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+  inoremap <silent><nowait><expr> <C-u> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+  vnoremap <silent><nowait><expr> <C-e> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+  vnoremap <silent><nowait><expr> <C-u> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+endif
+
+autocmd CursorHold * silent call CocActionAsync('highlight')
 
 augroup mygroup
  autocmd!
  " Setup formatexpr specified filetype(s).
- "autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+ autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
  " Update signature help on jump placeholder.
  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
-autocmd CursorHold * silent call CocActionAsync('highlight')
-
-command! -nargs=? Fold :call     CocAction('fold', <f-args>)
-
-command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
-
-"set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-
+" Add `:Format` command to format current buffer
+command! -nargs=0 Format :call CocActionAsync('format')
 
 
 " coc-plugin keymaps
@@ -339,6 +369,7 @@ autocmd! FileType json syntax match Comment +\/\/.\+$+
 autocmd! VimLeavePre * if get(g:, 'coc_process_pid', 0)
 		\	| call system('kill -9 '.g:coc_process_pid) | endif
 map <LEADER>t <Plug>(coc-translator-p)
+vmap <LEADER>t <Plug>(coc-translator-pv)
 nnoremap tt :CocCommand explorer<CR>
 nnoremap <silent> <space>y  :<C-u>CocList -A --normal yank<cr>
 
@@ -498,4 +529,70 @@ let g:VM_maps['Visual All']  						= '<C-f>'
 let g:VM_maps['Skip Region']						= '<c-n>'
 let g:VM_maps['Remove Region']					= 'q'
 
+
+" auto switch keylayout
+let g:smartim_default = 'com.apple.keylayout.Colemak'
+function! Multiple_cursors_before()
+	let g:smartim_disable = 1
+endfunction
+function! Multiple_cursors_after()
+	unlet g:smartim_disable
+endfunction
+
+" vim-go
+let g:go_gopls_enabled = 0
+let g:go_fmt_autosave = 0
+let g:go_imports_autosave = 0
+let g:go_fmt_command = 'goimports'
+let g:go_addtags_transform = "camelcase"
+let g:go_highlight_types = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_function_calls = 1
+let g:go_highlight_build_constraints = 1
+let g:go_highlight_generate_tags = 1
+let g:go_highlight_fields = 1
+"let g:go_highlight_extra_types = 1
+"let g:go_highlight_operators = 1
+"let g:go_alternate_mode = "vsplit"
+
+
+autocmd FileType go nmap <LEADER><LEADER> :GoAlternate!<CR>
+autocmd Filetype go command! -bang T call go#coverage#BufferToggle(<bang>0)
+
+
+
+
+
+" Compile function
+noremap r :call CompileRunGcc()<CR>
+func! CompileRunGcc()
+  exec "w"
+  if &filetype == 'python'
+  	set splitbelow
+  	:sp
+  	:term python3 %
+	elseif &filetype == 'go'
+		call s:runGoFiles()
+	elseif &filetype == 'java'
+    exec "!javac %"
+    exec "!time java %<"
+  endif
+endfunc
+
+function! s:runGoFiles()
+  let l:file = expand('%')
+  if l:file =~# '^\f\+_test\.go$'
+    :GoTestFunc
+  elseif l:file =~# '^\f\+\.go$'
+		:GoRun
+  endif
+endfunction
+
+
+let g:UltiSnipsExpandTrigger             = "<nop>"
+let g:UltiSnipsListSnippets              = "<nop>"
+let g:UltiSnipsJumpForwardTrigger        = "<nop>"
+let g:UltiSnipsJumpBackwardTrigger       = "<nop>"
+
+let g:UltiSnipsSnippetDirectories=["UltiSnips", "MySnippets"]
 

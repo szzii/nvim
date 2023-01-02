@@ -712,6 +712,7 @@ let g:go_highlight_trailing_whitespace_error = 1
 let g:go_highlight_types = 1
 let g:go_highlight_variable_assignments = 0
 let g:go_highlight_variable_declarations = 0
+
 let g:go_doc_keywordprg_enabled = 0
 let g:go_test_timeout = '20s'
 let g:go_gopls_enabled = 0
@@ -755,7 +756,7 @@ autocmd FileType go nmap gr  <Plug>(go-test)
 autocmd FileType go nmap gb  <Plug>(go-build)
 autocmd FileType go nmap gc  <Plug>(go-coverage-toggle)
 " tags
-autocmd FileType go nmap gta :CocCommand go.tags.add 
+autocmd FileType go nmap gta :CocCommand go.tags.add json<cr>
 autocmd FileType go nmap gtl :CocCommand go.tags.line 
 autocmd FileType go nmap gtr :CocCommand go.tags.remove 
 autocmd FileType go nmap gtd :CocCommand go.tags.remove.line 
@@ -763,11 +764,6 @@ autocmd FileType go nmap gtc :CocCommand go.tags.clear<cr>
 " test
 autocmd FileType go nmap <LEADER>g :CocCommand go.test.generate.function<cr>
 autocmd FileType go nmap <LEADER><LEADER> :GoAlternate<cr>
-
-
-
-
-
 
 nnoremap <LEADER>g :GoImport 
 autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')

@@ -4,11 +4,11 @@
 
 
 	// 基础设置
-	"coc.preferences.promptInput": false,
-	"coc.preferences.currentFunctionSymbolAutoUpdate":true,
+	"coc.preferences.promptInput": true,
+	"coc.preferences.currentFunctionSymbolAutoUpdate": true,
 	"coc.preferences.messageLevel": "error",
 	"coc.preferences.jumpCommand": "edit",
-	"coc.preferences.rootPatterns":[".git","pom.xml","go.mod","Cargo.toml","Makefile"],
+	"coc.preferences.rootPatterns": [ ".git", "pom.xml", "go.mod", "Cargo.toml", "Makefile" ],
 	"coc.preferences.formatOnSaveFiletypes": [
 		"javascript",
 		"typescript",
@@ -16,6 +16,7 @@
 		"xml",
 		"css",
 		"json",
+		"jsonc",
 		"python",
 		"vue",
 		"svelte",
@@ -23,20 +24,25 @@
 		"cpp",
 		"rust",
 		"java",
-		"go",
-		"prisma"
+		"prisma",
+		"go"
 	],
+
+
+	"outline.previewBorderRounded": true,
 
 
 	// 禁用提示源
 	"coc.source.around.enable": false,
 	"coc.source.buffer.enable": false,
-	"coc.source.syntax.enable": false,
 	"coc.source.file.ignoreHidden": false,
+
 
 
 	// 代码诊断
 	"diagnostic.enable": true,
+	"diagnostic.displayByAle": false,
+	"diagnostic.checkCurrentLine": true,
 	"diagnostic.refreshOnInsertMode": true,
 	"diagnostic.virtualText": true,
 	"diagnostic.virtualTextPrefix": " ❯❯❯ ",
@@ -49,6 +55,7 @@
 		"rounded": true,
 		"highlight": "none"
 	},
+
 
 
 	// 镶嵌提示
@@ -69,14 +76,11 @@
 		"rounded": true,
 		"highlight": "none"
 	},
-	"suggest.noselect": true,
+	"suggest.noselect": false,
 	"suggest.reversePumAboveCursor": true,
-	"suggest.triggerAfterInsertEnter": true,
-	"suggest.virtualText": true,
 	"suggest.labelMaxLength": 60,
-	//"suggest.removeDuplicateItems": true, // TODO  wait test
+	"suggest.removeDuplicateItems": true,
 	"suggest.timeout": 2000,
-	"suggest.snippetIndicator": "~",
 	"suggest.completionItemKindLabels": { // TODO 找出双class提示源
 		"class": "\uf0e8",
 		"color": "\ue22b",
@@ -114,10 +118,9 @@
 		"youdao"
 	],
 
-	"clangd.path": "/usr/local/clangd_14.0.3/bin/clangd",
 
 	// rust
-	"rust-analyzer.enable": false,
+	"rust-analyzer.enable": true,
 	"rust-analyzer.lens.enable": true,
 	"rust-analyzer.cargo.autoreload": true,
 
@@ -128,19 +131,19 @@
 	"java.configuration.updateBuildConfiguration": "interactive",
 	"java.configuration.maven.userSettings": "/Users/szz/.m2/settings.xml",
 	"java.configuration.runtimes": [
-  {
-    "name": "JavaSE-1.8",
-    "path": "/Library/Java/JavaVirtualMachines/jdk1.8.0_301.jdk/Contents/Home"
-  },
-  {
-    "name": "JavaSE-11",
-    "path": "/Users/szz/.javahome/jdk-11.0.13.jdk/Contents/Home",
-		"default": true
-  },
-  {
-    "name": "JavaSE-17",
-    "path": "/Users/szz/.javahome/jdk-17.0.1.jdk/Contents/Home"
-  }],
+		{
+			"name": "JavaSE-1.8",
+			"path": "/Library/Java/JavaVirtualMachines/jdk1.8.0_301.jdk/Contents/Home"
+		},
+		{
+			"name": "JavaSE-11",
+			"path": "/Users/szz/.javahome/jdk-11.0.13.jdk/Contents/Home",
+			"default": true
+		},
+		{
+			"name": "JavaSE-17",
+			"path": "/Users/szz/.javahome/jdk-17.0.1.jdk/Contents/Home"
+		} ],
 	"java.referencesCodeLens.enabled": true,
 	"java.implementationsCodeLens.enabled": true,
 	"java.signatureHelp.enabled": true,
@@ -181,9 +184,15 @@
 		"${user} ${date}"
 	],
 
+	// clangd
+	"clangd.enabled": true,
+	"clangd.path": "/usr/local/clangd_14.0.3/bin/clangd",
+
+
 	// json 
 	"json.enable": true,
 	"json.format.enable": true,
+	"json.format.keepLines": true,
 
 	// xml
 	"xml.codeLens.enabled": true,
@@ -213,14 +222,14 @@
 		}
 	],
 	"explorer.git.enable": true,
-	"explorer.git.showIgnored": true,
 	"explorer.toggle": true,
+	"explorer.git.showIgnored": true,
 	"explorer.mouseMode": "singleclick",
 	"explorer.file.column.indent.indentLine": true,
 	"explorer.buffer.showHiddenBuffers": false,
 	"explorer.icon.enableNerdfont": true,
 	"explorer.filename.colored.enable": true,
-	"explorer.openAction.strategy": "tab",
+	"explorer.openAction.strategy": "select",
 	"explorer.quitOnOpen": false,
 	"explorer.position": "floating",
 	"explorer.floating.position": "right-center",
@@ -288,7 +297,21 @@
 		"<<": "gitStage",
 		">>": "gitUnstage"
 	},
+
+	//"diagnostic-languageserver.formatFiletypes": {
+	//  "go": "gofmt"
+	//},
+	//"diagnostic-languageserver.formatters": {
+	//  "gofmt": {
+	//    "command": "goimports"
+	//  }
+	//},
 	"languageserver": {
+		"golang": {
+			"command": "gopls",
+			"rootPatterns": [ "go.mod" ],
+			"filetypes": [ "go" ]
+		},
 		"sql": {
 			"command": "sql-language-server",
 			"args": [
@@ -319,4 +342,4 @@
 	"Lua.telemetry.enable": true
 }
 
-// vim: filetype=jsonc
+//  vim: filetype=jsonc
