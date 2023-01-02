@@ -271,6 +271,7 @@ let g:coc_global_extensions = [
        		\"coc-explorer",
        		\"coc-highlight",
        		\"coc-java",
+       		\"coc-java-vimspector",
        		\"coc-json",
        		\"coc-xml",
        		\"coc-rust-analyzer",
@@ -558,6 +559,19 @@ let g:go_highlight_fields = 1
 
 autocmd FileType go nmap <LEADER><LEADER> :GoAlternate!<CR>
 autocmd Filetype go command! -bang T call go#coverage#BufferToggle(<bang>0)
+
+autocmd Filetype go nmap <LEADER>0 :GoDebugStart<CR>
+autocmd Filetype go nmap <LEADER>q :GoDebugStop<CR>
+
+let g:go_debug_breakpoint_sign_text = '>'
+let g:go_debug_mappings = {
+   \ '(go-debug-breakpoint)': {'key': '1'},
+   \ '(go-debug-stepout)':    {'key': '7'},
+   \ '(go-debug-next)':       {'key': '8'},
+   \ '(go-debug-step)':       {'key': '9'},
+   \ '(go-debug-continue)':   {'key': '0'},
+\ }
+
 
 
 
