@@ -10,7 +10,6 @@
 "endif
 
 
-
 let mapleader = ' '
 
 filetype plugin on
@@ -202,10 +201,11 @@ Plug 'yianwillis/vimcdoc', {'for': 'vim'}
 Plug 'ybian/smartim'
 
 " themes
-Plug 'szzii/eleline.vim'
+Plug 'nvim-lualine/lualine.nvim'
+Plug 'kyazdani42/nvim-web-devicons'
 Plug 'ryanoasis/vim-devicons'
-Plug 'szzii/jellybeans.vim'
-Plug 'uiiaoo/java-syntax.vim'
+Plug 'sainnhe/sonokai'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 
 
@@ -242,27 +242,27 @@ Plug 'rust-lang/rust.vim'
 
 call plug#end()
 
-" colorsheme
-"let g:jellybeans_overrides = {
-"\    'background': { 'guibg': '000000' },
-"\}
-"let g:jellybeans_use_term_italics = 1
 
+let g:sonokai_style = 'maia'
+let g:sonokai_better_performance = 1
+let g:sonokai_disable_italic_comment = 1
+let g:sonokai_disable_terminal_colors = 1
 
-colorscheme jellybeans
-hi link javaIdentifier NONE
-hi link javaDelimiter NONE
-hi link javaOperator NONE
-hi link javaPreProc Function
-hi link javaNumber NONE
-hi link javaCharacter javaString
-hi! javaConstant guifg=NONE guibg=NONE gui=bold
+let g:gruvbox_material_background = 'hard'
+let g:gruvbox_material_foreground = 'original'
 
+let g:everforest_background = 'hard'
 
+let g:edge_style = 'neon'
 
+"function! s:sonokai_custom() abort
+"endfunction
+"augroup SonokaiCustom
+"  autocmd!
+"  autocmd ColorScheme sonokai call s:sonokai_custom()
+"augroup END
+colorscheme sonokai
 
-
-"highlight link javaFunction NONE
 
 "===================
 "====== coc configration ======
@@ -277,7 +277,7 @@ let g:coc_global_extensions = [
        		\"coc-rust-analyzer",
        		\"coc-yaml",
        		\"coc-html",
-          \"coc-pairs",
+				  \"coc-pairs",
 					\"coc-yank",
           \"coc-translator",
        		\"coc-clangd",
@@ -288,7 +288,6 @@ let g:coc_global_extensions = [
        		\"coc-ultisnips",
        		\"coc-diagnostic",
           \"coc-marketplace"]
-
 
 inoremap <silent><expr> <TAB>
       \ coc#pum#visible() ? coc#pum#next(1) :
@@ -392,36 +391,25 @@ function AutoDisableIndentLines()
 endfunction
 
 
-
-
-"let g:VM_maps['k'] = 'i'
-"let g:VM_maps['K'] = 'I'
-"let g:VM_maps['o'] = 'i'
-"let g:VM_maps['O'] = 'I'
-" eleline
-let g:eleline_powerline_fonts = 1
-"let g:eleline_background = 264
-
-
-
 " tmuxline
+
 let g:tmuxline_separators = {
-    \ 'left' : '',
-    \ 'left_alt': '>',
-    \ 'right' : '',
-    \ 'right_alt' : '<',
-    \ 'space' : ' '}
+		\ 'left' : '',
+		\ 'left_alt': '>',
+		\ 'right' : '',
+		\ 'right_alt' : '<',
+		\ 'space' : ' '}
 let g:tmuxline_preset = {
-      \'a'    : '#S',
-      \'win'  : '#I #W',
-      \'cwin' : '#I #W #F',
-      \'x'    : '%Y-%m-%d %H:%M:%S'}
+			\'a'    : '#S',
+			\'win'  : '#I #W',
+			\'cwin' : '#I #W #F',
+			\'x'    : '%Y-%m-%d %H:%M:%S'}
 
 
 " git
 "let g:gitgutter_git_executable = '/usr/bin/git'
 let g:gitgutter_map_keys = 0
-let g:gitgutter_sign_allow_clobber = 0
+let g:gitgutter_sign_allow_clobber = 1
 let g:gitgutter_preview_win_floating = 1
 let g:gitgutter_set_sign_backgrounds = 1
 " Thanks for @theniceboy
@@ -430,6 +418,10 @@ let g:gitgutter_sign_modified = '░'
 let g:gitgutter_sign_removed = '▏'
 let g:gitgutter_sign_removed_first_line = '▔'
 let g:gitgutter_sign_modified_removed = '▒'
+highlight GitGutterAdd    guifg=#009900 ctermfg=2
+highlight GitGutterChange guifg=#bbbb00 ctermfg=3
+highlight GitGutterDelete guifg=#ff2222 ctermfg=1
+
 "--
 let g:blamer_enabled = 1
 let g:blamer_date_format = '%Y-%m-%d %H:%M'
@@ -504,13 +496,6 @@ let g:startify_custom_header = [
 
 
 
-" ==================== nvim-scrollbar ====================
-lua <<EOF
-require("scrollbar").setup({
-		 set_highlights = false
-   })
-EOF
-
 
 
 " wildfire
@@ -574,9 +559,6 @@ let g:go_debug_mappings = {
 
 
 
-
-
-
 " Compile function
 noremap r :call CompileRunGcc()<CR>
 func! CompileRunGcc()
@@ -603,10 +585,154 @@ function! s:runGoFiles()
 endfunction
 
 
-let g:UltiSnipsExpandTrigger             = "<nop>"
-let g:UltiSnipsListSnippets              = "<nop>"
-let g:UltiSnipsJumpForwardTrigger        = "<nop>"
-let g:UltiSnipsJumpBackwardTrigger       = "<nop>"
+let g:UltiSnipsExpandTrigger            = '<c-I>'
+let g:UltiSnipsListSnippets             = '<c-N>'
+let g:UltiSnipsJumpForwardTrigger       = '<c-i>'
+let g:UltiSnipsJumpBackwardTrigger      = '<c-n>'
 
 let g:UltiSnipsSnippetDirectories=["UltiSnips", "MySnippets"]
 
+" ==================== nvim-scrollbar ====================
+lua <<EOF
+require'nvim-treesitter.configs'.setup {
+	--ensure_installed = { "java" },
+	ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+
+
+  highlight = {
+    enable = true,
+		disable = { "c", "rust", "go" },
+
+  },
+}
+
+require("scrollbar").setup({
+    show = true,
+    show_in_active_only = false,
+    set_highlights = true,
+    folds = 1000, -- handle folds, set to number to disable folds if no. of lines in buffer exceeds this
+    max_lines = false, -- disables if no. of lines in buffer exceeds this
+    hide_if_all_visible = false, -- Hides everything if all lines are visible
+    throttle_ms = 100,
+    handle = {
+        text = " ",
+        color = nil,
+        cterm = nil,
+        highlight = "CursorColumn",
+        hide_if_all_visible = true, -- Hides handle if all lines are visible
+    },
+    marks = {
+        Cursor = {
+            text = "•",
+            priority = 0,
+            color = nil,
+            cterm = nil,
+            highlight = "Normal",
+        },
+        Search = {
+            text = { "-", "=" },
+            priority = 1,
+            color = nil,
+            cterm = nil,
+            highlight = "Search",
+        },
+        Error = {
+            text = { "-", "=" },
+            priority = 2,
+            color = nil,
+            cterm = nil,
+            highlight = "DiagnosticVirtualTextError",
+        },
+        Warn = {
+            text = { "-", "=" },
+            priority = 3,
+            color = nil,
+            cterm = nil,
+            highlight = "DiagnosticVirtualTextWarn",
+        },
+        Info = {
+            text = { "-", "=" },
+            priority = 4,
+            color = nil,
+            cterm = nil,
+            highlight = "DiagnosticVirtualTextInfo",
+        },
+        Hint = {
+            text = { "-", "=" },
+            priority = 5,
+            color = nil,
+            cterm = nil,
+            highlight = "DiagnosticVirtualTextHint",
+        },
+        Misc = {
+            text = { "-", "=" },
+            priority = 6,
+            color = nil,
+            cterm = nil,
+            highlight = "Normal",
+        },
+        GitAdd = {
+            text = "┆",
+            priority = 7,
+            color = nil,
+            cterm = nil,
+            highlight = "GitSignsAdd",
+        },
+        GitChange = {
+            text = "┆",
+            priority = 7,
+            color = nil,
+            cterm = nil,
+            highlight = "GitSignsChange",
+        },
+        GitDelete = {
+            text = "▁",
+            priority = 7,
+            color = nil,
+            cterm = nil,
+            highlight = "GitSignsDelete",
+        },
+    },
+    excluded_buftypes = {
+        "terminal",
+    },
+    excluded_filetypes = {
+        "prompt",
+        "TelescopePrompt",
+        "noice",
+    },
+    autocmd = {
+        render = {
+            "BufWinEnter",
+            "TabEnter",
+            "TermEnter",
+            "WinEnter",
+            "CmdwinLeave",
+            "TextChanged",
+            "VimResized",
+            "WinScrolled",
+        },
+        clear = {
+            "BufWinLeave",
+            "TabLeave",
+            "TermLeave",
+            "WinLeave",
+        },
+    },
+    handlers = {
+        cursor = true,
+        diagnostic = true,
+        gitsigns = false, -- Requires gitsigns
+        handle = true,
+        search = false, -- Requires hlslens
+        ale = false, -- Requires ALE
+    },
+})
+
+require'lualine'.setup {
+  options = {
+    theme = 'sonokai'
+  }
+}
+
+EOF

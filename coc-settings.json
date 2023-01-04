@@ -44,17 +44,12 @@
 	"diagnostic.displayByAle": false,
 	"diagnostic.checkCurrentLine": true,
 	"diagnostic.refreshOnInsertMode": true,
-	"diagnostic.virtualText": true,
+	"diagnostic.virtualText": false,
 	"diagnostic.virtualTextPrefix": " ❯❯❯ ",
 	"diagnostic.errorSign": "\uf467",
 	"diagnostic.warningSign": "\uf071",
 	"diagnostic.infoSign": "\uf129",
 	"diagnostic.hintSign": "\uf864",
-	"diagnostic.floatConfig": {
-		"border": true,
-		"rounded": true,
-		"highlight": "none"
-	},
 
 
 
@@ -71,11 +66,6 @@
 
 
 	// 代码提示
-	"suggest.floatConfig": {
-		"border": true,
-		"rounded": true,
-		"highlight": "none"
-	},
 	"suggest.noselect": false,
 	"suggest.reversePumAboveCursor": true,
 	"suggest.labelMaxLength": 60,
@@ -107,11 +97,6 @@
 		"unit": "\uf475",
 		"value": "\uf89f",
 		"variable": "\ue71b"
-	},
-	"hover.floatConfig": {
-		"border": true,
-		"rounded": true,
-		"highlight": "none"
 	},
 
 	"translator.engines": [
