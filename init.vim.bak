@@ -277,7 +277,7 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'ryanoasis/vim-devicons'
 Plug 'uiiaoo/java-syntax.vim'
 Plug 'Iron-E/nvim-highlite'
-Plug 'metalelf0/jellybeans-nvim'
+Plug 'nanotech/jellybeans.vim'
 
 
 

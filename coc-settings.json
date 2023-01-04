@@ -5,7 +5,6 @@
 
 	// 基础设置
 	"coc.preferences.promptInput": true,
-	"coc.preferences.currentFunctionSymbolAutoUpdate": true,
 	"coc.preferences.messageLevel": "error",
 	"coc.preferences.jumpCommand": "edit",
 	"coc.preferences.rootPatterns": [ ".git", "pom.xml", "go.mod", "Cargo.toml", "Makefile" ],
@@ -218,7 +217,7 @@
 	"explorer.quitOnOpen": false,
 	"explorer.position": "floating",
 	"explorer.floating.position": "right-center",
-	"explorer.floating.height": 41,
+	"explorer.floating.height": 100,
 	"explorer.floating.width": 50,
 	"explorer.keyMappings.global": {
 		"il": false,

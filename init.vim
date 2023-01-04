@@ -191,10 +191,11 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'mhinz/vim-startify'
 Plug 'junegunn/vim-peekaboo'
 Plug 'lambdalisue/suda.vim' " do stuff like :sudowrite
-Plug 'Yggdroot/indentLine'
+Plug 'lukas-reineke/indent-blankline.nvim'
 Plug 'mbbill/undotree'
 Plug 'petertriho/nvim-scrollbar'
 Plug 'preservim/nerdcommenter'
+Plug 'romgrk/barbar.nvim'
 Plug 'yianwillis/vimcdoc', {'for': 'vim'}
 
 " switch keyboard layout only on macos 
@@ -204,10 +205,10 @@ Plug 'ybian/smartim'
 Plug 'nvim-lualine/lualine.nvim'
 Plug 'kyazdani42/nvim-web-devicons'
 Plug 'ryanoasis/vim-devicons'
-Plug 'sainnhe/sonokai'
+Plug 'Mofiqul/vscode.nvim'
+Plug 'lunarvim/darkplus.nvim'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-
-
+Plug 'nvim-treesitter/playground'
 
 " tmux
 Plug 'edkolev/tmuxline.vim'
@@ -240,28 +241,12 @@ Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'rust-lang/rust.vim'
 
 
+
 call plug#end()
 
-
-let g:sonokai_style = 'maia'
-let g:sonokai_better_performance = 1
-let g:sonokai_disable_italic_comment = 1
-let g:sonokai_disable_terminal_colors = 1
-
-let g:gruvbox_material_background = 'hard'
-let g:gruvbox_material_foreground = 'original'
-
-let g:everforest_background = 'hard'
-
-let g:edge_style = 'neon'
-
-"function! s:sonokai_custom() abort
-"endfunction
-"augroup SonokaiCustom
-"  autocmd!
-"  autocmd ColorScheme sonokai call s:sonokai_custom()
-"augroup END
-colorscheme sonokai
+set t_Co=256
+set t_ut=
+colorscheme vscode
 
 
 "===================
@@ -271,7 +256,6 @@ let g:coc_global_extensions = [
        		\"coc-explorer",
        		\"coc-highlight",
        		\"coc-java",
-       		\"coc-java-vimspector",
        		\"coc-json",
        		\"coc-xml",
        		\"coc-rust-analyzer",
@@ -374,21 +358,6 @@ nnoremap tt :CocCommand explorer<CR>
 nnoremap <silent> <space>y  :<C-u>CocList -A --normal yank<cr>
 
 
-" indentline
-let g:indentLine_char_list = ['|', '¦', '┆', '┊']
-augroup MyIndentLine 
-	au!
-	autocmd User StartifyReady :IndentLinesDisable
-	autocmd BufEnter * call AutoDisableIndentLines()
-augroup END
-
-function AutoDisableIndentLines() 
-	if &filetype == 'json' || &filetype == 'markdown'  || &filetype == 'coc-explorer'
-		:IndentLinesDisable
-	else 
-		:IndentLinesEnable
-	endif
-endfunction
 
 
 " tmuxline
@@ -592,6 +561,17 @@ let g:UltiSnipsJumpBackwardTrigger      = '<c-n>'
 
 let g:UltiSnipsSnippetDirectories=["UltiSnips", "MySnippets"]
 
+
+
+"TS
+nnoremap <LEADER>h :TSHighlightCapturesUnderCursor<CR>
+
+
+" indentline
+let g:indent_blankline_filetype_exclude = ['help','startify','markdown','json','jsonc']
+
+
+
 " ==================== nvim-scrollbar ====================
 lua <<EOF
 require'nvim-treesitter.configs'.setup {
@@ -606,133 +586,50 @@ require'nvim-treesitter.configs'.setup {
   },
 }
 
+
 require("scrollbar").setup({
     show = true,
-    show_in_active_only = false,
+    show_in_active_only = true,
     set_highlights = true,
-    folds = 1000, -- handle folds, set to number to disable folds if no. of lines in buffer exceeds this
-    max_lines = false, -- disables if no. of lines in buffer exceeds this
-    hide_if_all_visible = false, -- Hides everything if all lines are visible
-    throttle_ms = 100,
-    handle = {
-        text = " ",
-        color = nil,
-        cterm = nil,
-        highlight = "CursorColumn",
-        hide_if_all_visible = true, -- Hides handle if all lines are visible
-    },
-    marks = {
-        Cursor = {
-            text = "•",
-            priority = 0,
-            color = nil,
-            cterm = nil,
-            highlight = "Normal",
-        },
-        Search = {
-            text = { "-", "=" },
-            priority = 1,
-            color = nil,
-            cterm = nil,
-            highlight = "Search",
-        },
-        Error = {
-            text = { "-", "=" },
-            priority = 2,
-            color = nil,
-            cterm = nil,
-            highlight = "DiagnosticVirtualTextError",
-        },
-        Warn = {
-            text = { "-", "=" },
-            priority = 3,
-            color = nil,
-            cterm = nil,
-            highlight = "DiagnosticVirtualTextWarn",
-        },
-        Info = {
-            text = { "-", "=" },
-            priority = 4,
-            color = nil,
-            cterm = nil,
-            highlight = "DiagnosticVirtualTextInfo",
-        },
-        Hint = {
-            text = { "-", "=" },
-            priority = 5,
-            color = nil,
-            cterm = nil,
-            highlight = "DiagnosticVirtualTextHint",
-        },
-        Misc = {
-            text = { "-", "=" },
-            priority = 6,
-            color = nil,
-            cterm = nil,
-            highlight = "Normal",
-        },
-        GitAdd = {
-            text = "┆",
-            priority = 7,
-            color = nil,
-            cterm = nil,
-            highlight = "GitSignsAdd",
-        },
-        GitChange = {
-            text = "┆",
-            priority = 7,
-            color = nil,
-            cterm = nil,
-            highlight = "GitSignsChange",
-        },
-        GitDelete = {
-            text = "▁",
-            priority = 7,
-            color = nil,
-            cterm = nil,
-            highlight = "GitSignsDelete",
-        },
-    },
-    excluded_buftypes = {
-        "terminal",
-    },
-    excluded_filetypes = {
-        "prompt",
-        "TelescopePrompt",
-        "noice",
-    },
-    autocmd = {
-        render = {
-            "BufWinEnter",
-            "TabEnter",
-            "TermEnter",
-            "WinEnter",
-            "CmdwinLeave",
-            "TextChanged",
-            "VimResized",
-            "WinScrolled",
-        },
-        clear = {
-            "BufWinLeave",
-            "TabLeave",
-            "TermLeave",
-            "WinLeave",
-        },
-    },
-    handlers = {
-        cursor = true,
-        diagnostic = true,
-        gitsigns = false, -- Requires gitsigns
-        handle = true,
-        search = false, -- Requires hlslens
-        ale = false, -- Requires ALE
-    },
 })
 
 require'lualine'.setup {
   options = {
-    theme = 'sonokai'
-  }
+    theme = 'vscode'
+  },
+	sections = { lualine_c = { 'g:coc_status' } }
 }
+
+require("indent_blankline").setup {
+    show_current_context = true,
+}
+
+--vim.o.background = 'light'
+
+require('vscode').setup({
+    -- Enable transparent background
+    transparent = true,
+
+    -- Disable nvim-tree background color
+    --disable_nvimtree_bg = true,
+
+    -- Override highlight groups (see ./lua/vscode/theme.lua)
+    group_overrides = {
+        -- this supports the same val table as vim.api.nvim_set_hl
+        -- use colors from this colorscheme by requiring vscode.colors!
+        CocHighlightText = { bold=true ,bg = "#4B4B4B" },
+        --ScrollbarHandle = { bold=true ,bg = "#26DAFF" },
+    }
+})
+
+-- java
+vim.api.nvim_set_hl(0, "@type.qualifier.java", { link = "@keyword" })
+vim.api.nvim_set_hl(0, "@exception.java", { link = "@keyword" })
+-- vim.api.nvim_set_hl(0, "@type.java", { bold = true })
+-- vim.api.nvim_set_hl(0, "@constant.java", { bold = true })
+-- common
+vim.api.nvim_set_hl(0, "@variable", { fg = "#F5ECEB" })
+vim.api.nvim_set_hl(0, "@parameter", { fg = "#F5ECEB" })
+vim.api.nvim_set_hl(0, "@field", { fg = "#F5ECEB" })
 
 EOF
