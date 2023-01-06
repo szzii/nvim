@@ -562,7 +562,7 @@ function! s:runJavaFiles()
 		if l:file =~# '^\f\+Test\.java$' || l:file =~# '^\f\+Tests\.java$'
 			let l:funcName = s:getClassPath()
 			call asyncrun#run("", {'cwd' :'<root>','save': 2}, "mvn -DskipTests clean package && \
-					\java -jar ~/Downloads/junit-platform-console-standalone-1.9.1.jar \
+					\java -jar ~/.config/nvim/junit-platform-console-standalone-1.9.1.jar \
 		 			\-cp target/test-classes \
 		 			\--disable-ansi-colors \
 		 			\-m ".. l:funcName)
