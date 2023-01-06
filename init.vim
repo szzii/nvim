@@ -161,8 +161,8 @@ noremap <right> :vertical resize+5<CR>
 
 " switch tab
 nmap tu :tabe<CR>
-nmap ti :+tabnext<CR>
-nmap tn :-tabnext<CR>
+"nmap ti :+tabnext<CR>
+"nmap tn :-tabnext<CR>
 
 " insert mode
 inoremap <C-a> <ESC>A
@@ -197,6 +197,10 @@ Plug 'petertriho/nvim-scrollbar'
 Plug 'preservim/nerdcommenter'
 Plug 'romgrk/barbar.nvim'
 Plug 'yianwillis/vimcdoc', {'for': 'vim'}
+Plug 'skywind3000/asyncrun.vim'
+Plug 'skywind3000/asynctasks.vim'
+
+
 
 " switch keyboard layout only on macos 
 Plug 'ybian/smartim'
@@ -529,18 +533,16 @@ let g:go_debug_mappings = {
 
 
 " Compile function
-noremap r :call CompileRunGcc()<CR>
-func! CompileRunGcc()
+noremap <leader><esc> :AsyncStop<CR>
+noremap r :call CompileRun()<CR>
+func! CompileRun()
   exec "w"
   if &filetype == 'python'
-  	set splitbelow
-  	:sp
-  	:term python3 %
+		call asyncrun#run("", {}, "python3 $(VIM_FILENAME)")
 	elseif &filetype == 'go'
 		call s:runGoFiles()
 	elseif &filetype == 'java'
-    exec "!javac %"
-    exec "!time java %<"
+		call s:runJavaFiles()
   endif
 endfunc
 
@@ -552,6 +554,34 @@ function! s:runGoFiles()
 		:GoRun
   endif
 endfunction
+
+function! s:runJavaFiles()
+	let l:pom = findfile("pom.xml",".;")
+	if l:pom != ""
+		let l:file = expand('%')
+		if l:file =~# '^\f\+Test\.java$' || l:file =~# '^\f\+Tests\.java$'
+			let l:funcName = s:getClassPath()
+			call asyncrun#run("", {'cwd' :'<root>','save': 2}, "mvn -DskipTests clean package && \
+					\java -jar ~/Downloads/junit-platform-console-standalone-1.9.1.jar \
+		 			\-cp target/test-classes \
+		 			\--disable-ansi-colors \
+		 			\-m ".. l:funcName)
+		else 
+			call asyncrun#run("", {'cwd' :'<root>','save': 2}, "mvn clean spring-boot:run")
+		endif
+	else 
+		call asyncrun#run("", {'save': 1}, "javac $(VIM_FILENAME) && java $(VIM_FILENAME)")
+	endif
+endfunction
+
+command! Cp call s:getClassPath()
+
+function s:getClassPath() abort
+	let l:line = substitute(getline(1),"package ","","")
+	let l:line = strpart(l:line,0,strlen(l:line) - 1)
+	return l:line .. "." .. expand("%:r")  .. "#" .. expand("<cword>")
+endfunction
+
 
 
 let g:UltiSnipsExpandTrigger            = '<c-I>'
@@ -568,9 +598,52 @@ nnoremap <LEADER>h :TSHighlightCapturesUnderCursor<CR>
 
 
 " indentline
-let g:indent_blankline_filetype_exclude = ['help','startify','markdown','json','jsonc']
+let g:indent_blankline_filetype_exclude = ['help','startify','markdown','json','jsonc','qf']
 
 
+"barbar
+" Move to previous/next
+nnoremap <silent>    tn <Cmd>BufferPrevious<CR>
+nnoremap <silent>    ti <Cmd>BufferNext<CR>
+
+" Re-order to previous/next
+nnoremap <silent>    tN <Cmd>BufferMovePrevious<CR>
+nnoremap <silent>    tI <Cmd>BufferMoveNext<CR>
+
+" Goto buffer in position...
+nnoremap <silent>    t1 <Cmd>BufferGoto 1<CR>
+nnoremap <silent>    t2 <Cmd>BufferGoto 2<CR>
+nnoremap <silent>    t3 <Cmd>BufferGoto 3<CR>
+nnoremap <silent>    t4 <Cmd>BufferGoto 4<CR>
+nnoremap <silent>    t5 <Cmd>BufferGoto 5<CR>
+nnoremap <silent>    t6 <Cmd>BufferGoto 6<CR>
+nnoremap <silent>    t7 <Cmd>BufferGoto 7<CR>
+nnoremap <silent>    t8 <Cmd>BufferGoto 8<CR>
+nnoremap <silent>    t9 <Cmd>BufferGoto 9<CR>
+nnoremap <silent>    t0 <Cmd>BufferLast<CR>
+
+" Pin/unpin buffer
+nnoremap <silent>    tp <Cmd>BufferPin<CR>
+
+" Close buffer
+nnoremap <silent>    tq <Cmd>BufferClose<CR>
+nnoremap <silent>    tQ <Cmd>BufferCloseAllButCurrent<CR>
+
+" Wipeout buffer
+"                          :BufferWipeout
+" Close commands
+"                          :BufferCloseAllButCurrent
+"                          :BufferCloseAllButVisible
+"                          :BufferCloseAllButPinned
+"                          :BufferCloseAllButCurrentOrPinned
+"                          :BufferCloseBuffersLeft
+"                          :BufferCloseBuffersRight
+
+" Sort automatically by...
+nnoremap <silent> to <Cmd>BufferOrderByBufferNumber<CR>
+
+let g:asyncrun_open = 8
+let g:asyncrun_rootmarks = ['.git','pom.xml', '.svn', '.root', '.project', '.hg','.vscode','.project']
 
 " ==================== nvim-scrollbar ====================
 lua <<EOF

@@ -35,6 +35,7 @@
 	"coc.source.around.enable": false,
 	"coc.source.buffer.enable": false,
 	"coc.source.file.ignoreHidden": false,
+	"coc.source.ultisnips.priority": 90,
 
 
 

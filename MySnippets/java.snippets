@@ -3,5 +3,12 @@
 priority  1
 
 snippet sout  "system out ..."
-System.out.println("${1:str}");
+System.out.println(${1:str});
+endsnippet
+
+snippet test  ""
+@Test
+public void test${1:Function}() {
+	${0:${VISUAL}}
+}
 endsnippet
