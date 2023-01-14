@@ -29,7 +29,7 @@ set encoding=utf-8
 " line number
 set scrolloff=10
 set number
-set relativenumber
+"set relativenumber
 set wrap
 let &showbreak='+++ '
 "set list        
@@ -85,13 +85,6 @@ autocmd BufRead * autocmd FileType <buffer> ++once
 exec "nohlsearch"
 
 
-
-
-map <TAB> <nop>
-exec "nohlsearch"
-
-
-
 " ======= basic keymap ======= 
 
 "
@@ -110,15 +103,18 @@ nnoremap < <<
 nnoremap > >>
 
 " go to the start or end of the line
-noremap  N 0
-noremap  I $
+noremap N 0
+noremap I $
+
+map <TAB> >
+nnoremap \ e
 
 " Insert Key
 noremap h i
 noremap H I
 
 " Save & quit
-map s :<nop>
+"map s :<nop>
 map S :w<CR>
 map Q :q<CR>
 
@@ -560,26 +556,26 @@ function! s:runJavaFiles()
 	if l:pom != ""
 		let l:file = expand('%')
 		if l:file =~# '^\f\+Test\.java$' || l:file =~# '^\f\+Tests\.java$'
-			let l:funcName = s:getClassPath()
-			call asyncrun#run("", {'cwd' :'<root>','save': 2}, "mvn -DskipTests clean package && \
-					\java -jar ~/.config/nvim/junit-platform-console-standalone-1.9.1.jar \
-		 			\-cp target/test-classes \
-		 			\--disable-ansi-colors \
-		 			\-m ".. l:funcName)
+			let l:testName = s:getJavaTestFuncName()
+			call asyncrun#run("", {'cwd' :'<root>','save': 2}, "mvn -Dtest=".. l:testName .." test" )
+			"call asyncrun#run("", {'cwd' :'<root>','save': 2}, "mvn -DskipTests test package && \
+			"    \java -jar ~/.config/nvim/junit-platform-console-standalone-1.9.1.jar \
+			"     \-cp target/test-classes \
+			"     \--disable-ansi-colors" .. l:testName)
 		else 
-			call asyncrun#run("", {'cwd' :'<root>','save': 2}, "mvn clean spring-boot:run")
+			call asyncrun#run("", {'cwd' :'<root>','save': 2}, "mvn -Dmaven.test.skip=true clean spring-boot:run")
 		endif
 	else 
-		call asyncrun#run("", {'save': 1}, "javac $(VIM_FILENAME) && java $(VIM_FILENAME)")
+		call asyncrun#run("", {'save': 1}, "javac -cp . $(VIM_FILENAME) && java $(VIM_FILENAME)")
 	endif
 endfunction
 
-command! Cp call s:getClassPath()
-
-function s:getClassPath() abort
-	let l:line = substitute(getline(1),"package ","","")
-	let l:line = strpart(l:line,0,strlen(l:line) - 1)
-	return l:line .. "." .. expand("%:r")  .. "#" .. expand("<cword>")
+function s:getJavaTestFuncName() abort
+	if expand("<cword>") != ""
+		return expand("%:r")  .. "#" .. expand("<cword>")
+	else 
+		return expand("%:r")
+	endif
 endfunction
 
 
@@ -645,6 +641,10 @@ nnoremap <silent> to <Cmd>BufferOrderByBufferNumber<CR>
 let g:asyncrun_open = 8
 let g:asyncrun_rootmarks = ['.git','pom.xml', '.svn', '.root', '.project', '.hg','.vscode','.project']
 
+
+let g:suda_smart_edit = 1
+
+
 " ==================== nvim-scrollbar ====================
 lua <<EOF
 require'nvim-treesitter.configs'.setup {
@@ -704,5 +704,6 @@ vim.api.nvim_set_hl(0, "@exception.java", { link = "@keyword" })
 vim.api.nvim_set_hl(0, "@variable", { fg = "#F5ECEB" })
 vim.api.nvim_set_hl(0, "@parameter", { fg = "#F5ECEB" })
 vim.api.nvim_set_hl(0, "@field", { fg = "#F5ECEB" })
+vim.api.nvim_set_hl(0, "@constant", { italic = true })
 
 EOF

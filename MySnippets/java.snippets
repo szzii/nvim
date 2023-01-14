@@ -6,6 +6,18 @@ snippet sout  "system out ..."
 System.out.println(${1:str});
 endsnippet
 
+snippet func  "public void func(){...}"
+public void ${1:Function}() {
+	${0:${VISUAL}}
+}
+endsnippet
+
+snippet sf  "public static void func(){...}"
+public static void ${1:Function}() {
+	${0:${VISUAL}}
+}
+endsnippet
+
 snippet test  ""
 @Test
 public void test${1:Function}() {
