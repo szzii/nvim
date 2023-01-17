@@ -109,6 +109,8 @@
 	"rust-analyzer.lens.enable": true,
 	"rust-analyzer.cargo.autoreload": true,
 
+	"sh.enable": true,
+
 	// java
 	"java.enabled": true,
 	"java.home": "/Users/szz/.javahome/jdk-17.0.1.jdk/Contents/Home",

@@ -107,6 +107,9 @@ noremap N 0
 noremap I $
 
 map <TAB> >
+xmap <TAB> >
+map <S-TAB> <
+xmap <S-TAB> <
 nnoremap \ e
 
 " Insert Key
@@ -185,6 +188,7 @@ call plug#begin('~/.config/nvim/plugged')
 
 " Base Tools
 Plug 'mhinz/vim-startify'
+Plug 'kevinhwang91/rnvimr'
 Plug 'junegunn/vim-peekaboo'
 Plug 'lambdalisue/suda.vim' " do stuff like :sudowrite
 Plug 'lukas-reineke/indent-blankline.nvim'
@@ -193,8 +197,10 @@ Plug 'petertriho/nvim-scrollbar'
 Plug 'preservim/nerdcommenter'
 Plug 'romgrk/barbar.nvim'
 Plug 'yianwillis/vimcdoc', {'for': 'vim'}
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }
 Plug 'skywind3000/asyncrun.vim'
 Plug 'skywind3000/asynctasks.vim'
+Plug 'airblade/vim-rooter'
 
 
 
@@ -359,6 +365,9 @@ nnoremap <silent> <space>y  :<C-u>CocList -A --normal yank<cr>
 
 
 
+" rooter
+let g:rooter_patterns = ['.git', 'Makefile', '*.sln', 'pom.xml','Cargo.toml','go.mod']
+
 
 " tmuxline
 
@@ -387,18 +396,15 @@ let g:gitgutter_sign_modified = '░'
 let g:gitgutter_sign_removed = '▏'
 let g:gitgutter_sign_removed_first_line = '▔'
 let g:gitgutter_sign_modified_removed = '▒'
-highlight GitGutterAdd    guifg=#009900 ctermfg=2
-highlight GitGutterChange guifg=#bbbb00 ctermfg=3
-highlight GitGutterDelete guifg=#ff2222 ctermfg=1
 
 "--
 let g:blamer_enabled = 1
 let g:blamer_date_format = '%Y-%m-%d %H:%M'
 let g:blamer_template = '<committer>: <committer-time> (<summary>)'
 "--
-nnoremap <silent> <LEADER>1 :LazyGit<CR>
-let g:lazygit_floating_window_winblend = 0 " transparency of floating window
-let g:lazygit_floating_window_scaling_factor = 1.0 " scaling factor for floating window
+nnoremap <silent> <c-g> :LazyGit<CR>
+let g:lazygit_floating_window_winblend = 1 " transparency of floating window
+let g:lazygit_floating_window_scaling_factor = 0.685 " scaling factor for floating window
 let g:lazygit_floating_window_corner_chars = ['╭', '╮', '╰', '╯'] " customize lazygit popup window corner characters
 let g:lazygit_use_neovim_remote = 1 " for neovim-remote support
 
@@ -446,24 +452,32 @@ endif
 
 
 " fzf
-noremap <leader>2 :Rg<CR>
 noremap <leader>; :History:<CR>
-let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.9} }
+noremap <c-n> :Notes<CR>
+noremap <c-f> :Rg<CR>
+noremap <C-h> :Helptags<CR>
+
+let g:fzf_layout = { 'window': { 'width': 0.7, 'height':0.7} }
+
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case " .. shellescape(<q-args>), 1,
+  \   fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}), <bang>0)
+
+command! -bang -nargs=* Notes
+  \ call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case '' ~/notes", 1,
+  \   fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}), <bang>0)
+
+
+" rnvimr
+let g:rnvimr_enable_picker = 1
+let g:rnvimr_enable_bw = 1
+nnoremap <LEADER>2 :RnvimrToggle<CR>
 
 
 " startify
 nnoremap <LEADER>3 :Startify<CR>
-let g:startify_custom_header = [
-        \ '                                 ________  __ __        ',
-        \ '            __                  /\_____  \/\ \\ \       ',
-        \ '    __  __ /\_\    ___ ___      \/___//''/''\ \ \\ \    ',
-        \ '   /\ \/\ \\/\ \ /'' __` __`\        /'' /''  \ \ \\ \_ ',
-        \ '   \ \ \_/ |\ \ \/\ \/\ \/\ \      /'' /''__  \ \__ ,__\',
-        \ '    \ \___/  \ \_\ \_\ \_\ \_\    /\_/ /\_\  \/_/\_\_/  ',
-        \ '     \/__/    \/_/\/_/\/_/\/_/    \//  \/_/     \/_/    ',
-        \ ]
-
-
+let g:startify_custom_header =
+            \ startify#pad(split(system('fortune | cowsay'), '\n'))
 
 
 
@@ -479,8 +493,8 @@ let g:VM_maps['I'] = 'K'
 
 let g:VM_maps['Find Under']							= '<C-k>'
 let g:VM_maps['Find Subword Under']			= '<C-k>'
-let g:VM_maps['Select All']  						= '<C-f>'
-let g:VM_maps['Visual All']  						= '<C-f>'
+"let g:VM_maps['Select All']  						= '<C-f>'
+"let g:VM_maps['Visual All']  						= '<C-f>'
 let g:VM_maps['Skip Region']						= '<c-n>'
 let g:VM_maps['Remove Region']					= 'q'
 
@@ -552,29 +566,27 @@ function! s:runGoFiles()
 endfunction
 
 function! s:runJavaFiles()
-	let l:pom = findfile("pom.xml",".;")
-	if l:pom != ""
+	let l:dir = FindRootDirectory()
+
+	if l:dir != ""
 		let l:file = expand('%')
 		if l:file =~# '^\f\+Test\.java$' || l:file =~# '^\f\+Tests\.java$'
 			let l:testName = s:getJavaTestFuncName()
-			call asyncrun#run("", {'cwd' :'<root>','save': 2}, "mvn -Dtest=".. l:testName .." test" )
-			"call asyncrun#run("", {'cwd' :'<root>','save': 2}, "mvn -DskipTests test package && \
-			"    \java -jar ~/.config/nvim/junit-platform-console-standalone-1.9.1.jar \
-			"     \-cp target/test-classes \
-			"     \--disable-ansi-colors" .. l:testName)
+			call asyncrun#run("", {'cwd' :'<root>','save': 2}, "mvn package -Dtest=".. l:testName .." test" )
 		else 
 			call asyncrun#run("", {'cwd' :'<root>','save': 2}, "mvn -Dmaven.test.skip=true clean spring-boot:run")
 		endif
 	else 
 		call asyncrun#run("", {'save': 1}, "javac -cp . $(VIM_FILENAME) && java $(VIM_FILENAME)")
 	endif
+
 endfunction
 
 function s:getJavaTestFuncName() abort
 	if expand("<cword>") != ""
-		return expand("%:r")  .. "#" .. expand("<cword>")
+		return expand("%:t:r")  .. "#" .. expand("<cword>")
 	else 
-		return expand("%:r")
+		return expand("%:t:r")
 	endif
 endfunction
 
@@ -639,7 +651,6 @@ nnoremap <silent>    tQ <Cmd>BufferCloseAllButCurrent<CR>
 nnoremap <silent> to <Cmd>BufferOrderByBufferNumber<CR>
 
 let g:asyncrun_open = 8
-let g:asyncrun_rootmarks = ['.git','pom.xml', '.svn', '.root', '.project', '.hg','.vscode','.project']
 
 
 let g:suda_smart_edit = 1
@@ -690,7 +701,7 @@ require('vscode').setup({
     group_overrides = {
         -- this supports the same val table as vim.api.nvim_set_hl
         -- use colors from this colorscheme by requiring vscode.colors!
-        CocHighlightText = { bold=true ,bg = "#4B4B4B" },
+				CocHighlightText = { bold=true ,bg = "#4B4B4B" },
         --ScrollbarHandle = { bold=true ,bg = "#26DAFF" },
     }
 })
@@ -705,5 +716,6 @@ vim.api.nvim_set_hl(0, "@variable", { fg = "#F5ECEB" })
 vim.api.nvim_set_hl(0, "@parameter", { fg = "#F5ECEB" })
 vim.api.nvim_set_hl(0, "@field", { fg = "#F5ECEB" })
 vim.api.nvim_set_hl(0, "@constant", { italic = true })
+vim.api.nvim_set_hl(0, "Search", { bg = "#65FF58", fg = "#26120F",bold = true })
 
 EOF
