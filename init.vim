@@ -29,6 +29,8 @@ set encoding=utf-8
 " line number
 set scrolloff=10
 set number
+set cursorline
+set cursorlineopt=number
 "set relativenumber
 set wrap
 let &showbreak='+++ '
@@ -89,7 +91,7 @@ exec "nohlsearch"
 
 "
 "     ^
-"e    u
+"     u
 " < n   i >
 "     e
 "     v
@@ -152,10 +154,10 @@ noremap <LEADER>q <C-w>o
 noremap <LEADER>w <C-w>w
 noremap sh <C-w>t<C-w>K
 noremap sv <C-w>t<C-w>H
-noremap <up> :res +5<CR>
-noremap <down> :res -5<CR>
-noremap <left> :vertical resize-5<CR>
-noremap <right> :vertical resize+5<CR>
+"noremap <up> :res +5<CR>
+"noremap <down> :res -5<CR>
+"noremap <left> :vertical resize-5<CR>
+"noremap <right> :vertical resize+5<CR>
 
 
 " switch tab
@@ -201,6 +203,7 @@ Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }
 Plug 'skywind3000/asyncrun.vim'
 Plug 'skywind3000/asynctasks.vim'
 Plug 'airblade/vim-rooter'
+Plug 'ggandor/leap.nvim'
 
 
 
@@ -209,15 +212,14 @@ Plug 'ybian/smartim'
 
 " themes
 Plug 'nvim-lualine/lualine.nvim'
-Plug 'kyazdani42/nvim-web-devicons'
-Plug 'ryanoasis/vim-devicons'
-Plug 'Mofiqul/vscode.nvim'
+Plug 'nvim-tree/nvim-web-devicons'
+"Plug 'ryanoasis/vim-devicons'
+Plug 'szzii/vscode.nvim'
 Plug 'lunarvim/darkplus.nvim'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'nvim-treesitter/playground'
 
 " tmux
-Plug 'edkolev/tmuxline.vim'
 Plug 'wellle/tmux-complete.vim'
 
 " git
@@ -252,7 +254,6 @@ call plug#end()
 
 set t_Co=256
 set t_ut=
-colorscheme vscode
 
 
 "===================
@@ -360,28 +361,27 @@ autocmd! VimLeavePre * if get(g:, 'coc_process_pid', 0)
 		\	| call system('kill -9 '.g:coc_process_pid) | endif
 map <LEADER>t <Plug>(coc-translator-p)
 vmap <LEADER>t <Plug>(coc-translator-pv)
-nnoremap tt :CocCommand explorer<CR>
+nnoremap <silent> tt :CocCommand explorer<CR>
 nnoremap <silent> <space>y  :<C-u>CocList -A --normal yank<cr>
 
+function! s:open_explorer()
+	setl cursorlineopt=line
+	lua require'bufferline.api'.set_offset(41, 'FileTree')
+endfunction
 
+function! s:quit_explorer()
+	lua require'bufferline.api'.set_offset(0)
+endfunction
+
+augroup CocExplorerCustom
+  autocmd!
+	autocmd BufEnter * if (winnr("$") == 1 && &filetype == 'coc-explorer') | q | endif
+  autocmd User CocExplorerOpenPost  call <SID>open_explorer()
+  autocmd User CocExplorerQuitPre  call <SID>quit_explorer()
+augroup END
 
 " rooter
 let g:rooter_patterns = ['.git', 'Makefile', '*.sln', 'pom.xml','Cargo.toml','go.mod']
-
-
-" tmuxline
-
-let g:tmuxline_separators = {
-		\ 'left' : '',
-		\ 'left_alt': '>',
-		\ 'right' : '',
-		\ 'right_alt' : '<',
-		\ 'space' : ' '}
-let g:tmuxline_preset = {
-			\'a'    : '#S',
-			\'win'  : '#I #W',
-			\'cwin' : '#I #W #F',
-			\'x'    : '%Y-%m-%d %H:%M:%S'}
 
 
 " git
@@ -390,7 +390,6 @@ let g:gitgutter_map_keys = 0
 let g:gitgutter_sign_allow_clobber = 1
 let g:gitgutter_preview_win_floating = 1
 let g:gitgutter_set_sign_backgrounds = 1
-" Thanks for @theniceboy
 let g:gitgutter_sign_added = '▎'
 let g:gitgutter_sign_modified = '░'
 let g:gitgutter_sign_removed = '▏'
@@ -417,10 +416,8 @@ nnoremap  <Space>c <Plug>NERDCommenterToggle
 xnoremap  <Space>c <Plug>NERDCommenterToggle
 
 
-
-
 " undotree
-nnoremap L :UndotreeToggle<CR>
+nnoremap <leader>l :UndotreeToggle<CR>
 let g:undotree_WindowLayout = 3
 let g:undotree_RelativeTimestamp = 1
 let g:undotree_HelpLine = 1
@@ -548,13 +545,25 @@ noremap r :call CompileRun()<CR>
 func! CompileRun()
   exec "w"
   if &filetype == 'python'
-		call asyncrun#run("", {}, "python3 $(VIM_FILENAME)")
+		call asyncrun#run("", {'save':1}, "python3 $(VIM_FILENAME)")
 	elseif &filetype == 'go'
 		call s:runGoFiles()
 	elseif &filetype == 'java'
 		call s:runJavaFiles()
+	elseif &filetype == 'rust'
+		call s:runRustFiles()
   endif
 endfunc
+
+
+function! s:runRustFiles()
+	let l:dir = FindRootDirectory()
+	if l:dir != ""
+		call asyncrun#run("", {'save': 2}, "cargo run")
+	else
+		:RustRun
+	endif
+endfunction
 
 function! s:runGoFiles()
   let l:file = expand('%')
@@ -567,22 +576,20 @@ endfunction
 
 function! s:runJavaFiles()
 	let l:dir = FindRootDirectory()
-
 	if l:dir != ""
 		let l:file = expand('%')
 		if l:file =~# '^\f\+Test\.java$' || l:file =~# '^\f\+Tests\.java$'
 			let l:testName = s:getJavaTestFuncName()
-			call asyncrun#run("", {'cwd' :'<root>','save': 2}, "mvn package -Dtest=".. l:testName .." test" )
+			call asyncrun#run("", {'save': 2}, "mvn package -Dtest=".. l:testName .." test" )
 		else 
-			call asyncrun#run("", {'cwd' :'<root>','save': 2}, "mvn -Dmaven.test.skip=true clean spring-boot:run")
+			call asyncrun#run("", {'save': 2}, "mvn -Dmaven.test.skip=true clean spring-boot:run")
 		endif
 	else 
 		call asyncrun#run("", {'save': 1}, "javac -cp . $(VIM_FILENAME) && java $(VIM_FILENAME)")
 	endif
-
 endfunction
 
-function s:getJavaTestFuncName() abort
+function s:getJavaTestFuncName()
 	if expand("<cword>") != ""
 		return expand("%:t:r")  .. "#" .. expand("<cword>")
 	else 
@@ -609,46 +616,29 @@ nnoremap <LEADER>h :TSHighlightCapturesUnderCursor<CR>
 let g:indent_blankline_filetype_exclude = ['help','startify','markdown','json','jsonc','qf']
 
 
-"barbar
+" bufferline
 " Move to previous/next
-nnoremap <silent>    tn <Cmd>BufferPrevious<CR>
-nnoremap <silent>    ti <Cmd>BufferNext<CR>
-
-" Re-order to previous/next
-nnoremap <silent>    tN <Cmd>BufferMovePrevious<CR>
-nnoremap <silent>    tI <Cmd>BufferMoveNext<CR>
+nnoremap <silent> tn <Cmd>BufferPrevious<CR>
+nnoremap <silent> ti <Cmd>BufferNext<CR>
 
 " Goto buffer in position...
-nnoremap <silent>    t1 <Cmd>BufferGoto 1<CR>
-nnoremap <silent>    t2 <Cmd>BufferGoto 2<CR>
-nnoremap <silent>    t3 <Cmd>BufferGoto 3<CR>
-nnoremap <silent>    t4 <Cmd>BufferGoto 4<CR>
-nnoremap <silent>    t5 <Cmd>BufferGoto 5<CR>
-nnoremap <silent>    t6 <Cmd>BufferGoto 6<CR>
-nnoremap <silent>    t7 <Cmd>BufferGoto 7<CR>
-nnoremap <silent>    t8 <Cmd>BufferGoto 8<CR>
-nnoremap <silent>    t9 <Cmd>BufferGoto 9<CR>
-nnoremap <silent>    t0 <Cmd>BufferLast<CR>
+nnoremap <silent>t1 <Cmd>BufferGoto 1<CR>
+nnoremap <silent>t2 <Cmd>BufferGoto 2<CR>
+nnoremap <silent>t3 <Cmd>BufferGoto 3<CR>
+nnoremap <silent>t4 <Cmd>BufferGoto 4<CR>
+nnoremap <silent>t5 <Cmd>BufferGoto 5<CR>
+nnoremap <silent>t6 <Cmd>BufferGoto 6<CR>
+nnoremap <silent>t7 <Cmd>BufferGoto 7<CR>
+nnoremap <silent>t8 <Cmd>BufferGoto 8<CR>
+nnoremap <silent>t9 <Cmd>BufferGoto 9<CR>
+nnoremap <silent>t0 <Cmd>BufferLast<CR>
 
-" Pin/unpin buffer
-nnoremap <silent>    tp <Cmd>BufferPin<CR>
+" close buffers
+nnoremap <silent>tq <Cmd>BufferClose<CR>
+nnoremap <silent>tQ <Cmd>BufferCloseAllButCurrent<CR>
+nnoremap <silent>tr <Cmd>BufferCloseBuffersRight<CR>
+nnoremap <silent>tl <Cmd>BufferCloseBuffersLeft<CR>
 
-" Close buffer
-nnoremap <silent>    tq <Cmd>BufferClose<CR>
-nnoremap <silent>    tQ <Cmd>BufferCloseAllButCurrent<CR>
-
-" Wipeout buffer
-"                          :BufferWipeout
-" Close commands
-"                          :BufferCloseAllButCurrent
-"                          :BufferCloseAllButVisible
-"                          :BufferCloseAllButPinned
-"                          :BufferCloseAllButCurrentOrPinned
-"                          :BufferCloseBuffersLeft
-"                          :BufferCloseBuffersRight
-
-" Sort automatically by...
-nnoremap <silent> to <Cmd>BufferOrderByBufferNumber<CR>
 
 let g:asyncrun_open = 8
 
@@ -656,66 +646,157 @@ let g:asyncrun_open = 8
 let g:suda_smart_edit = 1
 
 
+
+
 " ==================== nvim-scrollbar ====================
 lua <<EOF
-require'nvim-treesitter.configs'.setup {
-	--ensure_installed = { "java" },
-	ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
-
-
-  highlight = {
-    enable = true,
-		disable = { "c", "rust", "go" },
-
-  },
-}
-
 
 require("scrollbar").setup({
     show = true,
     show_in_active_only = true,
     set_highlights = true,
+		handle = {
+				text = "░",
+				hide_if_all_visible = true, -- Hides handle if all lines are visible
+    },
+		excluded_filetypes = {
+        "coc-explorer",
+    },
+    handlers = {
+        cursor = false,
+        diagnostic = false,
+        gitsigns = false, -- Requires gitsigns
+        handle = true,
+        search = false, -- Requires hlslens
+        ale = false, -- Requires ALE
+    },
 })
 
-require'lualine'.setup {
-  options = {
-    theme = 'vscode'
-  },
-	sections = { lualine_c = { 'g:coc_status' } }
-}
+
 
 require("indent_blankline").setup {
     show_current_context = true,
 }
 
---vim.o.background = 'light'
+
+require('leap').init_highlight(true)
+vim.keymap.set({'n', 'x', 'o'}, 'f', '<Plug>(leap-forward-to)')
+vim.keymap.set({'n', 'x', 'o'}, 'F', '<Plug>(leap-backward-to)')
+vim.keymap.set({'n', 'x', 'o'}, '^', '<Plug>(leap-forward-till)')
+vim.keymap.set({'n', 'x', 'o'}, '&', '<Plug>(leap-backward-till)')
+
+-- Set barbar's options
+require'bufferline'.setup {
+		animation = true,
+		tabpages = false,
+	  icons = 'both',
+		icon_custom_colors = false,
+		icon_separator_active = '▎',
+		icon_separator_inactive = '▎',
+		icon_close_tab = '',
+    icon_close_tab_modified = '●',
+		icon_pinned = '車',
+}
+
+
+require('nvim-treesitter.configs').setup {
+	--ensure_installed = { "java" },
+	ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+
+  highlight = {
+    enable = true,
+		disable = { "c", "rust", "go" },
+  },
+}
+-- Set barbar's options
 
 require('vscode').setup({
     -- Enable transparent background
     transparent = true,
 
+		italic_comments = true,
+
     -- Disable nvim-tree background color
-    --disable_nvimtree_bg = true,
+    -- disable_nvimtree_bg = false,
 
     -- Override highlight groups (see ./lua/vscode/theme.lua)
     group_overrides = {
         -- this supports the same val table as vim.api.nvim_set_hl
         -- use colors from this colorscheme by requiring vscode.colors!
+
+				-- vim
+				Search = { bg = "#65FF58", fg = "#26120F",bold = true },
+				CursorLineNr = {fg = "white"},
+
+				-- coc.nvim
 				CocHighlightText = { bold=true ,bg = "#4B4B4B" },
-        --ScrollbarHandle = { bold=true ,bg = "#26DAFF" },
+
+        -- scrollbar
+        ScrollbarHandle = { fg = '#26DAFF' , bg ='NONE' },
+				ScrollbarWarnHandle = { fg ='yellow' },
+				ScrollbarErrorHandle = { fg ='red' },
+				ScrollbarInfoHandle = { fg ='white' },
+				ScrollbarHintHandle = { fg ='grey' },
+				ScrollbarWarn = { fg ='yellow' },
+				ScrollbarError = { fg ='red' },
+				ScrollbarInfo = { fg ='white' },
+				ScrollbarHint = { fg ='grey' },
+
+				-- barbar
+				BufferTabpageFill = { bg = 'NONE' },
+				-- BufferTabpages = { fg = 'grey' },
+
+
+				-- nvim-treesitter
+				['@variable'] = { fg = "#F5ECEB" },
+				['@parameter'] = { fg = "#F5ECEB" },
+				['@field'] = { fg = "#F5ECEB" },
+				['@constant'] = { italic = true },
+				['@type.qualifier.java'] = { link = "@keyword" },
+				['@exception.java'] = { link  = "@keyword" },
+		 
+				-- leap.nvim
+				LeapMatch = { fg = 'yellow' },
+				-- LeapLabelPrimary = { fg = 'red' }
+				-- LeapLabelSecondary = { fg = 'blue' }
+				-- LeapLabelSelected = { fg = 'black' }
+				LeapBackdrop = { fg = 'grey' },
+
+				-- Diagnostic 
+				DiagnosticWarn = { fg = 'yellow', bg = 'NONE'},
+				DiagnosticError = { fg = 'red', bg = 'NONE'},
+				DiagnosticHint = { fg = 'grey', bg = 'NONE'},
+				DiagnosticInfo = { fg = 'white', bg = 'NONE'},
+
+				-- BufferCurrentIcon = { fg = 'yellow'}
     }
 })
 
--- java
-vim.api.nvim_set_hl(0, "@type.qualifier.java", { link = "@keyword" })
-vim.api.nvim_set_hl(0, "@exception.java", { link = "@keyword" })
--- vim.api.nvim_set_hl(0, "@type.java", { bold = true })
--- vim.api.nvim_set_hl(0, "@constant.java", { bold = true })
--- common
-vim.api.nvim_set_hl(0, "@variable", { fg = "#F5ECEB" })
-vim.api.nvim_set_hl(0, "@parameter", { fg = "#F5ECEB" })
-vim.api.nvim_set_hl(0, "@field", { fg = "#F5ECEB" })
-vim.api.nvim_set_hl(0, "@constant", { italic = true })
-vim.api.nvim_set_hl(0, "Search", { bg = "#65FF58", fg = "#26120F",bold = true })
+
+require'lualine'.setup {
+	options = {
+		icons_enabled = true,
+		theme = 'vscode',
+		component_separators = { left = '', right = ''},
+		section_separators = { left = '', right = ''},
+		ignore_focus = {},
+    always_divide_middle = true,
+    globalstatus = false,
+    refresh = {
+      statusline = 1000,
+      tabline = 1000,
+      winbar = 1000,
+    }
+	},
+	sections = {
+		lualine_a = {'mode'},
+    lualine_b = {'branch', 'diff', 'diagnostics'},
+    lualine_c = {'g:coc_status','searchcount'},
+    lualine_x = {'encoding', 'fileformat', 'filetype'},
+    lualine_y = {'progress'},
+    lualine_z = {'location'}
+  },
+}
 
 EOF
+
