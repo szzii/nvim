@@ -7,25 +7,8 @@
 	"coc.preferences.promptInput": true,
 	"coc.preferences.messageLevel": "error",
 	"coc.preferences.jumpCommand": "edit",
-	"coc.preferences.rootPatterns": [ ".git", "pom.xml", "go.mod", "Cargo.toml", "Makefile" ],
-	"coc.preferences.formatOnSaveFiletypes": [
-		"javascript",
-		"typescript",
-		"html",
-		"xml",
-		"css",
-		"json",
-		"jsonc",
-		"python",
-		"vue",
-		"svelte",
-		"c",
-		"cpp",
-		"rust",
-		"java",
-		"prisma",
-		"go"
-	],
+	"coc.preferences.formatOnSave": true,
+	"coc.preferences.formatOnType": true,
 
 
 	"outline.previewBorderRounded": true,
@@ -113,23 +96,27 @@
 
 	// java
 	"java.enabled": true,
-	"java.home": "/Users/szz/.javahome/jdk-17.0.1.jdk/Contents/Home",
+	//"java.jdt.ls.java.home": "/Users/szz/.javahome/jdk-17.0.1.jdk/Contents/Home",
+	"java.jdt.ls.lombokSupport.enabled": false,
 	"java.jdt.ls.vmargs": "-javaagent:/Users/szz/.config/coc/extensions/lombok.jar",
+	"java.jdt.ls.statusIcons": { "busy": "🔥", "ready": "👌", "warning": "⚠️ ", "Error": "\uf467" },
+	"java.inlayHints.parameterNames.enabled": "all",
+	"java.typeHierarchy.lazyLoad": true,
 	"java.configuration.updateBuildConfiguration": "interactive",
 	"java.configuration.maven.userSettings": "/Users/szz/.m2/settings.xml",
 	"java.configuration.runtimes": [
 		{
 			"name": "JavaSE-1.8",
-			"path": "/Library/Java/JavaVirtualMachines/jdk1.8.0_301.jdk/Contents/Home"
+			"path": "/Library/Java/JavaVirtualMachines/jdk1.8.0_301.jdk/Contents/Home",
 		},
 		{
 			"name": "JavaSE-11",
 			"path": "/Users/szz/.javahome/jdk-11.0.13.jdk/Contents/Home",
-			"default": true
 		},
 		{
 			"name": "JavaSE-17",
-			"path": "/Users/szz/.javahome/jdk-17.0.1.jdk/Contents/Home"
+			"path": "/Users/szz/.javahome/jdk-17.0.1.jdk/Contents/Home",
+			"default": true
 		} ],
 	"java.referencesCodeLens.enabled": true,
 	"java.implementationsCodeLens.enabled": true,
@@ -139,14 +126,13 @@
 	"java.autobuild.enabled": true,
 	"java.maxConcurrentBuilds": 8,
 	"java.completion.enabled": true,
-	"java.completion.overwrite": true,
 	"java.completion.guessMethodArguments": true,
 	"java.format.enabled": true,
 	"java.format.comments.enabled": true,
 	"java.format.onType.enabled": true,
 	"java.foldingRange.enabled": true,
-	"java.maven.downloadSources": false,
-	"java.maven.updateSnapshots": false,
+	"java.maven.downloadSources": true,
+	"java.maven.updateSnapshots": true,
 	"java.saveActions.organizeImports": true,
 	"java.selectionRange.enabled": true,
 	"java.sources.organizeImports.starThreshold": 10,
@@ -190,7 +176,6 @@
 	"yaml.format.enable": true,
 
 	// html
-	"html.enable": true,
 	"html.format.enable": true,
 
 	// yank
@@ -286,19 +271,25 @@
 	},
 
 	//"diagnostic-languageserver.formatFiletypes": {
-	//  "go": "gofmt"
+	//  "nginx": "nginxfmt"
 	//},
 	//"diagnostic-languageserver.formatters": {
-	//  "gofmt": {
-	//    "command": "goimports"
+	//  "nginxfmt": {
+	//    "command": "nginxfmt"
 	//  }
 	//},
+
 	"languageserver": {
 		"golang": {
 			"command": "gopls",
 			"rootPatterns": [ "go.mod" ],
 			"filetypes": [ "go" ]
 		},
+		//"nginx-language-server": {
+		//  "command": "nginx-language-server",
+		//  "filetypes": [ "nginx" ],
+		//  "rootPatterns": [ "nginx.conf", ".git" ]
+		//},
 		"sql": {
 			"command": "sql-language-server",
 			"args": [
@@ -318,15 +309,8 @@
 				"s",
 				"S"
 			]
-		},
-		"nginx-language-server": {
-			"command": "nginx-language-server",
-			"filetypes": [
-				"nginx"
-			]
 		}
 	},
-	"Lua.telemetry.enable": true
 }
 
 //  vim: filetype=jsonc

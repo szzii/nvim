@@ -11,10 +11,13 @@
 
 
 let mapleader = ' '
+"set makeencoding=char
 
 filetype plugin on
 syntax on
 set termguicolors " enable true colors support
+set t_Co=256
+set t_ut=
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 
 
@@ -34,8 +37,10 @@ set cursorlineopt=number
 "set relativenumber
 set wrap
 let &showbreak='+++ '
-"set list        
-"set listchars=tab:\|\ ,trail:▫
+set list
+set lcs=tab:\ \ ,trail:▒
+"set listchars=trail:
+
 
 " search
 set hlsearch
@@ -44,7 +49,7 @@ set ignorecase
 set smartcase
 set inccommand=split
 
-" indent 
+" indent
 set autoindent
 set smartindent
 set indentexpr=
@@ -71,7 +76,7 @@ set nottimeout
 set timeoutlen=1000
 set updatetime=0
 set virtualedit=block
-set ttyfast 
+set ttyfast
 set tw=0
 set viewoptions=cursor,folds,unix
 set laststatus=2
@@ -87,7 +92,7 @@ autocmd BufRead * autocmd FileType <buffer> ++once
 exec "nohlsearch"
 
 
-" ======= basic keymap ======= 
+" ======= basic keymap =======
 
 "
 "     ^
@@ -112,7 +117,8 @@ map <TAB> >
 xmap <TAB> >
 map <S-TAB> <
 xmap <S-TAB> <
-nnoremap \ e
+nnoremap \ E
+xnoremap \ E
 
 " Insert Key
 noremap h i
@@ -132,7 +138,32 @@ noremap k n
 
 " change key
 noremap ; :
-noremap ` ~
+nnoremap <silent> ` :call Reverse_ture_false()<CR>
+xnoremap ` ~
+
+" False
+" FALSE
+" false
+function! Reverse_ture_false() abort
+		let cword = expand("<cword>")
+		echo cword
+		if cword !=? "true" || cword !=? "false"
+			exec "normal ~"
+		endif
+		if cword ==# "true" 
+			exec "normal bcwfalse"
+		elseif cword ==# "false" 
+			exec "normal bcwtrue"
+		elseif cword ==# "True" 
+			exec "normal bcwFalse"
+		elseif cword ==# "False" 
+			exec "normal bcwTrue"
+		elseif cword ==# "TRUE" 
+			exec "normal bcwFALSE"
+		elseif cword ==# "FALSE" 
+			exec "normal bcwTRUE"
+		endif
+endfunction
 
 " Copy to system clipboard
 vnoremap Y "+y
@@ -181,7 +212,6 @@ inoremap <C-o> <ESC>A {}<ESC>i<CR><ESC>ko
 
 " other
 noremap <LEADER><CR> :nohlsearch<CR>
-noremap <LEADER><LEADER> zz
 
 
 
@@ -199,13 +229,14 @@ Plug 'petertriho/nvim-scrollbar'
 Plug 'preservim/nerdcommenter'
 Plug 'romgrk/barbar.nvim'
 Plug 'yianwillis/vimcdoc', {'for': 'vim'}
-Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' , 'for': ['gitignore', 'markdown', 'vim-plug'] }
+Plug 'mzlogin/vim-markdown-toc', { 'for': ['gitignore', 'markdown', 'vim-plug'] }
 Plug 'skywind3000/asyncrun.vim'
-Plug 'skywind3000/asynctasks.vim'
 Plug 'airblade/vim-rooter'
 Plug 'ggandor/leap.nvim'
 
-
+" Binary View
+Plug 'Shougo/vinarise.vim'
 
 " switch keyboard layout only on macos 
 Plug 'ybian/smartim'
@@ -213,7 +244,6 @@ Plug 'ybian/smartim'
 " themes
 Plug 'nvim-lualine/lualine.nvim'
 Plug 'nvim-tree/nvim-web-devicons'
-"Plug 'ryanoasis/vim-devicons'
 Plug 'szzii/vscode.nvim'
 Plug 'lunarvim/darkplus.nvim'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
@@ -225,12 +255,13 @@ Plug 'wellle/tmux-complete.vim'
 " git
 Plug 'airblade/vim-gitgutter'
 Plug 'kdheepak/lazygit.nvim'
-"Plug 'APZelos/blamer.nvim'
 
 
 " code Completion
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+
 
 
 " fzf search
@@ -249,11 +280,8 @@ Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'rust-lang/rust.vim'
 
 
-
 call plug#end()
 
-set t_Co=256
-set t_ut=
 
 
 "===================
@@ -274,6 +302,7 @@ let g:coc_global_extensions = [
        		\"coc-clangd",
        		\"coc-pyright",
        		\"coc-sh",
+       		\"@yaegassy/coc-nginx",
           \"coc-sumneko-lua",
        		\"coc-vimlsp",
        		\"coc-ultisnips",
@@ -366,22 +395,22 @@ nnoremap <silent> <space>y  :<C-u>CocList -A --normal yank<cr>
 
 function! s:open_explorer()
 	setl cursorlineopt=line
-	lua require'bufferline.api'.set_offset(41, 'FileTree')
+	"lua require'bufferline.api'.set_offset(41, 'FileTree')
 endfunction
 
-function! s:quit_explorer()
-	lua require'bufferline.api'.set_offset(0)
-endfunction
+"function! s:quit_explorer()
+"  lua require'bufferline.api'.set_offset(0)
+"endfunction
 
 augroup CocExplorerCustom
   autocmd!
 	autocmd BufEnter * if (winnr("$") == 1 && &filetype == 'coc-explorer') | q | endif
-  autocmd User CocExplorerOpenPost  call <SID>open_explorer()
-  autocmd User CocExplorerQuitPre  call <SID>quit_explorer()
+	autocmd User CocExplorerOpenPost  call <SID>open_explorer()
+  "autocmd User CocExplorerQuitPre  call <SID>quit_explorer()
 augroup END
 
 " rooter
-let g:rooter_patterns = ['.git', 'Makefile', '*.sln', 'pom.xml','Cargo.toml','go.mod']
+let g:rooter_patterns = ['.git', 'Makefile', '*.sln', 'pom.xml','build.gradle','Cargo.toml','go.mod']
 
 
 " git
@@ -541,10 +570,14 @@ let g:go_debug_mappings = {
 
 " Compile function
 noremap <leader><esc> :AsyncStop<CR>
+let g:asyncrun_open = 8
+
 noremap r :call CompileRun()<CR>
 func! CompileRun()
   exec "w"
-  if &filetype == 'python'
+  if &filetype == 'sh'
+		call asyncrun#run("", {'save':1}, "bash $(VIM_FILENAME)")
+	elseif &filetype == 'python'
 		call asyncrun#run("", {'save':1}, "python3 $(VIM_FILENAME)")
 	elseif &filetype == 'go'
 		call s:runGoFiles()
@@ -552,6 +585,14 @@ func! CompileRun()
 		call s:runJavaFiles()
 	elseif &filetype == 'rust'
 		call s:runRustFiles()
+	elseif &filetype == 'c'
+		call asyncrun#run("", {'save':1}, "clang $(VIM_FILENAME) -o $(VIM_FILENOEXT) && ./$(VIM_FILENOEXT)")
+	elseif &filetype == 'cpp'
+		call asyncrun#run("", {'save':1}, "clang++ -std=c++11 $(VIM_FILENAME) -Wall -o $(VIM_FILENOEXT) && ./$(VIM_FILENOEXT)")
+	elseif &filetype == 'asm'
+		call asyncrun#run("", {'save':1}, "as $(VIM_FILENAME) -o $(VIM_FILENOEXT).o && 
+				\ ld $(VIM_FILENOEXT).o -o $(VIM_FILENOEXT) -L /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib -lSystem &&
+				\ ./$(VIM_FILENOEXT)")
   endif
 endfunc
 
@@ -582,10 +623,10 @@ function! s:runJavaFiles()
 			let l:testName = s:getJavaTestFuncName()
 			call asyncrun#run("", {'save': 2}, "mvn package -Dtest=".. l:testName .." test" )
 		else 
-			call asyncrun#run("", {'save': 2}, "mvn -Dmaven.test.skip=true clean spring-boot:run")
+			call asyncrun#run("", {'save': 2}, "mvn clean spring-boot:run")
 		endif
 	else 
-		call asyncrun#run("", {'save': 1}, "javac -cp . $(VIM_FILENAME) && java $(VIM_FILENAME)")
+		call asyncrun#run("", {'save': 1}, "javac -cp . $(VIM_FILENAME) && java $(VIM_FILENOEXT)")
 	endif
 endfunction
 
@@ -599,6 +640,7 @@ endfunction
 
 
 
+" UltiSnips
 let g:UltiSnipsExpandTrigger            = '<c-I>'
 let g:UltiSnipsListSnippets             = '<c-N>'
 let g:UltiSnipsJumpForwardTrigger       = '<c-i>'
@@ -640,12 +682,17 @@ nnoremap <silent>tr <Cmd>BufferCloseBuffersRight<CR>
 nnoremap <silent>tl <Cmd>BufferCloseBuffersLeft<CR>
 
 
-let g:asyncrun_open = 8
 
 
 let g:suda_smart_edit = 1
 
 
+" Nginx 
+augroup custom_nginx
+  autocmd!
+  autocmd FileType nginx setlocal iskeyword+=$
+  autocmd FileType nginx let b:coc_additional_keywords = ['$']
+augroup end
 
 
 " ==================== nvim-scrollbar ====================
@@ -687,7 +734,8 @@ vim.keymap.set({'n', 'x', 'o'}, '&', '<Plug>(leap-backward-till)')
 
 -- Set barbar's options
 require'bufferline'.setup {
-		animation = true,
+		animation = false,
+		auto_hide = true,
 		tabpages = false,
 	  icons = 'both',
 		icon_custom_colors = false,
@@ -696,6 +744,8 @@ require'bufferline'.setup {
 		icon_close_tab = '',
     icon_close_tab_modified = '●',
 		icon_pinned = '車',
+		exclude_ft = {'qf'},
+
 }
 
 
@@ -727,6 +777,7 @@ require('vscode').setup({
 				-- vim
 				Search = { bg = "#65FF58", fg = "#26120F",bold = true },
 				CursorLineNr = {fg = "white"},
+				CursorLine = { bold = true , bg = "#222222"},
 
 				-- coc.nvim
 				CocHighlightText = { bold=true ,bg = "#4B4B4B" },
@@ -744,8 +795,19 @@ require('vscode').setup({
 
 				-- barbar
 				BufferTabpageFill = { bg = 'NONE' },
-				-- BufferTabpages = { fg = 'grey' },
 
+				BufferCurrent = { fg = 'white', bg = '#0d4908' },
+				BufferCurrentIndex = { fg = 'white', bg = '#0d4908' },
+				BufferCurrentMod = { bg = '#0d4908' },
+				BufferCurrentSign = { bg = '#0d4908' },
+				BufferCurrentIcon = { bg = '#0d4908' },
+				BufferCurrentTarget = { bg = '#0d4908' },
+
+				BufferInactive = { fg = '#808080', bg = 'NONE' },
+				BufferInactiveIndex = { fg = '#808080', bg = 'NONE' },
+				BufferInactiveMod = { bg = 'NONE' },
+				BufferInactiveSign = { bg = 'NONE' },
+				BufferInactiveTarget = { bg = 'NONE' },
 
 				-- nvim-treesitter
 				['@variable'] = { fg = "#F5ECEB" },

@@ -1,4 +1,5 @@
 {
   "Lua.runtime.version": "LuaJIT",
-  "Lua.workspace.checkThirdParty": false
+  "Lua.workspace.checkThirdParty": false,
+  "java.compile.nullAnalysis.mode": "automatic"
 }
