@@ -431,10 +431,10 @@ let g:blamer_date_format = '%Y-%m-%d %H:%M'
 let g:blamer_template = '<committer>: <committer-time> (<summary>)'
 "--
 nnoremap <silent> <c-g> :LazyGit<CR>
-let g:lazygit_floating_window_winblend = 1 " transparency of floating window
-let g:lazygit_floating_window_scaling_factor = 0.685 " scaling factor for floating window
+let g:lazygit_floating_window_winblend = 0 " transparency of floating window
+let g:lazygit_floating_window_scaling_factor = 0.8 " scaling factor for floating window
 let g:lazygit_floating_window_corner_chars = ['╭', '╮', '╰', '╯'] " customize lazygit popup window corner characters
-let g:lazygit_use_neovim_remote = 1 " for neovim-remote support
+let g:lazygit_use_neovim_remote = 0 " for neovim-remote support
 
 
 
@@ -501,7 +501,7 @@ nnoremap <LEADER>2 :RnvimrToggle<CR>
 
 
 " startify
-nnoremap <LEADER>3 :Startify<CR>
+nnoremap <LEADER>1 :Startify<CR>
 let g:startify_custom_header =
             \ startify#pad(split(system('fortune | cowsay'), '\n'))
 
@@ -646,7 +646,7 @@ let g:UltiSnipsListSnippets             = '<c-N>'
 let g:UltiSnipsJumpForwardTrigger       = '<c-i>'
 let g:UltiSnipsJumpBackwardTrigger      = '<c-n>'
 
-let g:UltiSnipsSnippetDirectories=["UltiSnips", "MySnippets"]
+let g:UltiSnipsSnippetDirectories=["UltiSnips", "$HOME/.config/nvim/UltiSnips/"]
 
 
 
