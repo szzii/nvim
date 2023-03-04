@@ -1,0 +1,206 @@
+
+let mapleader = ' '
+"set makeencoding=char
+
+filetype plugin on
+syntax on
+set termguicolors " enable true colors support
+set t_Co=256
+set t_ut=
+let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+
+
+set nocompatible
+set autoread
+set autowrite
+set autochdir
+set exrc
+set secure
+set encoding=utf-8
+
+" line number
+set scrolloff=10
+set number
+set cursorline
+set cursorlineopt=number
+"set relativenumber
+set wrap
+let &showbreak='+++ '
+set list
+set lcs=tab:\ \ ,trail:▒
+"set listchars=trail:
+
+
+" search
+set hlsearch
+set incsearch
+set ignorecase
+set smartcase
+"set inccommand=split
+
+" indent
+set autoindent
+set smartindent
+set indentexpr=
+set tabstop=2
+set shiftwidth=2
+set softtabstop=2
+set noexpandtab
+set foldmethod=indent
+set nofoldenable
+
+"spilt
+set splitright
+set nosplitbelow
+
+" system
+set mouse=a
+set concealcursor=nc
+set hidden
+set signcolumn=yes
+set noshowcmd
+set noshowmode
+set timeout
+set nottimeout
+set timeoutlen=1000
+set updatetime=0
+set virtualedit=block
+set ttyfast
+set tw=0
+set viewoptions=cursor,folds,unix
+set laststatus=2
+
+"augroup QuickNotes
+"  au!
+"  autocmd BufWinLeave *.* execute "mkview! " . "~/.vim/view" . "/" . expand('<afile>:t') . ".view"
+"  autocmd BufWinEnter *.* execute "silent! source " . "~/.vim/view" . "/" . expand('%:t') . ".view"
+"augroup END 
+" last-position-jump
+autocmd BufRead * autocmd FileType <buffer> ++once
+      \ if &ft !~# 'commit\|rebase' && line("'\"") > 1 && line("'\"") <= line("$") | exe 'normal! g`"' | endif
+exec "nohlsearch"
+
+
+" ======= basic keymap =======
+
+"
+"     ^
+"     u
+" < n   i >
+"     e
+"     v
+noremap <silent> n h
+noremap <silent> e j
+noremap <silent> i l
+noremap <silent> u k
+noremap U 5k
+noremap E 5j
+nnoremap < <<
+nnoremap > >>
+
+" go to the start or end of the line
+noremap N 0
+noremap I $
+
+map <TAB> >
+xmap <TAB> >
+map <S-TAB> <
+xmap <S-TAB> <
+nnoremap \ E
+xnoremap \ E
+
+" Insert Key
+noremap h i
+noremap H I
+
+" Save & quit
+"map s :<nop>
+map S :w<CR>
+map Q :q<CR>
+
+" Undo operations
+nnoremap l u
+
+" select  searching
+noremap K N
+noremap k n
+
+" change key
+noremap ; :
+nnoremap <silent> ` :call Reverse_ture_false()<CR>
+xnoremap ` ~
+
+" False
+" FALSE
+" false
+function! Reverse_ture_false() abort
+		let cword = expand("<cword>")
+		echo cword
+		if cword !=? "true" || cword !=? "false"
+			exec "normal ~"
+		endif
+		if cword ==# "true"
+			exec "normal bcwfalse"
+		elseif cword ==# "false"
+			exec "normal bcwtrue"
+		elseif cword ==# "True"
+			exec "normal bcwFalse"
+		elseif cword ==# "False"
+			exec "normal bcwTrue"
+		elseif cword ==# "TRUE"
+			exec "normal bcwFALSE"
+		elseif cword ==# "FALSE"
+			exec "normal bcwTRUE"
+		endif
+endfunction
+
+" Copy to system clipboard
+vnoremap Y "+y
+
+" vimrc open & reload
+nmap <LEADER>rc :e $HOME/.config/nvim/init.vim<CR>
+nmap R :source $MYVIMRC<CR>
+
+" split screen
+nmap si :set splitright<CR>:vsplit<CR>
+nmap sn :set nosplitright<CR>:vsplit<CR>
+nmap su :set nosplitbelow<CR>:split<CR>
+nmap se :set splitbelow<CR>:split<CR>
+noremap <LEADER>n <C-w>h
+noremap <LEADER>u <C-w>k
+noremap <LEADER>e <C-w>j
+noremap <LEADER>i <C-w>l
+noremap <LEADER>q <C-w>o
+noremap <LEADER>w <C-w>w
+noremap sh <C-w>t<C-w>K
+noremap sv <C-w>t<C-w>H
+"noremap <up> :res +5<CR>
+"noremap <down> :res -5<CR>
+"noremap <left> :vertical resize-5<CR>
+"noremap <right> :vertical resize+5<CR>
+
+
+" switch tab
+nmap tu :tabe<CR>
+"nmap ti :+tabnext<CR>
+"nmap tn :-tabnext<CR>
+
+" insert mode
+inoremap <C-a> <ESC>A
+inoremap <C-o> <ESC>A {}<ESC>i<CR><ESC>ko
+
+" command mode
+"cnoremap <C-a> <Home>
+"cnoremap <C-e> <End>
+"cnoremap <C-p> <Up>
+"cnoremap <C-n> <Down>
+"cnoremap <C-b> <Left>
+"cnoremap <C-f> <Right>
+"cnoremap <M-b> <S-Left>
+"cnoremap <M-w> <S-Right>
+
+" other
+noremap <LEADER><CR> :nohlsearch<CR>
+
+
+

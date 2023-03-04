@@ -150,12 +150,6 @@
 		"resources",
 		".idea"
 	],
-	"java.templates.fileHeader": [
-		"${user} ${date}"
-	],
-	"java.templates.typeComment": [
-		"${user} ${date}"
-	],
 
 	// clangd
 	"clangd.enabled": true,
