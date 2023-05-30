@@ -34,7 +34,7 @@ set scrolloff=10
 set number
 set cursorline
 set cursorlineopt=number
-"set relativenumber
+set relativenumber
 set wrap
 let &showbreak='+++ '
 set list
@@ -227,13 +227,16 @@ Plug 'lukas-reineke/indent-blankline.nvim'
 Plug 'mbbill/undotree'
 Plug 'petertriho/nvim-scrollbar'
 Plug 'preservim/nerdcommenter'
-Plug 'romgrk/barbar.nvim'
+"Plug 'romgrk/barbar.nvim'
+Plug 'moll/vim-bbye'
 Plug 'yianwillis/vimcdoc', {'for': 'vim'}
-Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' , 'for': ['gitignore', 'markdown', 'vim-plug'] }
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
 Plug 'mzlogin/vim-markdown-toc', { 'for': ['gitignore', 'markdown', 'vim-plug'] }
+Plug 'dhruvasagar/vim-table-mode'
 Plug 'skywind3000/asyncrun.vim'
 Plug 'airblade/vim-rooter'
 Plug 'ggandor/leap.nvim'
+"Plug 'github/copilot.vim'
 
 " Binary View
 Plug 'Shougo/vinarise.vim'
@@ -251,6 +254,7 @@ Plug 'nvim-treesitter/playground'
 
 " tmux
 Plug 'wellle/tmux-complete.vim'
+Plug 'preservim/vimux'
 
 " git
 Plug 'airblade/vim-gitgutter'
@@ -291,6 +295,8 @@ let g:coc_global_extensions = [
        		\"coc-explorer",
        		\"coc-highlight",
        		\"coc-java",
+       		\"coc-flutter",
+       		\"coc-docker",
        		\"coc-json",
        		\"coc-xml",
        		\"coc-rust-analyzer",
@@ -307,6 +313,8 @@ let g:coc_global_extensions = [
        		\"coc-vimlsp",
        		\"coc-ultisnips",
        		\"coc-diagnostic",
+       		\"coc-postfix",
+       		\"coc-symbol-line",
           \"coc-marketplace"]
 
 inoremap <silent><expr> <TAB>
@@ -411,6 +419,8 @@ augroup END
 
 " rooter
 let g:rooter_patterns = ['.git', 'Makefile', '*.sln', 'pom.xml','build.gradle','Cargo.toml','go.mod']
+let g:rooter_cd_cmd = 'lcd'
+
 
 
 " git
@@ -433,7 +443,7 @@ let g:blamer_template = '<committer>: <committer-time> (<summary>)'
 nnoremap <silent> <c-g> :LazyGit<CR>
 let g:lazygit_floating_window_winblend = 0 " transparency of floating window
 let g:lazygit_floating_window_scaling_factor = 0.8 " scaling factor for floating window
-let g:lazygit_floating_window_corner_chars = ['╭', '╮', '╰', '╯'] " customize lazygit popup window corner characters
+let g:lazygit_floating_window_border = ['╭', '╮', '╰', '╯'] " customize lazygit popup window corner characters
 let g:lazygit_use_neovim_remote = 0 " for neovim-remote support
 
 
@@ -479,8 +489,8 @@ endif
 
 " fzf
 noremap <leader>; :History:<CR>
-noremap <c-n> :Notes<CR>
-noremap <c-f> :Rg<CR>
+"noremap <C-n> :Notes<CR>
+noremap <C-f> :Rg<CR>
 noremap <C-h> :Helptags<CR>
 
 let g:fzf_layout = { 'window': { 'width': 0.7, 'height':0.7} }
@@ -535,9 +545,9 @@ function! Multiple_cursors_after()
 endfunction
 
 " vim-go
-let g:go_gopls_enabled = 0
-let g:go_fmt_autosave = 0
-let g:go_imports_autosave = 0
+let g:go_gopls_enabled = 1
+let g:go_fmt_autosave = 1
+let g:go_imports_autosave = 1
 let g:go_fmt_command = 'goimports'
 let g:go_addtags_transform = "camelcase"
 let g:go_highlight_types = 1
@@ -567,15 +577,22 @@ let g:go_debug_mappings = {
 \ }
 
 
+function ExitConsole() abort
+		:AsyncStop
+		:cclose
+endfunction
 
 " Compile function
-noremap <leader><esc> :AsyncStop<CR>
-let g:asyncrun_open = 8
+noremap <leader><esc> :call ExitConsole()<CR>
+
+let g:asyncrun_open = 12
+let g:asyncrun_encs = 'utf-8'
 
 noremap r :call CompileRun()<CR>
 func! CompileRun()
   exec "w"
   if &filetype == 'sh'
+		execute
 		call asyncrun#run("", {'save':1}, "bash $(VIM_FILENAME)")
 	elseif &filetype == 'python'
 		call asyncrun#run("", {'save':1}, "python3 $(VIM_FILENAME)")
@@ -600,7 +617,7 @@ endfunc
 function! s:runRustFiles()
 	let l:dir = FindRootDirectory()
 	if l:dir != ""
-		call asyncrun#run("", {'save': 2}, "cargo run")
+		call asyncrun#run("", {'save': 1}, "cargo run")
 	else
 		:RustRun
 	endif
@@ -612,6 +629,7 @@ function! s:runGoFiles()
     :GoTestFunc
   elseif l:file =~# '^\f\+\.go$'
 		:GoRun
+		call asyncrun#run("", {'save': 1}, "mvn clean spring-boot:run")
   endif
 endfunction
 
@@ -621,19 +639,18 @@ function! s:runJavaFiles()
 		let l:file = expand('%')
 		if l:file =~# '^\f\+Test\.java$' || l:file =~# '^\f\+Tests\.java$'
 			let l:testName = s:getJavaTestFuncName()
-			call asyncrun#run("", {'save': 2}, "mvn package -Dtest=".. l:testName .." test" )
-		else 
-			call asyncrun#run("", {'save': 2}, "mvn clean spring-boot:run")
+			call asyncrun#run("", {'save': 1}, "mvn package -Dtest=".. l:testName .." test" )
+		else
 		endif
-	else 
-		call asyncrun#run("", {'save': 1}, "javac -cp . $(VIM_FILENAME) && java $(VIM_FILENOEXT)")
+	else
+		call asyncrun#run("", {'save': 1}, "javac $(VIM_FILENAME) && java $(VIM_FILENOEXT)")
 	endif
 endfunction
 
 function s:getJavaTestFuncName()
 	if expand("<cword>") != ""
 		return expand("%:t:r")  .. "#" .. expand("<cword>")
-	else 
+	else
 		return expand("%:t:r")
 	endif
 endfunction
@@ -687,7 +704,7 @@ nnoremap <silent>tl <Cmd>BufferCloseBuffersLeft<CR>
 let g:suda_smart_edit = 1
 
 
-" Nginx 
+" Nginx
 augroup custom_nginx
   autocmd!
   autocmd FileType nginx setlocal iskeyword+=$
@@ -695,8 +712,22 @@ augroup custom_nginx
 augroup end
 
 
+
 " ==================== nvim-scrollbar ====================
 lua <<EOF
+
+
+function _G.symbol_line()
+  local curwin = vim.g.statusline_winid or 0
+  local curbuf = vim.api.nvim_win_get_buf(curwin)
+  local ok, line = pcall(vim.api.nvim_buf_get_var, curbuf, 'coc_symbol_line')
+  return ok and line or ''
+end
+
+vim.o.tabline = '%!v:lua.symbol_line()'
+vim.o.statusline = '%!v:lua.symbol_line()'
+vim.o.winbar = '%!v:lua.symbol_line()'
+
 
 require("scrollbar").setup({
     show = true,
@@ -732,21 +763,106 @@ vim.keymap.set({'n', 'x', 'o'}, 'F', '<Plug>(leap-backward-to)')
 vim.keymap.set({'n', 'x', 'o'}, '^', '<Plug>(leap-forward-till)')
 vim.keymap.set({'n', 'x', 'o'}, '&', '<Plug>(leap-backward-till)')
 
--- Set barbar's options
-require'bufferline'.setup {
-		animation = false,
-		auto_hide = true,
-		tabpages = false,
-	  icons = 'both',
-		icon_custom_colors = false,
-		icon_separator_active = '▎',
-		icon_separator_inactive = '▎',
-		icon_close_tab = '',
-    icon_close_tab_modified = '●',
-		icon_pinned = '車',
-		exclude_ft = {'qf'},
 
-}
+-- vim.g.barbar_auto_setup = false -- disable auto-setup
+-- require'barbar'.setup {
+--    -- WARN: do not copy everything below into your config!
+--    --       It is just an example of what configuration options there are.
+--    --       The defaults are suitable for most people.
+--  
+--    -- Enable/disable animations
+--    animation = false,
+-- 
+--    -- Enable/disable auto-hiding the tab bar when there is a single buffer
+--    auto_hide = false,
+-- 
+--    -- Enable/disable current/total tabpages indicator (top right corner)
+--    tabpages = false,
+-- 
+--    -- Enables/disable clickable tabs
+--    --  - left-click: go to buffer
+--    --  - middle-click: delete buffer
+--    clickable = true,
+--  
+--    -- Excludes buffers from the tabline
+--    exclude_ft = {'javascript','qf'},
+--    exclude_name = {'package.json'},
+-- 
+--    -- A buffer to this direction will be focused (if it exists) when closing the current buffer.
+--    -- Valid options are 'left' (the default) and 'right'
+--    focus_on_close = 'left',
+-- 
+--  
+--    -- Disable highlighting alternate buffers
+--    highlight_alternate = false,
+-- 
+--    -- Disable highlighting file icons in inactive buffers
+--    highlight_inactive_file_icons = false,
+--  
+-- --   -- Enable highlighting visible buffers
+--    highlight_visible = true,
+-- 
+--    icons = {
+-- --     -- Configure the base icons on the bufferline.
+--      buffer_index = true,
+--      buffer_number = false,
+-- 
+--      separator = {left = '▎', right = ''},
+--  
+--      -- Configure the icons on the bufferline when modified or pinned.
+--      -- Supports all the base icon options.
+--      modified = {button = '●'},
+-- --     pinned = {button = '車', filename = true, separator = {right = ''}},
+-- -- 
+-- --     -- Configure the icons on the bufferline based on the visibility of a buffer.
+-- --     -- Supports all the base icon options, plus `modified` and `pinned`.
+-- --     alternate = {filetype = {enabled = false}},
+-- --     current = {buffer_index = true},
+-- --     inactive = {button = '×',modified = {filetype={enable=false}}},
+-- --     visible = {modified = {buffer_number = false}},
+--    },
+-- -- 
+-- --   -- If true, new buffers will be inserted at the start/end of the list.
+-- --   -- Default is to insert after current buffer.
+-- --   insert_at_end = false,
+-- --   insert_at_start = false,
+-- -- 
+-- --   -- Sets the maximum padding width with which to surround each tab
+-- --   maximum_padding = 1,
+-- -- 
+-- --   -- Sets the minimum padding width with which to surround each tab
+-- --   minimum_padding = 1,
+-- -- 
+-- --   -- Sets the maximum buffer name length.
+-- --   maximum_length = 30,
+-- -- 
+-- --   -- If set, the letters for each buffer in buffer-pick mode will be
+-- --   -- assigned based on their name. Otherwise or in case all letters are
+-- --   -- already assigned, the behavior is to assign letters in order of
+-- --   -- usability (see order below)
+-- --   semantic_letters = true,
+-- -- 
+-- --   -- Set the filetypes which barbar will offset itself for
+-- --   sidebar_filetypes = {
+-- --     -- Use the default values: {event = 'BufWinLeave', text = nil}
+-- --     NvimTree = true,
+-- --     -- Or, specify the text used for the offset:
+-- --     undotree = {text = 'undotree'},
+-- --     -- Or, specify the event which the sidebar executes when leaving:
+-- --     ['neo-tree'] = {event = 'BufWipeout'},
+-- --     -- Or, specify both
+-- --     Outline = {event = 'BufWinLeave', text = 'symbols-outline'},
+-- --   },
+-- -- 
+-- --   -- New buffer letters are assigned in this order. This order is
+-- --   -- optimal for the qwerty keyboard layout but might need adjustment
+-- --   -- for other layouts.
+-- --   letters = 'asdfjkl;ghnmxcvbziowerutyqpASDFJKLGHNMXCVBZIOWERUTYQP',
+-- -- 
+-- --   -- Sets the name of unnamed buffers. By default format is "[Buffer X]"
+-- --   -- where X is the buffer number. But only a static string is accepted here.
+-- --   no_name_title = nil,
+--  }
 
 
 require('nvim-treesitter.configs').setup {
@@ -794,20 +910,20 @@ require('vscode').setup({
 				ScrollbarHint = { fg ='grey' },
 
 				-- barbar
-				BufferTabpageFill = { bg = 'NONE' },
-
-				BufferCurrent = { fg = 'white', bg = '#0d4908' },
-				BufferCurrentIndex = { fg = 'white', bg = '#0d4908' },
-				BufferCurrentMod = { bg = '#0d4908' },
-				BufferCurrentSign = { bg = '#0d4908' },
-				BufferCurrentIcon = { bg = '#0d4908' },
-				BufferCurrentTarget = { bg = '#0d4908' },
-
-				BufferInactive = { fg = '#808080', bg = 'NONE' },
-				BufferInactiveIndex = { fg = '#808080', bg = 'NONE' },
-				BufferInactiveMod = { bg = 'NONE' },
-				BufferInactiveSign = { bg = 'NONE' },
-				BufferInactiveTarget = { bg = 'NONE' },
+			  BufferTabpageFill = { bg = 'NONE' },
+       
+			  BufferCurrent = { fg = 'white', bg = 'NONE', bold = true },
+			  BufferCurrentIndex = { fg = 'white', bg = 'NONE' },
+			  BufferCurrentMod = { fg = '#d7ba7d', bg = 'NONE',bold = true },
+			  BufferCurrentSign = { fg = 'grey', bg = 'NONE'},
+			  BufferCurrentIcon = { bg = 'NONE' },
+			  BufferCurrentTarget = { bg = 'NONE' },
+       
+			  BufferInactive = { fg = '#808080', bg = 'NONE' },
+			  BufferInactiveIndex = { fg = '#808080', bg = 'NONE' },
+			  BufferInactiveMod = { fg = '#808080', bg = 'NONE' },
+			  BufferInactiveSign = { bg = 'NONE'},
+			  BufferInactiveTarget = { bg = 'NONE' },
 
 				-- nvim-treesitter
 				['@variable'] = { fg = "#F5ECEB" },
@@ -824,7 +940,7 @@ require('vscode').setup({
 				-- LeapLabelSelected = { fg = 'black' }
 				LeapBackdrop = { fg = 'grey' },
 
-				-- Diagnostic 
+				-- Diagnostic
 				DiagnosticWarn = { fg = 'yellow', bg = 'NONE'},
 				DiagnosticError = { fg = 'red', bg = 'NONE'},
 				DiagnosticHint = { fg = 'grey', bg = 'NONE'},
