@@ -70,11 +70,11 @@ local config = {
 			referencesCodeLens = {
 				enabled = true,
 			},
-			inlayhints = {
-				parameterNames = {
-					enabled = true,
-				},
-			},
+			--inlayhints = {
+			--parameterNames = {
+			--enabled = true,
+			--},
+			--},
 			saveActions = {
 				organizeImports = false
 			},

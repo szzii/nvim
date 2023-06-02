@@ -6,6 +6,9 @@ Runner.CompileRun = function()
 	if filetype == 'java' then
 		Runner.RunJavaFiles()
 	end
+	if filetype == 'python' then
+		vim.fn['asyncrun#run']("", { save = 1 }, "python3 $(VIM_FILENAME)")
+	end
 end
 
 -- TODO java-test and gradle

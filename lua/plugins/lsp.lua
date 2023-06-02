@@ -113,6 +113,7 @@ return {
 			local luasnip = require 'luasnip'
 			local lspkind = require 'lspkind'
 
+
 			local has_words_before = function()
 				unpack = unpack or table.unpack
 				local line, col = unpack(vim.api.nvim_win_get_cursor(0))
@@ -197,6 +198,11 @@ return {
 					}
 				})
 			})
+			local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+			cmp.event:on(
+				'confirm_done',
+				cmp_autopairs.on_confirm_done()
+			)
 		end
 	},
 	{
@@ -265,7 +271,8 @@ return {
 				numhl = 'DiagnosticError'
 			})
 
-			vim.keymap.set('n', '<F5>', function() require('dap').continue() end)
+			vim.keymap.set('n', '<F8>', function() require('dap').run_to_cursor() end)
+			vim.keymap.set('n', '<F9>', function() require('dap').step_back() end)
 			vim.keymap.set('n', '<F10>', function() require('dap').step_over() end)
 			vim.keymap.set('n', '<F11>', function() require('dap').step_into() end)
 			vim.keymap.set('n', '<F12>', function() require('dap').step_out() end)
@@ -283,8 +290,20 @@ return {
 		lazy = true,
 		keys = {
 			{
-				'<F6>',
-				function() require("dapui").toggle() end,
+				'<F4>',
+				function()
+					require("dapui").close()
+					require('dap').terminate()
+				end,
+				mode = 'n',
+				silent = true,
+			},
+			{
+				'<F5>',
+				function()
+					require("dapui").open()
+					require('dap').continue()
+				end,
 				mode = 'n',
 				silent = true,
 			},

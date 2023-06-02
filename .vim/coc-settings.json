@@ -1,5 +1,10 @@
 {
   "Lua.runtime.version": "LuaJIT",
   "Lua.workspace.checkThirdParty": false,
-  "java.compile.nullAnalysis.mode": "automatic"
+  "java.compile.nullAnalysis.mode": "automatic",
+  "Lua.diagnostics.globals": [
+    "vim",
+    "project_files",
+    "utils"
+  ]
 }
