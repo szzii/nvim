@@ -16,42 +16,12 @@ return {
 				vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
 			end
 
-			vim.api.nvim_create_autocmd("BufWritePre", {
-				buffer = buffer,
-				callback = function()
-					vim.lsp.buf.format { async = false }
-				end
-			})
-
-			vim.api.nvim_create_autocmd('BufWritePost', {
-				buffer = bufnr,
-				desc = 'refresh codelens',
-				callback = function()
-					pcall(vim.lsp.codelens.refresh)
-				end,
-			})
-
 			local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
 			function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
 				opts = opts or {}
 				opts.border = opts.border or border
 				return orig_util_open_floating_preview(contents, syntax, opts, ...)
 			end
-
-			vim.api.nvim_create_autocmd("CursorHold", {
-				buffer = bufnr,
-				callback = function()
-					local opts = {
-						focusable = false,
-						close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-						border = 'rounded',
-						source = 'always',
-						prefix = ' ',
-						scope = 'cursor',
-					}
-					vim.diagnostic.open_float(nil, opts)
-				end
-			})
 
 			vim.api.nvim_create_autocmd('LspAttach', {
 				group = vim.api.nvim_create_augroup('UserLspConfig', {}),
@@ -61,8 +31,8 @@ return {
 					vim.keymap.set('n', '<leader>]', vim.diagnostic.goto_next, { desc = 'diagnostic_goto_next' })
 					vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'setloclist' })
 
-					vim.keymap.set('n', '<leader>f', vim.lsp.buf.definition, { buffer = ev.buf, desc = 'definition' })
-					vim.keymap.set('n', '<leader>d', vim.lsp.buf.declaration, { buffer = ev.buf, desc = 'declaration' })
+					vim.keymap.set('n', '<leader>d', vim.lsp.buf.definition, { buffer = ev.buf, desc = 'definition' })
+					--vim.keymap.set('n', '<leader>d', vim.lsp.buf.declaration, { buffer = ev.buf, desc = 'declaration' })
 					vim.keymap.set('n', '<leader>h', vim.lsp.buf.hover, { buffer = ev.buf, desc = 'hover' })
 					vim.keymap.set('n', '<leader>v', vim.lsp.buf.implementation, { buffer = ev.buf, desc = 'implementation' })
 					vim.keymap.set('n', '<leader>r', vim.lsp.buf.references, { buffer = ev.buf, desc = 'references' })
@@ -73,7 +43,6 @@ return {
 					vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, { buffer = ev.buf, desc = 'type_definition' })
 
 					vim.keymap.set({ 'n', 'v' }, '<leader>z', vim.lsp.buf.code_action, { buffer = ev.buf, desc = 'code_action' })
-					pcall(vim.lsp.codelens.refresh)
 				end,
 
 			})
@@ -167,7 +136,7 @@ return {
 							fallback()
 						end
 					end, { "i", "s" }),
-					--['<C-c>'] = cmp.mapping.abort(),
+					['<C-c>'] = cmp.mapping.abort(),
 				}),
 				sources = cmp.config.sources({
 					{ name = 'nvim_lsp' },
@@ -207,11 +176,8 @@ return {
 	},
 	{
 		"L3MON4D3/LuaSnip",
-		version = "<CurrentMajor>.*",
+		version = "1.*",
 		build = "make install_jsregexp",
-		config = function()
-
-		end
 	},
 	{
 		"folke/neodev.nvim",
@@ -233,11 +199,84 @@ return {
 		"williamboman/mason-lspconfig.nvim",
 		config = function()
 			-- LSP settings (for overriding per client)
+
+			local function save_format()
+				vim.api.nvim_create_autocmd("BufWritePre", {
+					buffer = buffer,
+					callback = function()
+						vim.lsp.buf.format { async = false }
+					end
+				})
+			end
+
+			local function refresh_codelens()
+				vim.api.nvim_create_autocmd('BufWritePost', {
+					buffer = bufnr,
+					desc = 'refresh codelens',
+					callback = function()
+						pcall(vim.lsp.codelens.refresh)
+					end,
+				})
+			end
+
+			local function hover_diagnostic()
+				vim.api.nvim_create_autocmd("CursorHold", {
+					buffer = bufnr,
+					callback = function()
+						local opts = {
+							focusable = false,
+							close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+							border = 'rounded',
+							source = 'always',
+							prefix = ' ',
+							scope = 'cursor',
+						}
+						vim.diagnostic.open_float(nil, opts)
+					end
+				})
+			end
+
+
 			local handlers = {
 				function(server_name) -- default handler (optional)
 					require("lspconfig")[server_name].setup {
+						on_attach = function()
+							save_format()
+							refresh_codelens()
+							hover_diagnostic()
+							pcall(vim.lsp.codelens.refresh)
+						end
 					}
 				end,
+
+				['pyright'] = function()
+					require 'lspconfig'.pyright.setup {
+						on_attach = function()
+							hover_diagnostic()
+						end,
+					}
+				end,
+				['gopls'] = function()
+					require 'lspconfig'.gopls.setup {
+						on_attach = function()
+							hover_diagnostic()
+						end,
+						settings = {
+							gopls = {
+								hints = {
+									assignVariableTypes = true,
+									compositeLiteralFields = true,
+									constantValues = true,
+									functionTypeParameters = true,
+									parameterNames = true,
+									rangeVariableTypes = true
+								}
+							}
+
+						}
+					}
+				end,
+
 			}
 
 			require("mason-lspconfig").setup({
@@ -247,7 +286,6 @@ return {
 			})
 		end
 	},
-	"mfussenegger/nvim-jdtls",
 	{
 		"mfussenegger/nvim-dap",
 		config = function()
@@ -371,5 +409,79 @@ return {
 				}
 			)
 		end
-	}
+	},
+	{
+		"lvimuser/lsp-inlayhints.nvim",
+		config = function()
+			require("lsp-inlayhints").setup()
+			vim.api.nvim_create_augroup("LspAttach_inlayhints", {})
+			vim.api.nvim_create_autocmd("LspAttach", {
+				group = "LspAttach_inlayhints",
+				callback = function(args)
+					if not (args.data and args.data.client_id) then
+						return
+					end
+
+					local bufnr = args.buf
+					local client = vim.lsp.get_client_by_id(args.data.client_id)
+					require("lsp-inlayhints").on_attach(client, bufnr)
+				end,
+			})
+		end
+	},
+
+	"mfussenegger/nvim-jdtls",
+	{
+		"fatih/vim-go",
+		lazy = true,
+		ft = 'go',
+		build = ':GoUpdateBinaries',
+		config = function()
+			vim.keymap.set('n', '<LEADER><LEADER>', ':GoAlternate!<CR>', { silent = true, desc = 'Go TestFile' })
+		end
+	},
+	{
+		'akinsho/flutter-tools.nvim',
+		lazy = false,
+		dependencies = {
+			'nvim-lua/plenary.nvim',
+			'stevearc/dressing.nvim', -- optional for vim.ui.select
+		},
+		config = function()
+			require("flutter-tools").setup {
+				lsp = {
+					on_attach = function()
+						vim.api.nvim_create_autocmd("BufWritePre", {
+							buffer = buffer,
+							callback = function()
+								vim.lsp.buf.format { async = false }
+							end
+						})
+						vim.api.nvim_create_autocmd("CursorHold", {
+							buffer = bufnr,
+							callback = function()
+								local opts = {
+									focusable = false,
+									close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+									border = 'rounded',
+									source = 'always',
+									prefix = ' ',
+									scope = 'cursor',
+								}
+								vim.diagnostic.open_float(nil, opts)
+							end
+						})
+					end,
+					settings = {
+						showTodos = true,
+						completeFunctionCalls = true,
+						analysisExcludedFolders = { "<path-to-flutter-sdk-packages>" },
+						renameFilesWithClasses = "prompt", -- "always"
+						enableSnippets = true,
+						updateImportsOnRename = true,
+					}
+				}
+			}
+		end
+	},
 }

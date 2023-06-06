@@ -9,6 +9,17 @@ Runner.CompileRun = function()
 	if filetype == 'python' then
 		vim.fn['asyncrun#run']("", { save = 1 }, "python3 $(VIM_FILENAME)")
 	end
+	if filetype == 'dart' then
+		vim.cmd("FlutterRun")
+	end
+	--if filetype == 'go' then
+	--local file_name = vim.fn.expand('%')
+	--if l:file =~# '^\f\+_test\.go$'
+	--:GoTestFunc
+	--elseif l:file =~# '^\f\+\.go$'
+	--:GoRun
+	--end
+	--end
 end
 
 -- TODO java-test and gradle

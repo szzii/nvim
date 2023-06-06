@@ -4,7 +4,7 @@ return {
 	{
 		"nvim-lualine/lualine.nvim",
 		dependencies = {
-			"szzii/vscode.nvim",
+			"szzii/vscode.nvim"
 		},
 		config = function()
 			require("lualine").setup({
@@ -133,16 +133,64 @@ return {
 			})
 		end
 	},
-
-	{
-		"Xuyuanp/scrollbar.nvim",
-	},
+	--{
+	--"catppuccin/nvim",
+	--name = "catppuccin",
+	--config = function()
+	--require("catppuccin").setup({
+	--flavour = "macchiato", -- latte, frappe, macchiato, mocha
+	--background = {
+	---- :h background
+	--light = "latte",
+	--dark = "mocha",
+	--},
+	--transparent_background = true, -- disables setting the background color.
+	--show_end_of_buffer = false, -- shows the '~' characters after the end of buffers
+	--term_colors = false,       -- sets terminal colors (e.g. `g:terminal_color_0`)
+	--dim_inactive = {
+	--enabled = false,         -- dims the background color of inactive window
+	--shade = "dark",
+	--percentage = 0.15,       -- percentage of the shade to apply to the inactive window
+	--},
+	--no_italic = false,         -- Force no italic
+	--no_bold = false,           -- Force no bold
+	--no_underline = false,      -- Force no underline
+	--styles = {
+	---- Handles the styles of general hi groups (see `:h highlight-args`):
+	--comments = { "italic" }, -- Change the style of comments
+	--conditionals = { "italic" },
+	--loops = {},
+	--functions = {},
+	--keywords = {},
+	--strings = {},
+	--variables = {},
+	--numbers = {},
+	--booleans = {},
+	--properties = {},
+	--types = {},
+	--operators = {},
+	--},
+	--color_overrides = {},
+	--custom_highlights = {},
+	--integrations = {
+	--cmp = true,
+	--gitsigns = true,
+	--nvimtree = true,
+	--telescope = true,
+	--notify = false,
+	--mini = false,
+	---- For more plugins integrations please scroll down (https://github.com/catppuccin/nvim#integrations)
+	--},
+	--})
+	--end
+	--},
 
 	{
 		"szzii/vscode.nvim",
 		dependencies = {
 			"romgrk/barbar.nvim",
 			"folke/which-key.nvim",
+			"nvim-treesitter/nvim-treesitter",
 		},
 		config = function()
 			require('vscode').setup({
@@ -161,6 +209,7 @@ return {
 					CursorLineNr = { fg = "white" },
 					CursorLine = { bold = true, bg = "#222222" },
 					NormalFloat = { bg = 'NONE' },
+					LspInlayHint = { bg = 'NONE', fg = 'grey', italic = true },
 
 					-- coc.nvim
 					CocHighlightText = { bold = true, bg = "#4B4B4B" },
@@ -193,12 +242,12 @@ return {
 					BufferInactiveTarget = { bg = 'NONE' },
 
 					-- nvim-treesitter
-					['@variable'] = { fg = "#F5ECEB" },
-					['@parameter'] = { fg = "#F5ECEB" },
-					['@field'] = { fg = "#F5ECEB" },
-					['@constant'] = { italic = true },
-					['@type.qualifier.java'] = { link = "@keyword" },
-					['@exception.java'] = { link = "@keyword" },
+					--['@variable'] = { fg = "#F5ECEB" },
+					--['@parameter'] = { fg = "#F5ECEB" },
+					--['@field'] = { fg = "#F5ECEB" },
+					--['@constant'] = { italic = true },
+					--['@type.qualifier.java'] = { link = "@keyword" },
+					--['@exception.java'] = { link = "@keyword" },
 
 					-- leap.nvim
 					LeapMatch = { fg = 'yellow' },
@@ -225,6 +274,7 @@ return {
 
 	{
 		"nvim-treesitter/nvim-treesitter",
+		build = ':TSUpdate',
 		dependencies = {
 			"nvim-treesitter/playground",
 		},
@@ -253,7 +303,7 @@ return {
 					-- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
 					-- the name of the parser)
 					-- list of language that will be disabled
-					--disable = { "c", "rust" },
+					disable = { "c", "rust" },
 					-- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
 					disable = function(lang, buf)
 						local max_filesize = 100 * 1024 -- 100 KB

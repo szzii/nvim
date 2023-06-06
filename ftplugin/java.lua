@@ -70,11 +70,11 @@ local config = {
 			referencesCodeLens = {
 				enabled = true,
 			},
-			--inlayhints = {
-			--parameterNames = {
-			--enabled = true,
-			--},
-			--},
+			inlayhints = {
+				parameterNames = {
+					enabled = 'all',
+				},
+			},
 			saveActions = {
 				organizeImports = false
 			},
@@ -115,6 +115,37 @@ local config = {
 	on_attach = function()
 		require('jdtls').setup_dap({ hotcodereplace = 'auto' })
 		require('jdtls.dap').setup_dap_main_class_configs()
+		vim.api.nvim_create_autocmd("BufWritePre", {
+			buffer = buffer,
+			callback = function()
+				vim.lsp.buf.format { async = false }
+			end
+		})
+
+		vim.api.nvim_create_autocmd('BufWritePost', {
+			buffer = bufnr,
+			desc = 'refresh codelens',
+			callback = function()
+				pcall(vim.lsp.codelens.refresh)
+			end,
+		})
+
+
+		vim.api.nvim_create_autocmd("CursorHold", {
+			buffer = bufnr,
+			callback = function()
+				local opts = {
+					focusable = false,
+					close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+					border = 'rounded',
+					source = 'always',
+					prefix = ' ',
+					scope = 'cursor',
+				}
+				vim.diagnostic.open_float(nil, opts)
+			end
+		})
+		pcall(vim.lsp.codelens.refresh)
 	end
 }
 

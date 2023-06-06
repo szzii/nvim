@@ -22,4 +22,4 @@ require("lazy").setup("plugins")
 
 vim.keymap.set('n', 'R', ':lua require("functions.runner").CompileRun()<CR>', { noremap = true, silent = true })
 
---vim.cmd.colorscheme "vscode"
+--vim.cmd.colorscheme "catppuccin"

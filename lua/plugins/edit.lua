@@ -5,7 +5,6 @@ return {
 	{
 		"gcmt/wildfire.vim",
 		config = function()
-			-- 配置 wildfire.vim 插件
 			vim.g.wildfire_objects = { 'i\'', 'i"', 'i)', 'i]', 'i}', 'i>' }
 		end
 	},
