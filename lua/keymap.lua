@@ -50,3 +50,5 @@ vim.keymap.set("i", "<C-e>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down", si
 vim.keymap.set("i", "<C-u>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up", silent = true })
 vim.keymap.set("v", "<C-e>", ":m '>+1<cr>gv=gv", { desc = "Move down", silent = true })
 vim.keymap.set("v", "<C-u>", ":m '<-2<cr>gv=gv", { desc = "Move up", silent = true })
+
+vim.keymap.set("n", "`", ":lua require('functions.tools').Reverse_bool()<CR>", { desc = "reverse", silent = true })

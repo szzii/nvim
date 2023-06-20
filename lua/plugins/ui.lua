@@ -4,15 +4,15 @@ return {
 	{
 		"nvim-lualine/lualine.nvim",
 		dependencies = {
-			"szzii/vscode.nvim"
+			"szzii/vscode.nvim",
 		},
 		config = function()
 			require("lualine").setup({
 				options = {
 					icons_enabled = true,
-					theme = 'vscode',
-					component_separators = { left = '', right = '' },
-					section_separators = { left = '', right = '' },
+					theme = "vscode",
+					component_separators = { left = "", right = "" },
+					section_separators = { left = "", right = "" },
 					ignore_focus = {},
 					always_divide_middle = true,
 					globalstatus = false,
@@ -20,61 +20,64 @@ return {
 						statusline = 1000,
 						tabline = 1000,
 						winbar = 1000,
-					}
+					},
 				},
 				sections = {
-					lualine_a = { 'mode' },
-					lualine_b = { 'branch', 'diff', 'diagnostics' },
-					lualine_c = { 'searchcount' },
+					lualine_a = { "mode" },
+					lualine_b = { "branch", "diff", "diagnostics" },
+					lualine_c = { "searchcount" },
 					lualine_x = {
-						'encoding', 'fileformat', 'filetype',
+						"encoding",
+						"fileformat",
+						"filetype",
 					},
-					lualine_y = { 'progress' },
-					lualine_z = { 'location' }
+					lualine_y = { "progress" },
+					lualine_z = { "location" },
 				},
 			})
 		end,
 	},
 	{
-		'romgrk/barbar.nvim',
+		"romgrk/barbar.nvim",
 		dependencies = {
-			'lewis6991/gitsigns.nvim',  -- OPTIONAL: for git status
-			'nvim-tree/nvim-web-devicons', -- OPTIONAL: for file icons
+			"lewis6991/gitsigns.nvim",  -- OPTIONAL: for git status
+			"nvim-tree/nvim-web-devicons", -- OPTIONAL: for file icons
 		},
-		init = function() vim.g.barbar_auto_setup = false end,
+		init = function()
+			vim.g.barbar_auto_setup = false
+		end,
 		config = function()
 			local map = vim.api.nvim_set_keymap
 			local opts = { noremap = true, silent = true }
-			require 'barbar'.setup {
-				exclude_ft = { 'javascript', 'qf' },
-				icons = {
-				},
-			}
+			require("barbar").setup({
+				exclude_ft = { "javascript", "qf" },
+				icons = {},
+			})
 
 			-- Move to previous/next
-			map('n', 'tn', '<Cmd>BufferPrevious<CR>', opts)
-			map('n', 'ti', '<Cmd>BufferNext<CR>', opts)
+			map("n", "tn", "<Cmd>BufferPrevious<CR>", opts)
+			map("n", "ti", "<Cmd>BufferNext<CR>", opts)
 			-- Re-order to previous/next
-			map('n', 'tN', '<Cmd>BufferMovePrevious<CR>', opts)
-			map('n', 'tI', '<Cmd>BufferMoveNext<CR>', opts)
+			map("n", "tN", "<Cmd>BufferMovePrevious<CR>", opts)
+			map("n", "tI", "<Cmd>BufferMoveNext<CR>", opts)
 			-- Goto buffer in position...
-			map('n', 't1', '<Cmd>BufferGoto 1<CR>', opts)
-			map('n', 't2', '<Cmd>BufferGoto 2<CR>', opts)
-			map('n', 't3', '<Cmd>BufferGoto 3<CR>', opts)
-			map('n', 't4', '<Cmd>BufferGoto 4<CR>', opts)
-			map('n', 't5', '<Cmd>BufferGoto 5<CR>', opts)
-			map('n', 't6', '<Cmd>BufferGoto 6<CR>', opts)
-			map('n', 't7', '<Cmd>BufferGoto 7<CR>', opts)
-			map('n', 't8', '<Cmd>BufferGoto 8<CR>', opts)
-			map('n', 't9', '<Cmd>BufferGoto 9<CR>', opts)
-			map('n', 't0', '<Cmd>BufferLast<CR>', opts)
+			map("n", "t1", "<Cmd>BufferGoto 1<CR>", opts)
+			map("n", "t2", "<Cmd>BufferGoto 2<CR>", opts)
+			map("n", "t3", "<Cmd>BufferGoto 3<CR>", opts)
+			map("n", "t4", "<Cmd>BufferGoto 4<CR>", opts)
+			map("n", "t5", "<Cmd>BufferGoto 5<CR>", opts)
+			map("n", "t6", "<Cmd>BufferGoto 6<CR>", opts)
+			map("n", "t7", "<Cmd>BufferGoto 7<CR>", opts)
+			map("n", "t8", "<Cmd>BufferGoto 8<CR>", opts)
+			map("n", "t9", "<Cmd>BufferGoto 9<CR>", opts)
+			map("n", "t0", "<Cmd>BufferLast<CR>", opts)
 			-- Pin/unpin buffer
-			map('n', 'tp', '<Cmd>BufferPin<CR>', opts)
+			map("n", "tp", "<Cmd>BufferPin<CR>", opts)
 			-- Close buffer
-			map('n', 'tq', '<Cmd>BufferClose<CR>', opts)
-			map('n', 'tQ', '<Cmd>BufferCloseAllButCurrentOrPinned<CR>', opts)
-			map('n', 'tl', '<Cmd>BufferCloseBuffersLeft<CR>', opts)
-			map('n', 'tr', '<Cmd>BufferCloseBuffersRight<CR>', opts)
+			map("n", "tq", "<Cmd>BufferClose<CR>", opts)
+			map("n", "tQ", "<Cmd>BufferCloseAllButCurrentOrPinned<CR>", opts)
+			map("n", "tl", "<Cmd>BufferCloseBuffersLeft<CR>", opts)
+			map("n", "tr", "<Cmd>BufferCloseBuffersRight<CR>", opts)
 			-- Wipeout buffer
 			--                 :BufferWipeout
 			-- Close commands
@@ -84,15 +87,16 @@ return {
 			--                 :BufferCloseBuffersLeft
 			--                 :BufferCloseBuffersRight
 			-- Magic buffer-picking mode
-			map('n', '<C-p>', '<Cmd>BufferPick<CR>', opts)
+			map("n", "<C-p>", "<Cmd>BufferPick<CR>", opts)
 		end,
-		version = '^1.0.0', -- optional: only update when a new 1.x version is released
+		version = "^1.0.0", -- optional: only update when a new 1.x version is released
 	},
 	{
 		"folke/noice.nvim",
 		event = "VeryLazy",
 		dependencies = {
 			"MunifTanjim/nui.nvim",
+			"stevearc/dressing.nvim", -- optional for vim.ui.select
 			--"rcarriga/nvim-notify",
 		},
 		config = function()
@@ -108,7 +112,7 @@ return {
 						filter = { icon = " " },
 						lua = { icon = " " },
 						help = { icon = " " },
-					}
+					},
 				},
 				popupmenu = {
 					enabled = true,
@@ -131,155 +135,17 @@ return {
 					lsp_doc_border = false,  -- add a border to hover docs and signature help
 				},
 			})
-		end
-	},
-	--{
-	--"catppuccin/nvim",
-	--name = "catppuccin",
-	--config = function()
-	--require("catppuccin").setup({
-	--flavour = "macchiato", -- latte, frappe, macchiato, mocha
-	--background = {
-	---- :h background
-	--light = "latte",
-	--dark = "mocha",
-	--},
-	--transparent_background = true, -- disables setting the background color.
-	--show_end_of_buffer = false, -- shows the '~' characters after the end of buffers
-	--term_colors = false,       -- sets terminal colors (e.g. `g:terminal_color_0`)
-	--dim_inactive = {
-	--enabled = false,         -- dims the background color of inactive window
-	--shade = "dark",
-	--percentage = 0.15,       -- percentage of the shade to apply to the inactive window
-	--},
-	--no_italic = false,         -- Force no italic
-	--no_bold = false,           -- Force no bold
-	--no_underline = false,      -- Force no underline
-	--styles = {
-	---- Handles the styles of general hi groups (see `:h highlight-args`):
-	--comments = { "italic" }, -- Change the style of comments
-	--conditionals = { "italic" },
-	--loops = {},
-	--functions = {},
-	--keywords = {},
-	--strings = {},
-	--variables = {},
-	--numbers = {},
-	--booleans = {},
-	--properties = {},
-	--types = {},
-	--operators = {},
-	--},
-	--color_overrides = {},
-	--custom_highlights = {},
-	--integrations = {
-	--cmp = true,
-	--gitsigns = true,
-	--nvimtree = true,
-	--telescope = true,
-	--notify = false,
-	--mini = false,
-	---- For more plugins integrations please scroll down (https://github.com/catppuccin/nvim#integrations)
-	--},
-	--})
-	--end
-	--},
-
-	{
-		"szzii/vscode.nvim",
-		dependencies = {
-			"romgrk/barbar.nvim",
-			"folke/which-key.nvim",
-			"nvim-treesitter/nvim-treesitter",
-		},
-		config = function()
-			require('vscode').setup({
-				-- Enable transparent background
-				transparent = true,
-
-				italic_comments = true,
-
-				-- Override highlight groups (see ./lua/vscode/theme.lua)
-				group_overrides = {
-					-- this supports the same val table as vim.api.nvim_set_hl
-					-- use colors from this colorscheme by requiring vscode.colors!
-
-					-- vim
-					Search = { bg = "#65FF58", fg = "#26120F", bold = true },
-					CursorLineNr = { fg = "white" },
-					CursorLine = { bold = true, bg = "#222222" },
-					NormalFloat = { bg = 'NONE' },
-					LspInlayHint = { bg = 'NONE', fg = 'grey', italic = true },
-
-					-- coc.nvim
-					CocHighlightText = { bold = true, bg = "#4B4B4B" },
-
-					-- scrollbar
-					ScrollbarHandle = { fg = '#26DAFF', bg = 'NONE' },
-					ScrollbarWarnHandle = { fg = 'yellow' },
-					ScrollbarErrorHandle = { fg = 'red' },
-					ScrollbarInfoHandle = { fg = 'white' },
-					ScrollbarHintHandle = { fg = 'grey' },
-					ScrollbarWarn = { fg = 'yellow' },
-					ScrollbarError = { fg = 'red' },
-					ScrollbarInfo = { fg = 'white' },
-					ScrollbarHint = { fg = 'grey' },
-
-					-- barbar
-					BufferTabpageFill = { bg = 'NONE' },
-
-					BufferCurrent = { fg = 'white', bg = 'NONE', bold = true },
-					BufferCurrentIndex = { fg = 'white', bg = 'NONE' },
-					BufferCurrentMod = { fg = '#d7ba7d', bg = 'NONE', bold = true },
-					BufferCurrentSign = { fg = 'grey', bg = 'NONE' },
-					BufferCurrentIcon = { bg = 'NONE' },
-					BufferCurrentTarget = { bg = 'NONE' },
-
-					BufferInactive = { fg = '#808080', bg = 'NONE' },
-					BufferInactiveIndex = { fg = '#808080', bg = 'NONE' },
-					BufferInactiveMod = { fg = '#808080', bg = 'NONE' },
-					BufferInactiveSign = { bg = 'NONE' },
-					BufferInactiveTarget = { bg = 'NONE' },
-
-					-- nvim-treesitter
-					--['@variable'] = { fg = "#F5ECEB" },
-					--['@parameter'] = { fg = "#F5ECEB" },
-					--['@field'] = { fg = "#F5ECEB" },
-					--['@constant'] = { italic = true },
-					--['@type.qualifier.java'] = { link = "@keyword" },
-					--['@exception.java'] = { link = "@keyword" },
-
-					-- leap.nvim
-					LeapMatch = { fg = 'yellow' },
-					-- LeapLabelPrimary = { fg = 'red' }
-					-- LeapLabelSecondary = { fg = 'blue' }
-					-- LeapLabelSelected = { fg = 'black' }
-					LeapBackdrop = { fg = 'grey' },
-
-					-- Diagnostic
-					DiagnosticWarn = { fg = 'yellow', bg = 'NONE' },
-					DiagnosticError = { fg = 'red', bg = 'NONE' },
-					DiagnosticHint = { fg = 'grey', bg = 'NONE' },
-					DiagnosticInfo = { fg = 'white', bg = 'NONE' },
-
-					-- which key
-					WhichKeyFloat = { bg = 'NONE' },
-					--WhichKeyBorder = { fg = 'grey' },
-
-					-- BufferCurrentIcon = { fg = 'yellow'}
-				}
-			})
-		end
+		end,
 	},
 
 	{
 		"nvim-treesitter/nvim-treesitter",
-		build = ':TSUpdate',
+		build = ":TSUpdate",
 		dependencies = {
 			"nvim-treesitter/playground",
 		},
 		config = function()
-			require 'nvim-treesitter.configs'.setup {
+			require("nvim-treesitter.configs").setup({
 				-- A list of parser names, or "all" (the five listed parsers should always be installed)
 				ensure_installed = "all",
 
@@ -303,7 +169,7 @@ return {
 					-- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
 					-- the name of the parser)
 					-- list of language that will be disabled
-					disable = { "c", "rust" },
+					--disable = { "c", "rust" },
 					-- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
 					disable = function(lang, buf)
 						local max_filesize = 100 * 1024 -- 100 KB
@@ -319,67 +185,66 @@ return {
 					-- Instead of true it can also be a list of languages
 					additional_vim_regex_highlighting = false,
 				},
-			}
-		end
-
-	},
-
-	{
-		'glepnir/dashboard-nvim',
-		event = 'VimEnter',
-		config = function()
-			require('dashboard').setup {
-				theme = 'hyper',
-				config = {
-					week_header = {
-						enable = true,
-					},
-					shortcut = {
-						{ desc = '󰊳 Update', group = '@property', action = 'Lazy update', key = 'u' },
-						{
-							icon = ' ',
-							icon_hl = '@variable',
-							desc = 'Files',
-							group = 'Label',
-							action = 'Telescope find_files',
-							key = 'f',
-						},
-						{
-							desc = ' Apps',
-							group = 'DiagnosticHint',
-							action = 'Telescope app',
-							key = 'a',
-						},
-						{
-							desc = ' dotfiles',
-							group = 'Number',
-							action = 'Telescope dotfiles',
-							key = 'd',
-						},
-					},
-					footer = {} --your footer
-				},
-				--hide = {
-				--statusline    -- hide statusline default is true
-				--tabline       -- hide the tabline
-				--winbar        -- hide winbar
-				--},
-				--preview = {
-				--command       -- preview command
-				--file_path     -- preview file path
-				--file_height   -- preview file height
-				--file_width    -- preview file width
-				--},
-			}
+			})
 		end,
-		dependencies = { { 'nvim-tree/nvim-web-devicons' } }
 	},
+
+	--{
+	--"glepnir/dashboard-nvim",
+	--event = "VimEnter",
+	--config = function()
+	--require("dashboard").setup({
+	--theme = "hyper",
+	--config = {
+	--week_header = {
+	--enable = true,
+	--},
+	--shortcut = {
+	--{ desc = "󰊳 Update", group = "@property", action = "Lazy update", key = "u" },
+	--{
+	--icon = " ",
+	--icon_hl = "@variable",
+	--desc = "Files",
+	--group = "Label",
+	--action = "Telescope find_files",
+	--key = "f",
+	--},
+	--{
+	--desc = " Apps",
+	--group = "DiagnosticHint",
+	--action = "Telescope app",
+	--key = "a",
+	--},
+	--{
+	--desc = " dotfiles",
+	--group = "Number",
+	--action = "Telescope dotfiles",
+	--key = "d",
+	--},
+	--},
+	--footer = {}, --your footer
+	--},
+	----hide = {
+	----statusline    -- hide statusline default is true
+	----tabline       -- hide the tabline
+	----winbar        -- hide winbar
+	----},
+	----preview = {
+	----command       -- preview command
+	----file_path     -- preview file path
+	----file_height   -- preview file height
+	----file_width    -- preview file width
+	----},
+	--})
+	--end,
+	--dependencies = { { "nvim-tree/nvim-web-devicons" } },
+	--},
 	{
 		"onsails/lspkind.nvim",
 		config = function()
-			require('lspkind').init({
-				mode = 'symbol_text',
-				preset = 'codicons',
+			require("lspkind").init({
+				mode = "symbol_text",
+				preset = "codicons",
 				symbol_map = {
 					Text = "󰉿",
 					Method = "󰆧",
@@ -408,8 +273,77 @@ return {
 					TypeParameter = "",
 				},
 			})
-		end
+		end,
 	},
 
+	{
+		"szzii/vscode.nvim",
+		dependencies = {
+			"romgrk/barbar.nvim",
+			"folke/which-key.nvim",
+		},
+		config = function()
+			require("vscode").setup({
+				-- Enable transparent background
+				transparent = true,
 
+				italic_comments = true,
+
+				-- Override highlight groups (see ./lua/vscode/theme.lua)
+				group_overrides = {
+					-- this supports the same val table as vim.api.nvim_set_hl
+					-- use colors from this colorscheme by requiring vscode.colors!
+
+					-- vim
+					Search = { bg = "#65FF58", fg = "#26120F", bold = true },
+					CursorLineNr = { fg = "white" },
+					CursorLine = { bold = true, bg = "#222222" },
+					NormalFloat = { bg = "NONE" },
+					LspInlayHint = { bg = "NONE", fg = "grey", italic = true },
+
+					-- nvim-treesitter
+					["@variable"] = { fg = "#F5ECEB" },
+					["@parameter"] = { fg = "#F5ECEB" },
+					["@field"] = { fg = "#F5ECEB" },
+					["@constant"] = { italic = true },
+					["@type.qualifier.java"] = { link = "@keyword" },
+					["@exception.java"] = { link = "@keyword" },
+
+					-- barbar
+					BufferTabpageFill = { bg = "NONE" },
+					BufferCurrent = { fg = "white", bg = "NONE", bold = true },
+					BufferCurrentIndex = { fg = "white", bg = "NONE" },
+					BufferCurrentMod = { fg = "#d7ba7d", bg = "NONE", bold = true },
+					BufferCurrentSign = { fg = "grey", bg = "NONE" },
+					BufferCurrentIcon = { bg = "NONE" },
+					BufferCurrentTarget = { bg = "NONE" },
+
+					BufferInactive = { fg = "#808080", bg = "NONE" },
+					BufferInactiveIndex = { fg = "#808080", bg = "NONE" },
+					BufferInactiveMod = { fg = "#808080", bg = "NONE" },
+					BufferInactiveSign = { bg = "NONE" },
+					BufferInactiveTarget = { bg = "NONE" },
+
+					-- leap.nvim
+					LeapMatch = { fg = "yellow" },
+					-- LeapLabelPrimary = { fg = 'red' }
+					-- LeapLabelSecondary = { fg = 'blue' }
+					-- LeapLabelSelected = { fg = 'black' }
+					LeapBackdrop = { fg = "grey" },
+
+					-- Diagnostic
+					--DiagnosticWarn = { fg = 'yellow', bg = 'NONE' },
+					DiagnosticError = { fg = "red", bg = "NONE" },
+					--DiagnosticHint = { fg = 'grey', bg = 'NONE' },
+					--DiagnosticInfo = { fg = 'white', bg = 'NONE' },
+
+					-- which key
+					WhichKeyFloat = { bg = "NONE" },
+					--WhichKeyBorder = { fg = 'grey' },
+
+					-- BufferCurrentIcon = { fg = 'yellow'}
+				},
+			})
+		end,
+	},
 }

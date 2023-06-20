@@ -3,14 +3,20 @@ local Runner = {}
 Runner.CompileRun = function()
 	vim.cmd('w')
 	local filetype = vim.bo.filetype
+
 	if filetype == 'java' then
 		Runner.RunJavaFiles()
-	end
-	if filetype == 'python' then
+	elseif filetype == 'python' then
 		vim.fn['asyncrun#run']("", { save = 1 }, "python3 $(VIM_FILENAME)")
-	end
-	if filetype == 'dart' then
+	elseif filetype == 'dart' then
 		vim.cmd("FlutterRun")
+	elseif filetype == 'lua' then
+		vim.fn['asyncrun#run']("", { save = 1 }, "lua $(VIM_FILENAME)")
+	elseif filetype == 'c' then
+		vim.fn['asyncrun#run']("", { save = 1 }, "clang $(VIM_FILENAME) -o $(VIM_FILENOEXT) && ./$(VIM_FILENOEXT)")
+	elseif filetype == 'cpp' then
+		vim.fn['asyncrun#run']("", { save = 1 },
+			"clang++ -std=c++11 $(VIM_FILENAME) -Wall -o $(VIM_FILENOEXT) && ./$(VIM_FILENOEXT)")
 	end
 	--if filetype == 'go' then
 	--local file_name = vim.fn.expand('%')
