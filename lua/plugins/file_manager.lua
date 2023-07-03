@@ -214,8 +214,7 @@ return {
 						["z"] = "close_all_nodes",
 						["c"] = nil,
 						["cw"] = "rename",
-						["e"] = "<UP>",
-						["u"] = "<DOWN>",
+						["e"] = "noop",
 						["v"] = "open_vsplit",
 
 						['N'] = "prev_source",
@@ -239,4 +238,6 @@ return {
 			})
 		end
 	},
+
+
 }

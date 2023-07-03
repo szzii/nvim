@@ -30,6 +30,7 @@ local config = {
 		'-data', workspace_dir,
 	},
 
+	filetypes = { "java" },
 	root_dir = require('jdtls.setup').find_root({ '.git', 'mvnw', 'gradlew', 'build.gradle' }),
 
 
@@ -58,6 +59,9 @@ local config = {
 					}
 				}
 			},
+			autobuild = {
+				enabled = true
+			},
 			eclipse = {
 				downloadSources = true,
 			},
@@ -76,7 +80,7 @@ local config = {
 				},
 			},
 			saveActions = {
-				organizeImports = false
+				organizeImports = true
 			},
 			format = {
 				enabled = true,
@@ -131,20 +135,6 @@ local config = {
 		})
 
 
-		vim.api.nvim_create_autocmd("CursorHold", {
-			buffer = bufnr,
-			callback = function()
-				local opts = {
-					focusable = false,
-					close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-					border = 'rounded',
-					source = 'always',
-					prefix = ' ',
-					scope = 'cursor',
-				}
-				vim.diagnostic.open_float(nil, opts)
-			end
-		})
 		pcall(vim.lsp.codelens.refresh)
 	end
 }

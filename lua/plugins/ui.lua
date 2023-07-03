@@ -50,8 +50,11 @@ return {
 			local map = vim.api.nvim_set_keymap
 			local opts = { noremap = true, silent = true }
 			require("barbar").setup({
+				animation = false,
 				exclude_ft = { "javascript", "qf" },
-				icons = {},
+				icons = {
+					buffer_index = true,
+				},
 			})
 
 			-- Move to previous/next
@@ -114,16 +117,31 @@ return {
 						help = { icon = " " },
 					},
 				},
+				messages = {
+					enabled = true,         -- enables the Noice messages UI
+					view = "notify",        -- default view for messages
+					view_error = "notify",  -- view for errors
+					view_warn = "notify",   -- view for warnings
+					view_history = "messages", -- view for :messages
+					view_search = "virtualtext", -- view for search count messages. Set to `false` to disable
+				},
 				popupmenu = {
 					enabled = true,
 					backend = "cmp",
 				},
 				lsp = {
+					progress = {
+						enabled = false,
+					},
 					-- override markdown rendering so that **cmp** and other plugins use **Treesitter**
 					override = {
 						["vim.lsp.util.convert_input_to_markdown_lines"] = true,
 						["vim.lsp.util.stylize_markdown"] = true,
 						["cmp.entry.get_documentation"] = true,
+					},
+					message = {
+						-- Messages shown by lsp servers
+						enabled = false,
 					},
 				},
 				-- you can enable a preset for easier configuration

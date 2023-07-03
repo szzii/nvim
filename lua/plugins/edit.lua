@@ -44,9 +44,6 @@ return {
 		}
 	},
 
-	-- only mocos
-	"ybian/smartim",
-
 	{
 		"lambdalisue/suda.vim",
 		config = function()
@@ -54,4 +51,8 @@ return {
 		end
 	},
 
+	{
+		"iamcco/markdown-preview.nvim",
+		build = "cd app && yarn install",
+	},
 }

@@ -78,4 +78,12 @@ return {
 		end
 	},
 
+
+	{
+		"voldikss/vim-translator",
+		config = function()
+			vim.keymap.set('', 'tt', ':TranslateW<CR>', { noremap = true, silent = true })
+			vim.g.translator_target_lang = "zh"
+		end
+	}
 }

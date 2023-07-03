@@ -1,8 +1,18 @@
 local Runner = {}
 
+local function elementExists(arr, target)
+	for _, value in ipairs(arr) do
+		if value == target then
+			return true
+		end
+	end
+	return false
+end
+
 Runner.CompileRun = function()
 	vim.cmd('w')
 	local filetype = vim.bo.filetype
+	local webfiles = { 'javascript', 'javascriptreact' }
 
 	if filetype == 'java' then
 		Runner.RunJavaFiles()
@@ -17,6 +27,9 @@ Runner.CompileRun = function()
 	elseif filetype == 'cpp' then
 		vim.fn['asyncrun#run']("", { save = 1 },
 			"clang++ -std=c++11 $(VIM_FILENAME) -Wall -o $(VIM_FILENOEXT) && ./$(VIM_FILENOEXT)")
+	end
+	if elementExists(webfiles, filetype) then
+		vim.fn['asyncrun#run']("", { save = 1 }, "npm start")
 	end
 	--if filetype == 'go' then
 	--local file_name = vim.fn.expand('%')
@@ -33,24 +46,21 @@ Runner.RunJavaFiles = function()
 	local wordspacedir = vim.fn.FindRootDirectory()
 	if wordspacedir ~= '' then
 		local fileName = vim.fn.expand("%")
-		local suffix = string.sub(fileName, -1, 9)
-		vim.cmd('echo ' .. suffix)
 
 		-- Test Run
-		--if string.upper(suffix) == 'TEST.JAVA' or string.upper(suffix) == 'TESTS.java' then
-		--local testRunArg = ''
+		if string.sub(fileName, -9) == 'Test.java' or string.sub(fileName, -10) == 'Tests.java' then
+			local testRunArg = ''
 
-		--if vim.fn.expand('<cword>') ~= '' then
-		--testRunArg = vim.fn.expand("%:t:r") .. "#" .. vim.fn.expand("<cword>")
-		--else
-		--testRunArg = vim.fn.expand("%:t:r")
-		--end
-
-		--vim.fn['asyncrun#run']("", { save = 1 }, "mvn package -Dtest=" .. testRunArg .. " test")
-		--end
-
-		-- Maven Run
-		vim.fn['asyncrun#run']("", { save = 1 }, "mvn clean spring-boot:run")
+			if vim.fn.expand('<cword>') ~= '' then
+				testRunArg = vim.fn.expand("%:t:r") .. "#" .. vim.fn.expand("<cword>")
+			else
+				testRunArg = vim.fn.expand("%:t:r")
+			end
+			vim.fn['asyncrun#run']("", { save = 1 }, "mvn package -Dtest=" .. testRunArg .. " test")
+		else
+			-- Maven Run
+			vim.fn['asyncrun#run']("", { save = 1 }, "mvn clean spring-boot:run")
+		end
 	else
 		-- class file Run
 		vim.fn['asyncrun#run']("", { save = 1 }, "javac $(VIM_FILENAME) && java $(VIM_FILENOEXT)")

@@ -21,5 +21,3 @@ require("lazy").setup("plugins")
 --require('functions.runner')
 
 vim.keymap.set('n', 'R', ':lua require("functions.runner").CompileRun()<CR>', { noremap = true, silent = true })
--- Lua
---vim.cmd [[colorscheme tokyonight]]
