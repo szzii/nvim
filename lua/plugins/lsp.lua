@@ -16,12 +16,6 @@ return {
 				vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
 			end
 
-			local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
-			function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
-				opts = opts or {}
-				opts.border = opts.border or border
-				return orig_util_open_floating_preview(contents, syntax, opts, ...)
-			end
 
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("UserLspConfig", {}),
@@ -83,7 +77,7 @@ return {
 			{
 				"L3MON4D3/LuaSnip",
 				-- follow latest release.
-				version = "<CurrentMajor>.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+				version = "v1.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
 				-- install jsregexp (optional!).
 				build = "make install_jsregexp",
 				dependencies = {
@@ -191,11 +185,6 @@ return {
 			local cmp_autopairs = require("nvim-autopairs.completion.cmp")
 			cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
 		end,
-	},
-	{
-		"L3MON4D3/LuaSnip",
-		version = "1.*",
-		build = "make install_jsregexp",
 	},
 	{
 		"folke/neodev.nvim",

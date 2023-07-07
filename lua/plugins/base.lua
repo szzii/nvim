@@ -21,18 +21,91 @@ return {
 		end
 	},
 
+
 	{
-		"lukas-reineke/indent-blankline.nvim",
+		"shellRaining/hlchunk.nvim",
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter",
+		},
 		config = function()
-			require("indent_blankline").setup {
-				-- for example, context is off by default, use this to turn it on
-				show_current_context = true,
+			require('hlchunk').setup {
+				chunk = {
+					enable = true,
+					use_treesitter = true,
+					exclude_filetypes = {
+						aerial = true,
+						dashboard = true,
+					},
+					chars = {
+						horizontal_line = "─",
+						vertical_line = "│",
+						left_top = "╭",
+						left_bottom = "╰",
+						right_arrow = ">",
+					},
+					style = {
+						{ fg = "#806d9c" },
+					},
+				},
+
+				indent = {
+					enable = true,
+					use_treesitter = false,
+					chars = {
+						"│",
+					},
+					style = {
+						{ fg = "#404040" }
+					},
+				},
+
+				line_num = {
+					enable = false,
+					use_treesitter = false,
+					style = "#806d9c",
+				},
+
+				blank = {
+					enable = false,
+					chars = {
+						"․",
+					},
+					style = {
+						vim.fn.synIDattr(vim.fn.synIDtrans(vim.fn.hlID("Whitespace")), "fg", "gui"),
+					},
+				},
 			}
-			vim.g.indent_blankline_filetype_exclude = { "lspinfo", "checkhealth", "help", "man", "startify", "markdown",
-				"json", "jsonc", "qf", "dashboard" }
 		end
 	},
 
+	{
+		"petertriho/nvim-scrollbar",
+		dependencies = {
+			'kevinhwang91/nvim-hlslens',
+		},
+		config = function()
+			require("scrollbar.handlers.search").setup()
+			require("scrollbar").setup({
+				show = true,
+				handle = {
+					text = " ",
+					color = "#928374",
+					hide_if_all_visible = true,
+				},
+				marks = {
+					Search = { color = "yellow" },
+					Misc = { color = "purple" },
+				},
+				handlers = {
+					cursor = false,
+					diagnostic = true,
+					gitsigns = true,
+					handle = true,
+					search = true,
+				},
+			})
+		end,
+	},
 
 	{
 		"yianwillis/vimcdoc",

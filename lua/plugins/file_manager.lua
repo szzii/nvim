@@ -81,7 +81,7 @@ return {
 	{
 		"nvim-neo-tree/neo-tree.nvim",
 		lazy = true,
-		branch = "v2.x",
+		version = "2.69",
 		keys = {
 			{ "<leader>t", ":Neotree toggle <cwd><cr>", desc = "NeoTree", silent = true },
 		},
