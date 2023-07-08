@@ -28,10 +28,10 @@ return {
 			vim.keymap.set('n', '<F10>', function() require('dap').step_over() end)
 			vim.keymap.set('n', '<F11>', function() require('dap').step_into() end)
 			vim.keymap.set('n', '<F12>', function() require('dap').step_out() end)
-			vim.keymap.set('n', '<Leader>b', function() require('dap').toggle_breakpoint() end, { desc = 'toggle_breakpoint' })
 			vim.keymap.set('n', '<Leader>B',
-				function() require('dap').set_breakpoint(nil, nil, vim.fn.input('Log point message: ')) end,
-				{ desc = 'breakpoints_log' })
+				function() require('dap').toggle_breakpoint(vim.fn.input('Condition: '), nil, nil) end,
+				{ desc = 'toggle_breakpoint' })
+			vim.keymap.set('n', '<Leader>b', function() require('dap').toggle_breakpoint() end, { desc = 'toggle_breakpoint' })
 			vim.keymap.set({ 'n', 'v' }, '<Leader>H', function()
 				require('dap.ui.widgets').hover()
 			end, { desc = 'debug_hover' })
@@ -101,13 +101,16 @@ return {
 							size = 40
 						},
 						{
-							elements = { {
-								id = "repl",
-								size = 0.5
-							}, {
-								id = "console",
-								size = 0.5
-							} },
+							elements = {
+								{
+									id = "repl",
+									size = 0.22
+								},
+								{
+									id = "console",
+									size = 0.78
+								}
+							},
 							position = "bottom",
 							size = 10
 						}

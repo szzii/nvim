@@ -88,6 +88,33 @@ return {
 						end,
 					},
 				},
+				config = function()
+					local luasnip = require 'luasnip'
+					local types = require("luasnip.util.types")
+
+					luasnip.config.setup({
+						ext_opts = {
+							[types.choiceNode] = {
+								active = {
+									virt_text = { { "●", "GruvboxOrange" } }
+								}
+							},
+							[types.insertNode] = {
+								active = {
+									virt_text = { { "●", "GruvboxBlue" } }
+								}
+							}
+						},
+					})
+
+
+					local CustomLuaSnip = vim.api.nvim_create_augroup('CustomLuaSnip', { clear = true })
+					vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
+						pattern = "*",
+						group = CustomLuaSnip,
+						command = "lua require'luasnip'.unlink_current()"
+					})
+				end
 			},
 			"saadparwaiz1/cmp_luasnip",
 		},
@@ -103,6 +130,14 @@ return {
 				return col ~= 0
 						and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
 			end
+
+
+			-- If you want insert `(` after select function or method item
+			local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+			cmp.event:on(
+				'confirm_done',
+				cmp_autopairs.on_confirm_done()
+			)
 
 			cmp.setup({
 				snippet = {
@@ -124,10 +159,7 @@ return {
 				mapping = cmp.mapping.preset.insert({
 					["<C-u>"] = cmp.mapping.scroll_docs(-4),
 					["<C-e>"] = cmp.mapping.scroll_docs(4),
-					["<CR>"] = cmp.mapping.confirm({
-						behavior = cmp.ConfirmBehavior.Replace,
-						select = true,
-					}),
+					['<CR>'] = cmp.mapping.confirm({ select = true }),
 					["<Tab>"] = cmp.mapping(function(fallback)
 						if cmp.visible() then
 							cmp.select_next_item()
@@ -182,8 +214,6 @@ return {
 					},
 				}),
 			})
-			local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-			cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
 		end,
 	},
 	{
@@ -381,7 +411,6 @@ return {
 		end
 	},
 
-	"mfussenegger/nvim-jdtls",
 	{
 		"fatih/vim-go",
 		lazy = true,

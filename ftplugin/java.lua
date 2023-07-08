@@ -1,17 +1,64 @@
--- See `:help vim.lsp.start_client` for an overview of the supported `config` options.
-
 local jdtls_path = vim.fn.stdpath('data') .. "/custom_lsp/jdtls"
 local path_to_plugins = jdtls_path .. "/plugins/"
-local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ':p:h:t')
+
+local root_markers = { "gradlew", "mvnw", ".git", "pom.xml", "build.gradle" }
+local root_dir = require("jdtls.setup").find_root(root_markers)
+local workspace_dir = '/Users/szz/.cache/jdtls/workspace/' .. vim.fn.fnamemodify(root_dir, ':p:h:t')
 
 local path_to_lsp_server = jdtls_path .. "/config_mac"
-local workspace_dir = '/Users/szz/.cache/jdtls/workspace/' .. project_name
 local path_to_jar = path_to_plugins .. "org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar"
 local lombok_path = jdtls_path .. "/lombok.jar"
+local mason_path = vim.fn.glob(vim.fn.stdpath("data") .. "/mason/")
 
-os.execute("mkdir -p " .. workspace_dir .. " >> /dev/null")
+
+local bundles = {}
+
+vim.list_extend(bundles, vim.split(vim.fn.glob(mason_path .. "packages/java-test/extension/server/*.jar"), "\n"))
+
+vim.list_extend(
+	bundles,
+	vim.split(
+		vim.fn.glob(mason_path .. "packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar"),
+		"\n"
+	)
+)
+
+local on_attach = function()
+	require('jdtls').setup_dap({ hotcodereplace = 'auto' })
+	require('jdtls.dap').setup_dap_main_class_configs()
+
+
+	vim.api.nvim_create_autocmd("BufWritePre", {
+		buffer = buffer,
+		callback = function()
+			vim.lsp.buf.format { async = false }
+		end
+	})
+
+	vim.api.nvim_create_autocmd('BufWritePost', {
+		buffer = bufnr,
+		desc = 'refresh codelens',
+		callback = function()
+			pcall(vim.lsp.codelens.refresh)
+		end,
+	})
+
+	pcall(vim.lsp.codelens.refresh)
+end
+
+--os.execute("mkdir -p " .. workspace_dir .. " >> /dev/null")
 
 local config = {
+	flags = {
+		debounce_text_changes = 80,
+		allow_incremental_sync = true,
+	},
+	root_dir = root_dir,
+	filetypes = { "java" },
+	init_options = {
+		bundles = bundles,
+	},
+	on_attach = on_attach,
 	cmd = {
 		'/Users/szz/.javahome/jdk-17.0.1.jdk/Contents/Home/bin/java',
 		'-Declipse.application=org.eclipse.jdt.ls.core.id1',
@@ -30,15 +77,7 @@ local config = {
 		'-data', workspace_dir,
 	},
 
-	filetypes = { "java" },
-	root_dir = require('jdtls.setup').find_root({ '.git', 'mvnw', 'gradlew', 'build.gradle' }),
-
-
-	-- 💀
-	-- Here you can configure eclipse.jdt.ls specific settings
 	-- See https://github.com/eclipse/eclipse.jdt.ls/wiki/Running-the-JAVA-LS-server-from-the-command-line#initialize-request
-	-- for a list of options
-
 	settings = {
 		java = {
 			home = '/Users/szz/.javahome/jdk-17.0.1.jdk/Contents/Home',
@@ -59,36 +98,16 @@ local config = {
 					}
 				}
 			},
-			autobuild = {
-				enabled = true
-			},
-			eclipse = {
-				downloadSources = true,
-			},
-			maven = {
-				downloadSources = true,
-			},
-			implementationsCodeLens = {
-				enabled = true,
-			},
-			referencesCodeLens = {
-				enabled = true,
-			},
-			inlayhints = {
-				parameterNames = {
-					enabled = 'all',
+			format = {
+				settings = {
+					-- https://github.com/google/styleguide/blob/gh-pages/eclipse-java-google-style.xml
+					url = vim.fn.stdpath('data') .. "/eclipse/eclipse-java-google-style.xml",
+					profile = "GoogleStyle",
 				},
 			},
-			saveActions = {
-				organizeImports = true
-			},
-			format = {
-				enabled = true,
-			},
-			signatureHelp = {
-				enabled = true
-			},
 			completion = {
+				maxResults = 30,
+				postfix = { enabled = true },
 				favoriteStaticMembers = {
 					"org.junit.Assert.*",
 					"org.junit.Assume.*",
@@ -102,57 +121,37 @@ local config = {
 					"javax",
 					"com",
 					"org"
-				}
+				},
+				filteredTypes = {
+					"com.sun.*",
+					"io.micrometer.shaded.*",
+					"java.awt.*",
+					"jdk.*",
+					"sun.*",
+				},
 			},
-		},
+			autobuild = { enabled = true },
+			eclipse = { downloadSources = true, },
+			saveActions = { organizeImports = true },
+			-- LSP Related
+			implementationsCodeLens = { enabled = true },
+			referencesCodeLens = { enabled = true, },
+			signatureHelp = { enabled = true },
+			inlayHints = {
+				parameterNames = { enabled = true },
+			},
+			maven = {
+				downloadSources = true,
+				updateSnapshots = true,
+			},
+			-- On Save Cleanup
+			cleanup = {
+				actionsOnSave = {
+					"addOverride",
+				},
+			},
+		}
 	},
-
-	-- Language server `initializationOptions`
-	-- You need to extend the `bundles` with paths to jar files
-	-- if you want to use additional eclipse.jdt.ls plugins.
-	--
-	-- See https://github.com/mfussenegger/nvim-jdtls#java-debug-installation
-	--
-	-- If you don't plan on using the debugger or other eclipse.jdt.ls plugins you can remove this
-	--init_options = {
-	--},
-	on_attach = function()
-		require('jdtls').setup_dap({ hotcodereplace = 'auto' })
-		require('jdtls.dap').setup_dap_main_class_configs()
-		vim.api.nvim_create_autocmd("BufWritePre", {
-			buffer = buffer,
-			callback = function()
-				vim.lsp.buf.format { async = false }
-			end
-		})
-
-		vim.api.nvim_create_autocmd('BufWritePost', {
-			buffer = bufnr,
-			desc = 'refresh codelens',
-			callback = function()
-				pcall(vim.lsp.codelens.refresh)
-			end,
-		})
-
-
-		pcall(vim.lsp.codelens.refresh)
-	end
-}
-
-
--- This bundles definition is the same as in the previous section (java-debug installation)
-local bundles = {
-	vim.fn.glob(
-		vim.fn.stdpath('data') ..
-		"/custom_lsp/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar", 1),
-};
-
--- This is the new part
-vim.list_extend(bundles,
-	vim.split(vim.fn.glob(vim.fn.stdpath('data') .. "/custom_lsp/vscode-java-test/server/*.jar", 1), "\n"))
-
-config['init_options'] = {
-	bundles = bundles,
 }
 
 require('jdtls').start_or_attach(config)

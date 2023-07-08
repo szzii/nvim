@@ -42,6 +42,7 @@
         "/Users/szz/.local/share/nvim/lazy/telescope.nvim/lua",
         "/Users/szz/.local/share/nvim/lazy/nvim-web-devicons/lua",
         "/Users/szz/.config/nvim/lua",
+        "${3rd}/luv/library",
         "${3rd}/luv/library"
     ],
     "workspace.checkThirdParty": false
