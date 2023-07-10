@@ -99,11 +99,12 @@ local config = {
 				}
 			},
 			format = {
-				settings = {
-					-- https://github.com/google/styleguide/blob/gh-pages/eclipse-java-google-style.xml
-					url = vim.fn.stdpath('data') .. "/eclipse/eclipse-java-google-style.xml",
-					profile = "GoogleStyle",
-				},
+				enable = true,
+				--settings = {
+				---- https://github.com/google/styleguide/blob/gh-pages/eclipse-java-google-style.xml
+				--url = vim.fn.stdpath('data') .. "/eclipse/eclipse-java-google-style.xml",
+				--profile = "GoogleStyle",
+				--},
 			},
 			completion = {
 				maxResults = 30,
