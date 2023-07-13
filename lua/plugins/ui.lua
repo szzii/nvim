@@ -302,7 +302,7 @@ return {
 
 					-- Diagnostic
 					--DiagnosticWarn = { fg = 'yellow', bg = 'NONE' },
-					DiagnosticError = { fg = "red", bg = "NONE" },
+					--DiagnosticError = { fg = "red", bg = "NONE" },
 					--DiagnosticHint = { fg = 'grey', bg = 'NONE' },
 					--DiagnosticInfo = { fg = 'white', bg = 'NONE' },
 
@@ -311,6 +311,7 @@ return {
 					--WhichKeyBorder = { fg = 'grey' },
 
 					-- BufferCurrentIcon = { fg = 'yellow'}
+
 				},
 			})
 		end,

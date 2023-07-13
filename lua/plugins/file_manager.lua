@@ -81,7 +81,7 @@ return {
 	{
 		"nvim-neo-tree/neo-tree.nvim",
 		lazy = true,
-		version = "2.69",
+		--version = "2.69",
 		keys = {
 			{ "<leader>t", ":Neotree toggle <cwd><cr>", desc = "NeoTree", silent = true },
 		},
@@ -123,7 +123,7 @@ return {
 					statusline = false,
 					sources = {
 						{ source = "filesystem", display_name = " 󰉓 Files " },
-						{ source = "buffers",    display_name = " 󰉓 Buffers " },
+						--{ source = "buffers",    display_name = " 󰉓 Buffers " },
 						{ source = "git_status", display_name = " 󰊢 Git " },
 					},
 				},
@@ -236,6 +236,11 @@ return {
 					},
 				},
 			})
+
+			vim.cmd([[
+				hi NeoTreeGitUntracked gui=NONE guifg=#ff8700
+				hi NeoTreeGitConflict gui=bold guifg=#ff8700
+			]])
 		end
 	},
 
