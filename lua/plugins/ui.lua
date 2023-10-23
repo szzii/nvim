@@ -175,7 +175,7 @@ return {
 				auto_install = true,
 
 				-- List of parsers to ignore installing (for "all")
-				ignore_install = { "javascript" },
+				--ignore_install = { "javascript" },
 
 				---- If you need to change the installation directory of the parsers (see -> Advanced Setup)
 				-- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
@@ -300,6 +300,9 @@ return {
 					-- LeapLabelSelected = { fg = 'black' }
 					LeapBackdrop = { fg = "grey" },
 
+					-- neo-tree
+					NeoTreeCursorLine = { bg = "#5a5a5a" },
+
 					-- Diagnostic
 					--DiagnosticWarn = { fg = 'yellow', bg = 'NONE' },
 					--DiagnosticError = { fg = "red", bg = "NONE" },
@@ -327,6 +330,14 @@ return {
 		"nvim-zh/colorful-winsep.nvim",
 		config = true,
 		event = { "WinNew" },
+	},
+
+	{
+		"Bekaboo/dropbar.nvim",
+		config = function()
+			require("dropbar").setup({
+			})
+		end
 	}
 
 }

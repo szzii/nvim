@@ -123,7 +123,7 @@ return {
 					statusline = false,
 					sources = {
 						{ source = "filesystem", display_name = " 󰉓 Files " },
-						--{ source = "buffers",    display_name = " 󰉓 Buffers " },
+						{ source = "buffers",    display_name = " 󰉓 Buffers " },
 						{ source = "git_status", display_name = " 󰊢 Git " },
 					},
 				},
@@ -244,5 +244,21 @@ return {
 		end
 	},
 
+	{
+		"theniceboy/joshuto.nvim",
+		very_lazy = true,
+		cmd = "Joshuto",
+		keys = {
+			{ "<leader>2", ":Joshuto<CR>", mode = "n", noremap = true, silent = true, desc = 'Jushuto' },
+		},
+		config = function()
+			-- let g:joshuto_floating_window_winblend = 0
+			-- let g:joshuto_floating_window_scaling_factor = 1.0
+			-- let g:joshuto_use_neovim_remote = 1 " for neovim-remote support
+			vim.g.joshuto_floating_window_scaling_factor = 0.8
+			vim.g.joshuto_use_neovim_remote = 1
+			vim.g.joshuto_floating_window_winblend = 0
+		end
+	},
 
 }

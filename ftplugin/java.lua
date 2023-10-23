@@ -1,7 +1,7 @@
 local jdtls_path = vim.fn.stdpath('data') .. "/custom_lsp/jdtls"
 local path_to_plugins = jdtls_path .. "/plugins/"
 
-local root_markers = { "gradlew", "mvnw", ".git", "pom.xml", "build.gradle" }
+local root_markers = { "gradlew", ".git", "build.gradle" }
 local root_dir = require("jdtls.setup").find_root(root_markers)
 local workspace_dir = '/Users/szz/.cache/jdtls/workspace/' .. vim.fn.fnamemodify(root_dir, ':p:h:t')
 
@@ -139,7 +139,7 @@ local config = {
 			referencesCodeLens = { enabled = true, },
 			signatureHelp = { enabled = true },
 			inlayHints = {
-				parameterNames = { enabled = true },
+				parameterNames = { enabled = false },
 			},
 			maven = {
 				downloadSources = true,

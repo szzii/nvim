@@ -47,14 +47,16 @@ vim.keymap.set('', '<LEADER><CR>', ':nohlsearch<CR>', { noremap = true, silent =
 vim.keymap.set('n', 'tu', ':tabe<CR>', { noremap = true, silent = true })
 
 
-vim.keymap.set("n", "<C-e>", "5<C-e> .+1<cr>==", { desc = "scoller down", silent = true })
-vim.keymap.set("n", "<C-u>", "5<C-y>", { desc = "scoller up", silent = true })
+--vim.keymap.set("n", "<C-e>", "5<C-e> .+1<cr>==", { desc = "scoller down", silent = true })
+--vim.keymap.set("n", "<C-u>", "5<C-y>", { desc = "scoller up", silent = true })
 
---vim.keymap.set("n", "<C-e>", "<cmd>m .+1<cr>==", { desc = "Move down", silent = true })
---vim.keymap.set("n", "<C-u>", "<cmd>m .-2<cr>==", { desc = "Move up", silent = true })
---vim.keymap.set("i", "<C-e>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down", silent = true })
---vim.keymap.set("i", "<C-u>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up", silent = true })
---vim.keymap.set("v", "<C-e>", ":m '>+1<cr>gv=gv", { desc = "Move down", silent = true })
---vim.keymap.set("v", "<C-u>", ":m '<-2<cr>gv=gv", { desc = "Move up", silent = true })
+vim.keymap.set("n", "<C-e>", "<cmd>m .+1<cr>==", { desc = "Move down", silent = true })
+vim.keymap.set("n", "<C-u>", "<cmd>m .-2<cr>==", { desc = "Move up", silent = true })
+vim.keymap.set("i", "<C-e>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down", silent = true })
+vim.keymap.set("i", "<C-u>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up", silent = true })
+vim.keymap.set("v", "<C-e>", ":m '>+1<cr>gv=gv", { desc = "Move down", silent = true })
+vim.keymap.set("v", "<C-u>", ":m '<-2<cr>gv=gv", { desc = "Move up", silent = true })
 
 vim.keymap.set("n", "`", ":lua require('functions.tools').Reverse_bool()<CR>", { desc = "reverse", silent = true })
+
+vim.keymap.set('n', 'L', vim.cmd.UndotreeToggle)

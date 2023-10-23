@@ -20,6 +20,9 @@ return {
 			vim.g.lastplace_open_folds = 1
 		end
 	},
+	{
+		"mbbill/undotree",
+	},
 
 
 	{
@@ -148,6 +151,7 @@ return {
 		dependencies = { 'nvim-tree/nvim-web-devicons' },
 		config = function()
 			require 'alpha'.setup(require 'alpha.themes.startify'.config)
+			vim.keymap.set('n', '<leader>1', ':Alpha<CR>', { noremap = true, silent = true })
 		end
 	},
 
