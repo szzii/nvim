@@ -37,63 +37,63 @@ return {
 			})
 		end,
 	},
-	{
-		"romgrk/barbar.nvim",
-		dependencies = {
-			"lewis6991/gitsigns.nvim",  -- OPTIONAL: for git status
-			"nvim-tree/nvim-web-devicons", -- OPTIONAL: for file icons
-		},
-		init = function()
-			vim.g.barbar_auto_setup = false
-		end,
-		config = function()
-			local map = vim.api.nvim_set_keymap
-			local opts = { noremap = true, silent = true }
-			require("barbar").setup({
-				animation = false,
-				exclude_ft = { "javascript", "qf" },
-				icons = {
-					buffer_index = true,
-				},
-			})
+	--{
+		--"romgrk/barbar.nvim",
+		--dependencies = {
+			--"lewis6991/gitsigns.nvim",  -- OPTIONAL: for git status
+			--"nvim-tree/nvim-web-devicons", -- OPTIONAL: for file icons
+		--},
+		--init = function()
+			--vim.g.barbar_auto_setup = false
+		--end,
+		--config = function()
+			--local map = vim.api.nvim_set_keymap
+			--local opts = { noremap = true, silent = true }
+			--require("barbar").setup({
+				--animation = false,
+				--exclude_ft = { "javascript", "qf" },
+				--icons = {
+					--buffer_index = true,
+				--},
+			--})
 
-			-- Move to previous/next
-			map("n", "tn", "<Cmd>BufferPrevious<CR>", opts)
-			map("n", "ti", "<Cmd>BufferNext<CR>", opts)
-			-- Re-order to previous/next
-			map("n", "tN", "<Cmd>BufferMovePrevious<CR>", opts)
-			map("n", "tI", "<Cmd>BufferMoveNext<CR>", opts)
-			-- Goto buffer in position...
-			map("n", "t1", "<Cmd>BufferGoto 1<CR>", opts)
-			map("n", "t2", "<Cmd>BufferGoto 2<CR>", opts)
-			map("n", "t3", "<Cmd>BufferGoto 3<CR>", opts)
-			map("n", "t4", "<Cmd>BufferGoto 4<CR>", opts)
-			map("n", "t5", "<Cmd>BufferGoto 5<CR>", opts)
-			map("n", "t6", "<Cmd>BufferGoto 6<CR>", opts)
-			map("n", "t7", "<Cmd>BufferGoto 7<CR>", opts)
-			map("n", "t8", "<Cmd>BufferGoto 8<CR>", opts)
-			map("n", "t9", "<Cmd>BufferGoto 9<CR>", opts)
-			map("n", "t0", "<Cmd>BufferLast<CR>", opts)
-			-- Pin/unpin buffer
-			map("n", "tp", "<Cmd>BufferPin<CR>", opts)
-			-- Close buffer
-			map("n", "tq", "<Cmd>BufferClose<CR>", opts)
-			map("n", "tQ", "<Cmd>BufferCloseAllButCurrentOrPinned<CR>", opts)
-			map("n", "tl", "<Cmd>BufferCloseBuffersLeft<CR>", opts)
-			map("n", "tr", "<Cmd>BufferCloseBuffersRight<CR>", opts)
-			-- Wipeout buffer
-			--                 :BufferWipeout
-			-- Close commands
-			--                 :BufferCloseAllButCurrent
-			--                 :BufferCloseAllButPinned
-			--                 :BufferCloseAllButCurrentOrPinned
-			--                 :BufferCloseBuffersLeft
-			--                 :BufferCloseBuffersRight
-			-- Magic buffer-picking mode
-			map("n", "<C-p>", "<Cmd>BufferPick<CR>", opts)
-		end,
-		version = "^1.0.0", -- optional: only update when a new 1.x version is released
-	},
+			---- Move to previous/next
+			--map("n", "tn", "<Cmd>BufferPrevious<CR>", opts)
+			--map("n", "ti", "<Cmd>BufferNext<CR>", opts)
+			---- Re-order to previous/next
+			--map("n", "tN", "<Cmd>BufferMovePrevious<CR>", opts)
+			--map("n", "tI", "<Cmd>BufferMoveNext<CR>", opts)
+			---- Goto buffer in position...
+			--map("n", "t1", "<Cmd>BufferGoto 1<CR>", opts)
+			--map("n", "t2", "<Cmd>BufferGoto 2<CR>", opts)
+			--map("n", "t3", "<Cmd>BufferGoto 3<CR>", opts)
+			--map("n", "t4", "<Cmd>BufferGoto 4<CR>", opts)
+			--map("n", "t5", "<Cmd>BufferGoto 5<CR>", opts)
+			--map("n", "t6", "<Cmd>BufferGoto 6<CR>", opts)
+			--map("n", "t7", "<Cmd>BufferGoto 7<CR>", opts)
+			--map("n", "t8", "<Cmd>BufferGoto 8<CR>", opts)
+			--map("n", "t9", "<Cmd>BufferGoto 9<CR>", opts)
+			--map("n", "t0", "<Cmd>BufferLast<CR>", opts)
+			---- Pin/unpin buffer
+			--map("n", "tp", "<Cmd>BufferPin<CR>", opts)
+			---- Close buffer
+			--map("n", "tq", "<Cmd>BufferClose<CR>", opts)
+			--map("n", "tQ", "<Cmd>BufferCloseAllButCurrentOrPinned<CR>", opts)
+			--map("n", "tl", "<Cmd>BufferCloseBuffersLeft<CR>", opts)
+			--map("n", "tr", "<Cmd>BufferCloseBuffersRight<CR>", opts)
+			---- Wipeout buffer
+			----                 :BufferWipeout
+			---- Close commands
+			----                 :BufferCloseAllButCurrent
+			----                 :BufferCloseAllButPinned
+			----                 :BufferCloseAllButCurrentOrPinned
+			----                 :BufferCloseBuffersLeft
+			----                 :BufferCloseBuffersRight
+			---- Magic buffer-picking mode
+			--map("n", "<C-p>", "<Cmd>BufferPick<CR>", opts)
+		--end,
+		--version = "^1.0.0", -- optional: only update when a new 1.x version is released
+	--},
 	{
 		"folke/noice.nvim",
 		event = "VeryLazy",
@@ -189,13 +189,13 @@ return {
 					-- list of language that will be disabled
 					--disable = { "c", "rust" },
 					-- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
-					disable = function(lang, buf)
-						local max_filesize = 100 * 1024 -- 100 KB
-						local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-						if ok and stats and stats.size > max_filesize then
-							return true
-						end
-					end,
+					--disable = function(lang, buf)
+					--local max_filesize = 100 * 1024 -- 100 KB
+					--local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+					--if ok and stats and stats.size > max_filesize then
+					--return true
+					--end
+					--end,
 
 					-- Setting this to true will run `:h syntax` and tree-sitter at the same time.
 					-- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
@@ -248,7 +248,6 @@ return {
 	{
 		"szzii/vscode.nvim",
 		dependencies = {
-			"romgrk/barbar.nvim",
 			"folke/which-key.nvim",
 		},
 		config = function()

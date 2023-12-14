@@ -16,8 +16,10 @@ Runner.CompileRun = function()
 
 	if filetype == 'java' then
 		Runner.RunJavaFiles()
+	elseif filetype == 'vue' then
+		vim.fn['asyncrun#run']("", { save = 1 }, "npm run dev")
 	elseif filetype == 'python' then
-		vim.fn['asyncrun#run']("", { save = 1 }, "python3 $(VIM_FILENAME)")
+		vim.fn['asyncrun#run']("", { save = 1 }, "python $(VIM_FILENAME)")
 	elseif filetype == 'dart' then
 		vim.cmd("FlutterRun")
 	elseif filetype == 'lua' then

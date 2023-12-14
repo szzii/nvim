@@ -237,14 +237,14 @@ return {
 		config = function()
 			-- LSP settings (for overriding per client)
 
-			local function save_format(bufnr)
-				vim.api.nvim_create_autocmd("BufWritePre", {
-					buffer = bufnr,
-					callback = function()
-						vim.lsp.buf.format({ async = false })
-					end,
-				})
-			end
+			--local function save_format(bufnr)
+				--vim.api.nvim_create_autocmd("BufWritePre", {
+					--buffer = bufnr,
+					--callback = function()
+						--vim.lsp.buf.format({ async = false })
+					--end,
+				--})
+			--end
 
 			local function refresh_codelens(bufnr)
 				vim.api.nvim_create_autocmd("BufWritePost", {
@@ -305,6 +305,23 @@ return {
 					require("lspconfig").pyright.setup({
 						on_attach = function()
 						end,
+						settings = {
+							pyright = {
+								disableLanguageServices = true,
+								disableOrganizeImports = true,
+							},
+							python = {
+								analysis = {
+									autoImportCompletions = true,
+									autoSearchPaths = true,
+									diagnosticMode = "openFilesOnly",
+									useLibraryCodeForTypes = true,
+									logLevel = "Warning",
+									typeCheckingMode = "basic"
+								}
+							},
+							single_file_support = true,
+						}
 					})
 				end,
 				["gopls"] = function()

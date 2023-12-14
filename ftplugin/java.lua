@@ -28,22 +28,22 @@ local on_attach = function()
 	require('jdtls.dap').setup_dap_main_class_configs()
 
 
-	vim.api.nvim_create_autocmd("BufWritePre", {
-		buffer = buffer,
-		callback = function()
-			vim.lsp.buf.format { async = false }
-		end
-	})
+	--vim.api.nvim_create_autocmd("BufWritePre", {
+		--buffer = buffer,
+		--callback = function()
+			--vim.lsp.buf.format { async = false }
+		--end
+	--})
 
-	vim.api.nvim_create_autocmd('BufWritePost', {
-		buffer = bufnr,
-		desc = 'refresh codelens',
-		callback = function()
-			pcall(vim.lsp.codelens.refresh)
-		end,
-	})
+	--vim.api.nvim_create_autocmd('BufWritePost', {
+	--buffer = bufnr,
+	--desc = 'refresh codelens',
+	--callback = function()
+	--pcall(vim.lsp.codelens.refresh)
+	--end,
+	--})
 
-	pcall(vim.lsp.codelens.refresh)
+	--pcall(vim.lsp.codelens.refresh)
 end
 
 --os.execute("mkdir -p " .. workspace_dir .. " >> /dev/null")
@@ -135,8 +135,8 @@ local config = {
 			eclipse = { downloadSources = true, },
 			saveActions = { organizeImports = true },
 			-- LSP Related
-			implementationsCodeLens = { enabled = true },
-			referencesCodeLens = { enabled = true, },
+			implementationsCodeLens = { enabled = false },
+			referencesCodeLens = { enabled = false, },
 			signatureHelp = { enabled = true },
 			inlayHints = {
 				parameterNames = { enabled = false },

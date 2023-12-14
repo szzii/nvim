@@ -1,7 +1,8 @@
 return {
+	{ 'nvim-telescope/telescope-fzf-native.nvim', build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' },
 	{
 		'nvim-telescope/telescope.nvim',
-		version = '0.1.x',
+		--version = '0.1.x',
 		lazy = false,
 		dependencies = { 'nvim-lua/plenary.nvim' },
 		keys = {
@@ -123,7 +124,7 @@ return {
 					statusline = false,
 					sources = {
 						{ source = "filesystem", display_name = " 󰉓 Files " },
-						{ source = "buffers",    display_name = " 󰉓 Buffers " },
+						{ source = "buffers", display_name = " 󰉓 Buffers " },
 						{ source = "git_status", display_name = " 󰊢 Git " },
 					},
 				},
