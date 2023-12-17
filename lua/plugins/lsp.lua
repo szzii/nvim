@@ -237,7 +237,7 @@ return {
 		config = function()
 			-- LSP settings (for overriding per client)
 
-			--local function save_format(bufnr)
+			--local function save_format(bufnr)qq
 				--vim.api.nvim_create_autocmd("BufWritePre", {
 					--buffer = bufnr,
 					--callback = function()
@@ -262,7 +262,7 @@ return {
 					require("lspconfig")[server_name].setup({
 						on_attach = function(client, bufnr)
 							if client.supports_method("textDocument/formatting") then
-								save_format(bufnr)
+								--save_format(bufnr)
 							end
 							if client.supports_method("textDocument/codeLens") then
 								pcall(vim.lsp.codelens.refresh)

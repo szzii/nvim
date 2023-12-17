@@ -37,62 +37,103 @@ return {
 			})
 		end,
 	},
-	--{
-		--"romgrk/barbar.nvim",
-		--dependencies = {
-			--"lewis6991/gitsigns.nvim",  -- OPTIONAL: for git status
-			--"nvim-tree/nvim-web-devicons", -- OPTIONAL: for file icons
-		--},
-		--init = function()
-			--vim.g.barbar_auto_setup = false
-		--end,
-		--config = function()
-			--local map = vim.api.nvim_set_keymap
-			--local opts = { noremap = true, silent = true }
-			--require("barbar").setup({
-				--animation = false,
-				--exclude_ft = { "javascript", "qf" },
-				--icons = {
-					--buffer_index = true,
-				--},
-			--})
+	{
+		'akinsho/bufferline.nvim',
+		version = "*",
+		dependencies = 'nvim-tree/nvim-web-devicons',
+		config = function()
+			local bufferline = require('bufferline')
+			bufferline.setup({
+				options = {
+					style_preset = bufferline.style_preset.no_italic,
+					--numbers = "none" | "ordinal" | "buffer_id" | "both" | function({ ordinal, id, lower, raise }): string,
+					numbers = function(opts)
+						return string.format('%s|%s', opts.id, opts.raise(opts.ordinal))
+					end,
+				},
+				highlights = {
+					fill = {
+						bg = 'none',
+					}
+				}
+			})
+			vim.api.nvim_set_keymap("n", "t1", ':BufferLineGoToBuffer 1<CR>', { noremap = true, silent = true })
+			vim.api.nvim_set_keymap("n", "t2", ':BufferLineGoToBuffer 2<CR>', { noremap = true, silent = true })
+			vim.api.nvim_set_keymap("n", "t3", ':BufferLineGoToBuffer 3<CR>', { noremap = true, silent = true })
+			vim.api.nvim_set_keymap("n", "t4", ':BufferLineGoToBuffer 4<CR>', { noremap = true, silent = true })
+			vim.api.nvim_set_keymap("n", "t5", ':BufferLineGoToBuffer 5<CR>', { noremap = true, silent = true })
+			vim.api.nvim_set_keymap("n", "t6", ':BufferLineGoToBuffer 6<CR>', { noremap = true, silent = true })
+			vim.api.nvim_set_keymap("n", "t7", ':BufferLineGoToBuffer 7<CR>', { noremap = true, silent = true })
+			vim.api.nvim_set_keymap("n", "t8", ':BufferLineGoToBuffer 8<CR>', { noremap = true, silent = true })
+			vim.api.nvim_set_keymap("n", "t9", ':BufferLineGoToBuffer 9<CR>', { noremap = true, silent = true })
+			vim.api.nvim_set_keymap("n", "t0", ':BufferLineGoToBuffer -1<CR>', { noremap = true, silent = true })
+			vim.api.nvim_set_keymap("n", "ti", '<Cmd>BufferLineCycleNext<CR>', { noremap = true, silent = true })
+			vim.api.nvim_set_keymap("n", "tn", '<Cmd>BufferLineCyclePrev<CR>', { noremap = true, silent = true })
+			vim.api.nvim_set_keymap("n", "TI", '<Cmd>BufferLineMoveNext<CR>', { noremap = true, silent = true })
+			vim.api.nvim_set_keymap("n", "TN", '<Cmd>BufferLineMovePrev<CR>', { noremap = true, silent = true })
+			vim.api.nvim_set_keymap("n", "tQ", '<Cmd>BufferLineCloseOthers<CR>', { noremap = true, silent = true })
+			--vim.api.nvim_set_keymap("n", "Ti", ':BufferLineMoveNext<CR>', { silent = true, expr = true })
+			--vim.api.nvim_set_keymap("n", "Tn", ':BufferLineMovePrev<CR>', { silent = true, expr = true })
+			--vim.api.nvim_set_keymap("n", "TN", ':lua require"bufferline".move_to(1)<CR>', { silent = true, expr = true })
+		end,
+	},
 
-			---- Move to previous/next
-			--map("n", "tn", "<Cmd>BufferPrevious<CR>", opts)
-			--map("n", "ti", "<Cmd>BufferNext<CR>", opts)
-			---- Re-order to previous/next
-			--map("n", "tN", "<Cmd>BufferMovePrevious<CR>", opts)
-			--map("n", "tI", "<Cmd>BufferMoveNext<CR>", opts)
-			---- Goto buffer in position...
-			--map("n", "t1", "<Cmd>BufferGoto 1<CR>", opts)
-			--map("n", "t2", "<Cmd>BufferGoto 2<CR>", opts)
-			--map("n", "t3", "<Cmd>BufferGoto 3<CR>", opts)
-			--map("n", "t4", "<Cmd>BufferGoto 4<CR>", opts)
-			--map("n", "t5", "<Cmd>BufferGoto 5<CR>", opts)
-			--map("n", "t6", "<Cmd>BufferGoto 6<CR>", opts)
-			--map("n", "t7", "<Cmd>BufferGoto 7<CR>", opts)
-			--map("n", "t8", "<Cmd>BufferGoto 8<CR>", opts)
-			--map("n", "t9", "<Cmd>BufferGoto 9<CR>", opts)
-			--map("n", "t0", "<Cmd>BufferLast<CR>", opts)
-			---- Pin/unpin buffer
-			--map("n", "tp", "<Cmd>BufferPin<CR>", opts)
-			---- Close buffer
-			--map("n", "tq", "<Cmd>BufferClose<CR>", opts)
-			--map("n", "tQ", "<Cmd>BufferCloseAllButCurrentOrPinned<CR>", opts)
-			--map("n", "tl", "<Cmd>BufferCloseBuffersLeft<CR>", opts)
-			--map("n", "tr", "<Cmd>BufferCloseBuffersRight<CR>", opts)
-			---- Wipeout buffer
-			----                 :BufferWipeout
-			---- Close commands
-			----                 :BufferCloseAllButCurrent
-			----                 :BufferCloseAllButPinned
-			----                 :BufferCloseAllButCurrentOrPinned
-			----                 :BufferCloseBuffersLeft
-			----                 :BufferCloseBuffersRight
-			---- Magic buffer-picking mode
-			--map("n", "<C-p>", "<Cmd>BufferPick<CR>", opts)
-		--end,
-		--version = "^1.0.0", -- optional: only update when a new 1.x version is released
+	--{
+	--"romgrk/barbar.nvim",
+	--dependencies = {
+	--"lewis6991/gitsigns.nvim",  -- OPTIONAL: for git status
+	--"nvim-tree/nvim-web-devicons", -- OPTIONAL: for file icons
+	--},
+	--init = function()
+	--vim.g.barbar_auto_setup = false
+	--end,
+	--config = function()
+	--local map = vim.api.nvim_set_keymap
+	--local opts = { noremap = true, silent = true }
+	--require("barbar").setup({
+	--animation = false,
+	--exclude_ft = { "javascript", "qf" },
+	--icons = {
+	--buffer_index = true,
+	--},
+	--})
+
+	---- Move to previous/next
+	--map("n", "tn", "<Cmd>BufferPrevious<CR>", opts)
+	--map("n", "ti", "<Cmd>BufferNext<CR>", opts)
+	---- Re-order to previous/next
+	--map("n", "tN", "<Cmd>BufferMovePrevious<CR>", opts)
+	--map("n", "tI", "<Cmd>BufferMoveNext<CR>", opts)
+	---- Goto buffer in position...
+	--map("n", "t1", "<Cmd>BufferGoto 1<CR>", opts)
+	--map("n", "t2", "<Cmd>BufferGoto 2<CR>", opts)
+	--map("n", "t3", "<Cmd>BufferGoto 3<CR>", opts)
+	--map("n", "t4", "<Cmd>BufferGoto 4<CR>", opts)
+	--map("n", "t5", "<Cmd>BufferGoto 5<CR>", opts)
+	--map("n", "t6", "<Cmd>BufferGoto 6<CR>", opts)
+	--map("n", "t7", "<Cmd>BufferGoto 7<CR>", opts)
+	--map("n", "t8", "<Cmd>BufferGoto 8<CR>", opts)
+	--map("n", "t9", "<Cmd>BufferGoto 9<CR>", opts)
+	--map("n", "t0", "<Cmd>BufferLast<CR>", opts)
+	---- Pin/unpin buffer
+	--map("n", "tp", "<Cmd>BufferPin<CR>", opts)
+	---- Close buffer
+	--map("n", "tq", "<Cmd>BufferClose<CR>", opts)
+	--map("n", "tQ", "<Cmd>BufferCloseAllButCurrentOrPinned<CR>", opts)
+	--map("n", "tl", "<Cmd>BufferCloseBuffersLeft<CR>", opts)
+	--map("n", "tr", "<Cmd>BufferCloseBuffersRight<CR>", opts)
+	---- Wipeout buffer
+	----                 :BufferWipeout
+	---- Close commands
+	----                 :BufferCloseAllButCurrent
+	----                 :BufferCloseAllButPinned
+	----                 :BufferCloseAllButCurrentOrPinned
+	----                 :BufferCloseBuffersLeft
+	----                 :BufferCloseBuffersRight
+	---- Magic buffer-picking mode
+	--map("n", "<C-p>", "<Cmd>BufferPick<CR>", opts)
+	--end,
+	--version = "^1.0.0", -- optional: only update when a new 1.x version is released
 	--},
 	{
 		"folke/noice.nvim",
@@ -291,6 +332,14 @@ return {
 					BufferInactiveMod = { fg = "#808080", bg = "NONE" },
 					BufferInactiveSign = { bg = "NONE" },
 					BufferInactiveTarget = { bg = "NONE" },
+
+					-- bufferline
+					BufferLineFill = { bg = "NONE" },
+					BufferLineBufferSelected = { bold = true },
+					BufferLineDevIconLuaInactive = { fg = "grey" },
+					BufferLineInfo = { fg = "grey" },
+					BufferLineNumbers = { fg = "grey" },
+					BufferLineCloseButton = { fg = "grey" },
 
 					-- leap.nvim
 					LeapMatch = { fg = "yellow" },

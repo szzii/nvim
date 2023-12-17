@@ -23,6 +23,7 @@ return {
 				numhl = 'DiagnosticError'
 			})
 
+			vim.keymap.set('n', '<F6>', function() require('dap').restart() end)
 			vim.keymap.set('n', '<F8>', function() require('dap').run_to_cursor() end)
 			vim.keymap.set('n', '<F9>', function() require('dap').step_back() end)
 			vim.keymap.set('n', '<F10>', function() require('dap').step_over() end)
@@ -81,35 +82,23 @@ return {
 						{
 							elements = {
 								{
-									id = "watches",
-									size = 0.25
-								},
-								{
-									id = "breakpoints",
-									size = 0.25
-								},
-								{
 									id = "stacks",
-									size = 0.25
+									size = 0.40
 								},
 								{
 									id = "scopes",
-									size = 0.25
-								}
+									size = 0.60
+								},
 							},
 							position = "right",
-							size = 40
+							size = 35
 						},
 						{
 							elements = {
 								{
-									id = "repl",
-									size = 0.22
-								},
-								{
 									id = "console",
-									size = 0.78
-								}
+									size = 1
+								},
 							},
 							position = "bottom",
 							size = 10

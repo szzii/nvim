@@ -28,6 +28,7 @@ vim.keymap.set('', '`', '~', { noremap = true })
 vim.keymap.set('v', 'Y', '"+y', { noremap = true })
 
 
+vim.api.nvim_set_keymap("n", "tq", '<Cmd>bdelete %<CR>', { noremap = true, silent = true })
 
 --vim.keymap.set('', '<LEADER>rc', ':e $HOME/.config/nvim/init.lua<CR>', { noremap = true, silent = true })
 --vim.keymap.set('n', 'R', ':luafile $MYVIMRC<CR>', { noremap = true, silent = true })
