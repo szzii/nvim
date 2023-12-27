@@ -380,12 +380,12 @@ return {
 		event = { "WinNew" },
 	},
 
-	{
-		"Bekaboo/dropbar.nvim",
-		config = function()
-			require("dropbar").setup({
-			})
-		end
-	}
+	--{
+		--"Bekaboo/dropbar.nvim",
+		--config = function()
+			--require("dropbar").setup({
+			--})
+		--end
+	--}
 
 }

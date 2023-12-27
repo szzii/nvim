@@ -306,10 +306,10 @@ return {
 						on_attach = function()
 						end,
 						settings = {
-							pyright = {
-								disableLanguageServices = true,
-								disableOrganizeImports = true,
-							},
+							--pyright = {
+								--disableLanguageServices = true,
+								--disableOrganizeImports = true,
+							--},
 							python = {
 								analysis = {
 									autoImportCompletions = true,
