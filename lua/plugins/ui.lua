@@ -159,7 +159,7 @@ return {
 					},
 				},
 				messages = {
-					enabled = true,         -- enables the Noice messages UI
+					enabled = false,         -- enables the Noice messages UI
 					view = "notify",        -- default view for messages
 					view_error = "notify",  -- view for errors
 					view_warn = "notify",   -- view for warnings
@@ -368,24 +368,17 @@ return {
 		end,
 	},
 	{
-		"eandrju/cellular-automaton.nvim",
-		keys = { "<leader><leader>" },
-		config = function()
-			vim.keymap.set("n", "<leader><leader>", "<cmd>CellularAutomaton make_it_rain<CR>")
-		end
-	},
-	{
 		"nvim-zh/colorful-winsep.nvim",
 		config = true,
 		event = { "WinNew" },
-	},
+	}
 
 	--{
-		--"Bekaboo/dropbar.nvim",
-		--config = function()
-			--require("dropbar").setup({
-			--})
-		--end
+	--"Bekaboo/dropbar.nvim",
+	--config = function()
+	--require("dropbar").setup({
+	--})
+	--end
 	--}
 
 }

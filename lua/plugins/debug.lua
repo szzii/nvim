@@ -40,6 +40,8 @@ return {
 	},
 	{
 		"rcarriga/nvim-dap-ui",
+		dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"},
+		library = { plugins = { "nvim-dap-ui" }, types = true },
 		lazy = true,
 		keys = {
 			{

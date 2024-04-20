@@ -112,7 +112,7 @@ return {
 					vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
 						pattern = "*",
 						group = CustomLuaSnip,
-						command = "lua require'luasnip'.unlink_current()"
+						command = "lua require'luasnip'.unlink_current_if_deleted()"
 					})
 				end
 			},
