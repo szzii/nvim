@@ -1,15 +1,15 @@
 return {
 
-	{
-		"folke/which-key.nvim",
-		event = "VeryLazy",
-		config = function()
-			local presets = require("which-key.plugins.presets")
-			presets.operators["v"] = nil
-			require("which-key").setup {
-			}
-		end,
-	},
+	--{
+		--"folke/which-key.nvim",
+		--event = "VeryLazy",
+		--config = function()
+			--local presets = require("which-key.plugins.presets")
+			--presets.operators["v"] = nil
+			--require("which-key").setup {
+			--}
+		--end,
+	--},
 
 	{
 		"ethanholz/nvim-lastplace",
@@ -22,63 +22,6 @@ return {
 	},
 	{
 		"mbbill/undotree",
-	},
-
-
-	{
-		"shellRaining/hlchunk.nvim",
-		dependencies = {
-			"nvim-treesitter/nvim-treesitter",
-		},
-		config = function()
-			require('hlchunk').setup {
-				chunk = {
-					enable = true,
-					use_treesitter = true,
-					exclude_filetypes = {
-						aerial = true,
-						dashboard = true,
-					},
-					chars = {
-						horizontal_line = "─",
-						vertical_line = "│",
-						left_top = "╭",
-						left_bottom = "╰",
-						right_arrow = ">",
-					},
-					style = {
-						{ fg = "#806d9c" },
-					},
-				},
-
-				indent = {
-					enable = false,
-					use_treesitter = false,
-					chars = {
-						"│",
-					},
-					style = {
-						{ fg = "#404040" }
-					},
-				},
-
-				line_num = {
-					enable = false,
-					use_treesitter = false,
-					style = "#806d9c",
-				},
-
-				blank = {
-					enable = false,
-					chars = {
-						"․",
-					},
-					style = {
-						vim.fn.synIDattr(vim.fn.synIDtrans(vim.fn.hlID("Whitespace")), "fg", "gui"),
-					},
-				},
-			}
-		end
 	},
 
 	{
@@ -156,11 +99,11 @@ return {
 	},
 
 
-	{
-		"voldikss/vim-translator",
-		config = function()
-			vim.keymap.set('', 'tt', ':TranslateW<CR>', { noremap = true, silent = true })
-			vim.g.translator_target_lang = "zh"
-		end
-	}
+	--{
+		--"voldikss/vim-translator",
+		--config = function()
+			--vim.keymap.set('', 'tt', ':TranslateW<CR>', { noremap = true, silent = true })
+			--vim.g.translator_target_lang = "zh"
+		--end
+	--}
 }

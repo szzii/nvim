@@ -1,6 +1,12 @@
 return {
 
 	{
+		"mfussenegger/nvim-dap-python",
+		config = function ()
+			require("dap-python").setup("python3")
+		end
+	},
+	{
 		"mfussenegger/nvim-dap",
 		config = function()
 			vim.fn.sign_define('DapBreakpoint', {
@@ -23,6 +29,8 @@ return {
 				numhl = 'DiagnosticError'
 			})
 
+			require("dap-python").setup("python")
+
 			vim.keymap.set('n', '<F6>', function() require('dap').restart() end)
 			vim.keymap.set('n', '<F8>', function() require('dap').run_to_cursor() end)
 			vim.keymap.set('n', '<F9>', function() require('dap').step_back() end)
@@ -40,7 +48,7 @@ return {
 	},
 	{
 		"rcarriga/nvim-dap-ui",
-		dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"},
+		dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
 		library = { plugins = { "nvim-dap-ui" }, types = true },
 		lazy = true,
 		keys = {

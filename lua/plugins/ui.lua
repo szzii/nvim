@@ -159,7 +159,7 @@ return {
 					},
 				},
 				messages = {
-					enabled = false,         -- enables the Noice messages UI
+					enabled = true,         -- enables the Noice messages UI
 					view = "notify",        -- default view for messages
 					view_error = "notify",  -- view for errors
 					view_warn = "notify",   -- view for warnings
@@ -288,9 +288,9 @@ return {
 
 	{
 		"szzii/vscode.nvim",
-		dependencies = {
-			"folke/which-key.nvim",
-		},
+		--dependencies = {
+			--"folke/which-key.nvim",
+		--},
 		config = function()
 			require("vscode").setup({
 				-- Enable transparent background

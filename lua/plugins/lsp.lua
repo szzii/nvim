@@ -238,12 +238,12 @@ return {
 			-- LSP settings (for overriding per client)
 
 			--local function save_format(bufnr)qq
-				--vim.api.nvim_create_autocmd("BufWritePre", {
-					--buffer = bufnr,
-					--callback = function()
-						--vim.lsp.buf.format({ async = false })
-					--end,
-				--})
+			--vim.api.nvim_create_autocmd("BufWritePre", {
+			--buffer = bufnr,
+			--callback = function()
+			--vim.lsp.buf.format({ async = false })
+			--end,
+			--})
 			--end
 
 			local function refresh_codelens(bufnr)
@@ -306,18 +306,15 @@ return {
 						on_attach = function()
 						end,
 						settings = {
-							--pyright = {
-								--disableLanguageServices = true,
-								--disableOrganizeImports = true,
-							--},
 							python = {
 								analysis = {
 									autoImportCompletions = true,
-									autoSearchPaths = true,
-									diagnosticMode = "openFilesOnly",
+									autoSearchPaths = false,
+									diagnosticMode = "workspace",
 									useLibraryCodeForTypes = true,
 									logLevel = "Warning",
-									typeCheckingMode = "basic"
+									typeCheckingMode = "basic",
+									--extraPaths = "/Users/szz/anaconda3/envs/cv/lib/python3.12/site-packages"
 								}
 							},
 							single_file_support = true,
@@ -344,99 +341,96 @@ return {
 				end,
 			}
 
-			require("lspconfig").nginx_ls.setup({})
+			--require("lspconfig").nginx_ls.setup({})
 
 			require("mason-lspconfig").setup({
-				ensure_installed = { "lua_ls", "rust_analyzer", "pyright" },
+				--ensure_installed = { "lua_ls", "rust_analyzer" },
 				automatic_installation = false,
 				handlers = handlers,
 			})
 		end,
 	},
 
-	{
-		"lvimuser/lsp-inlayhints.nvim",
-		config = function()
-			require("lsp-inlayhints").setup()
-			vim.api.nvim_create_augroup("LspAttach_inlayhints", {})
-			vim.api.nvim_create_autocmd("LspAttach", {
-				group = "LspAttach_inlayhints",
-				callback = function(args)
-					if not (args.data and args.data.client_id) then
-						return
-					end
+	--{
+		--"lvimuser/lsp-inlayhints.nvim",
+		--config = function()
+			--require("lsp-inlayhints").setup()
+			--vim.api.nvim_create_augroup("LspAttach_inlayhints", {})
+			--vim.api.nvim_create_autocmd("LspAttach", {
+				--group = "LspAttach_inlayhints",
+				--callback = function(args)
+					--if not (args.data and args.data.client_id) then
+						--return
+					--end
 
-					local bufnr = args.buf
-					local client = vim.lsp.get_client_by_id(args.data.client_id)
-					require("lsp-inlayhints").on_attach(client, bufnr)
-				end,
-			})
-		end,
-	},
-	{
-		"RRethy/vim-illuminate",
-		config = function()
-			-- default configuration
-			require('illuminate').configure({
-				-- providers: provider used to get references in the buffer, ordered by priority
-				providers = {
-					'lsp',
-					'treesitter',
-					'regex',
-				},
-				-- delay: delay in milliseconds
-				delay = 100,
-				-- filetype_overrides: filetype specific overrides.
-				-- The keys are strings to represent the filetype while the values are tables that
-				-- supports the same keys passed to .configure except for filetypes_denylist and filetypes_allowlist
-				filetype_overrides = {},
-				-- filetypes_denylist: filetypes to not illuminate, this overrides filetypes_allowlist
-				filetypes_denylist = {
-					'dirvish',
-					'fugitive',
-				},
-				-- filetypes_allowlist: filetypes to illuminate, this is overridden by filetypes_denylist
-				filetypes_allowlist = {},
-				-- modes_denylist: modes to not illuminate, this overrides modes_allowlist
-				-- See `:help mode()` for possible values
-				modes_denylist = {},
-				-- modes_allowlist: modes to illuminate, this is overridden by modes_denylist
-				-- See `:help mode()` for possible values
-				modes_allowlist = {},
-				-- providers_regex_syntax_denylist: syntax to not illuminate, this overrides providers_regex_syntax_allowlist
-				-- Only applies to the 'regex' provider
-				-- Use :echom synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')
-				providers_regex_syntax_denylist = {},
-				-- providers_regex_syntax_allowlist: syntax to illuminate, this is overridden by providers_regex_syntax_denylist
-				-- Only applies to the 'regex' provider
-				-- Use :echom synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')
-				providers_regex_syntax_allowlist = {},
-				-- under_cursor: whether or not to illuminate under the cursor
-				under_cursor = false,
-				-- large_file_cutoff: number of lines at which to use large_file_config
-				-- The `under_cursor` option is disabled when this cutoff is hit
-				large_file_cutoff = nil,
-				-- large_file_config: config to use for large files (based on large_file_cutoff).
-				-- Supports the same keys passed to .configure
-				-- If nil, vim-illuminate will be disabled for large files.
-				large_file_overrides = nil,
-				-- min_count_to_highlight: minimum number of matches required to perform highlighting
-				min_count_to_highlight = 1,
-				-- should_enable: a callback that overrides all other settings to
-				-- enable/disable illumination. This will be called a lot so don't do
-				-- anything expensive in it.
-				should_enable = function(bufnr) return true end,
-				-- case_insensitive_regex: sets regex case sensitivity
-				case_insensitive_regex = true,
-			})
-			vim.cmd([[
-				hi IlluminatedWordText gui=NONE
-				hi IlluminatedWordRead gui=NONE
-				hi IlluminatedWordWrite gui=NONE
-			]])
-		end
-
-	},
+					--local bufnr = args.buf
+					--local client = vim.lsp.get_client_by_id(args.data.client_id)
+					--require("lsp-inlayhints").on_attach(client, bufnr)
+				--end,
+			--})
+		--end,
+	--},
+	--{
+		--"RRethy/vim-illuminate",
+		--config = function()
+			---- default configuration
+			---- default configuration
+			--require('illuminate').configure({
+				---- providers: provider used to get references in the buffer, ordered by priority
+				--providers = {
+					--'lsp',
+					--'treesitter',
+					--'regex',
+				--},
+				---- delay: delay in milliseconds
+				--delay = 100,
+				---- filetype_overrides: filetype specific overrides.
+				---- The keys are strings to represent the filetype while the values are tables that
+				---- supports the same keys passed to .configure except for filetypes_denylist and filetypes_allowlist
+				--filetype_overrides = {},
+				---- filetypes_denylist: filetypes to not illuminate, this overrides filetypes_allowlist
+				--filetypes_denylist = {
+					--'dirbuf',
+					--'dirvish',
+					--'fugitive',
+				--},
+				---- filetypes_allowlist: filetypes to illuminate, this is overridden by filetypes_denylist
+				---- You must set filetypes_denylist = {} to override the defaults to allow filetypes_allowlist to take effect
+				--filetypes_allowlist = {},
+				---- modes_denylist: modes to not illuminate, this overrides modes_allowlist
+				---- See `:help mode()` for possible values
+				--modes_denylist = {},
+				---- modes_allowlist: modes to illuminate, this is overridden by modes_denylist
+				---- See `:help mode()` for possible values
+				--modes_allowlist = {},
+				---- providers_regex_syntax_denylist: syntax to not illuminate, this overrides providers_regex_syntax_allowlist
+				---- Only applies to the 'regex' provider
+				---- Use :echom synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')
+				--providers_regex_syntax_denylist = {},
+				---- providers_regex_syntax_allowlist: syntax to illuminate, this is overridden by providers_regex_syntax_denylist
+				---- Only applies to the 'regex' provider
+				---- Use :echom synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')
+				--providers_regex_syntax_allowlist = {},
+				---- under_cursor: whether or not to illuminate under the cursor
+				--under_cursor = true,
+				---- large_file_cutoff: number of lines at which to use large_file_config
+				---- The `under_cursor` option is disabled when this cutoff is hit
+				--large_file_cutoff = nil,
+				---- large_file_config: config to use for large files (based on large_file_cutoff).
+				---- Supports the same keys passed to .configure
+				---- If nil, vim-illuminate will be disabled for large files.
+				--large_file_overrides = nil,
+				---- min_count_to_highlight: minimum number of matches required to perform highlighting
+				--min_count_to_highlight = 1,
+				---- should_enable: a callback that overrides all other settings to
+				---- enable/disable illumination. This will be called a lot so don't do
+				---- anything expensive in it.
+				--should_enable = function(bufnr) return true end,
+				---- case_insensitive_regex: sets regex case sensitivity
+				--case_insensitive_regex = false,
+			--})
+		--end
+	--},
 	{
 		"simrat39/symbols-outline.nvim",
 		lazy = true,
@@ -508,20 +502,22 @@ return {
 			"nvim-lua/plenary.nvim",
 		},
 		config = function()
-			require("flutter-tools").setup({
-				lsp = {
-					on_attach = function()
-					end,
-					settings = {
-						showTodos = true,
-						completeFunctionCalls = true,
-						analysisExcludedFolders = { "<path-to-flutter-sdk-packages>" },
-						renameFilesWithClasses = "prompt", -- "always"
-						enableSnippets = true,
-						updateImportsOnRename = true,
-					},
-				},
-			})
+			require("flutter-tools").setup {} -- use defaults
+
+			--require("flutter-tools").setup({
+				--lsp = {
+					--on_attach = function()
+					--end,
+					--settings = {
+						--showTodos = true,
+						--completeFunctionCalls = true,
+						--analysisExcludedFolders = { "<path-to-flutter-sdk-packages>" },
+						--renameFilesWithClasses = "prompt", -- "always"
+						--enableSnippets = true,
+						--updateImportsOnRename = true,
+					--},
+				--},
+			--})
 		end,
 	},
 }
