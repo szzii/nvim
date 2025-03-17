@@ -6,7 +6,7 @@ local root_dir = require("jdtls.setup").find_root(root_markers)
 local workspace_dir = '/Users/szz/.cache/jdtls/workspace/' .. vim.fn.fnamemodify(root_dir, ':p:h:t')
 
 local path_to_lsp_server = jdtls_path .. "/config_mac"
-local path_to_jar = path_to_plugins .. "org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar"
+local path_to_jar = path_to_plugins .. "org.eclipse.equinox.launcher_1.6.1000.v20250131-0606.jar"
 local lombok_path = jdtls_path .. "/lombok.jar"
 local mason_path = vim.fn.glob(vim.fn.stdpath("data") .. "/mason/")
 
@@ -60,14 +60,13 @@ local config = {
 	},
 	on_attach = on_attach,
 	cmd = {
-		'/Users/szz/.javahome/jdk-17.0.1.jdk/Contents/Home/bin/java',
+		'/Library/Java/JavaVirtualMachines/jdk-23.jdk/Contents/Home/bin/java',
 		'-Declipse.application=org.eclipse.jdt.ls.core.id1',
 		'-Dosgi.bundles.defaultStartLevel=4',
 		'-Declipse.product=org.eclipse.jdt.ls.core.product',
 		'-Dlog.protocol=true',
 		'-Dlog.level=ALL',
 		'-javaagent:' .. lombok_path,
-		'-Xmx1g',
 		'--add-modules=ALL-SYSTEM',
 		'--add-opens', 'java.base/java.util=ALL-UNNAMED',
 		'--add-opens', 'java.base/java.lang=ALL-UNNAMED',
@@ -80,22 +79,14 @@ local config = {
 	-- See https://github.com/eclipse/eclipse.jdt.ls/wiki/Running-the-JAVA-LS-server-from-the-command-line#initialize-request
 	settings = {
 		java = {
-			home = '/Users/szz/.javahome/jdk-17.0.1.jdk/Contents/Home',
+			home = '/Library/Java/JavaVirtualMachines/jdk-1.8.jdk/Contents/Home',
 			configuration = {
 				updateBuildConfiguration = "interactive",
 				runtimes = {
 					{
 						name = "JavaSE-1.8",
-						path = "/Library/Java/JavaVirtualMachines/jdk1.8.0_301.jdk/Contents/Home",
+						path = "/Library/Java/JavaVirtualMachines/jdk-1.8.jdk/Contents/Home",
 					},
-					{
-						name = "JavaSE-11",
-						path = "/Users/szz/.javahome/jdk-11.0.13.jdk/Contents/Home",
-					},
-					{
-						name = "JavaSE-17",
-						path = "/Users/szz/.javahome/jdk-17.0.1.jdk/Contents/Home",
-					}
 				}
 			},
 			format = {
