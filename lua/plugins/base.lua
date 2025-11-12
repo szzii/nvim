@@ -1,16 +1,5 @@
 return {
 
-	--{
-		--"folke/which-key.nvim",
-		--event = "VeryLazy",
-		--config = function()
-			--local presets = require("which-key.plugins.presets")
-			--presets.operators["v"] = nil
-			--require("which-key").setup {
-			--}
-		--end,
-	--},
-
 	{
 		"ethanholz/nvim-lastplace",
 		config = function()
@@ -98,12 +87,4 @@ return {
 		end
 	},
 
-
-	--{
-		--"voldikss/vim-translator",
-		--config = function()
-			--vim.keymap.set('', 'tt', ':TranslateW<CR>', { noremap = true, silent = true })
-			--vim.g.translator_target_lang = "zh"
-		--end
-	--}
 }

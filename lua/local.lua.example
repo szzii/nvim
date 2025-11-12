@@ -1,0 +1,64 @@
+-- Machine-specific configuration template
+-- Copy this file to local.lua and customize for your machine
+-- Example: cp lua/local.lua.example lua/local.lua
+
+local M = {}
+
+-- Keyboard layout configuration
+-- Set to true if you use Colemak layout, false for standard QWERTY
+M.use_colemak = false
+
+-- Debug configurations
+-- Adjust the Python path for your system
+-- Common paths:
+--   Linux: "/usr/bin/python3"
+--   macOS: "/usr/local/bin/python3" or "/opt/homebrew/bin/python3"
+--   Windows: "C:/Python3/python.exe"
+M.python_path = "/usr/bin/python3"
+
+-- AI/Copilot configuration
+M.copilot_enabled = true  -- Set to false to disable Copilot globally
+
+-- Avante AI provider configuration
+-- Options: "qianwen", "ollama", "openai", "claude", etc.
+M.avante_provider = "ollama"
+
+-- Provider-specific settings
+M.avante_providers = {
+	qianwen = {
+		__inherited_from = "openai",
+		api_key_name = "DASHSCOPE_API_KEY",
+		endpoint = "https://dashscope.aliyuncs.com/compatible-mode/v1",
+		model = "qwen3-coder-plus",
+		disable_tools = false,
+	},
+	ollama = {
+		__inherited_from = "openai",
+		api_key_name = "",
+		endpoint = "http://127.0.0.1:11434/v1",
+		model = "qwen2.5:14b",
+		disable_tools = false,
+	},
+	-- Add more providers as needed
+	-- openai = {
+	--   __inherited_from = "openai",
+	--   api_key_name = "OPENAI_API_KEY",
+	--   endpoint = "https://api.openai.com/v1",
+	--   model = "gpt-4",
+	-- },
+}
+
+-- Theme configuration
+M.theme = {
+	transparent = true,  -- Set to false for solid background
+	lualine_theme = "vscode",  -- Options: "vscode", "gruvbox", "tokyonight", etc.
+}
+
+-- Editor preferences (optional overrides)
+M.editor = {
+	tabstop = 2,       -- Number of spaces a tab counts for
+	shiftwidth = 2,    -- Number of spaces for each indent
+	expandtab = false, -- Use spaces instead of tabs (true/false)
+}
+
+return M

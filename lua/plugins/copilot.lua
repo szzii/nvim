@@ -1,99 +1,65 @@
+-- Load local configuration
+local ok, local_config = pcall(require, "local")
+local copilot_enabled = ok and local_config.copilot_enabled or true
+
 return {
-	--{
-		--"github/copilot.vim",
-		--config = function()
-			--vim.g.copilot_enabled = fale
-			--vim.g.copilot_no_tab_map = true
-			--vim.g.copilot_assume_mapped = true
-			----vim.g.copilot_proxy = "127.0.0.1:1087"
-			--vim.api.nvim_set_keymap("i", "<C-o>", 'copilot#Accept("<CR>")', { silent = true, expr = true })
-			--vim.api.nvim_set_keymap("i", "<C-u>", 'copilot#Previous()', { silent = true, expr = true })
-			--vim.api.nvim_set_keymap("i", "<C-e>", 'copilot#Next()', { silent = true, expr = true })
-			----vim.g.co
-			----vim.g.copilot_no_tab_map = true
-			----vim.api.nvim_set_keymap('n', '<leader>go', ':Copilot<CR>', { silent = true })
-			----vim.api.nvim_set_keymap('n', '<leader>ge', ':Copilot enable<CR>', { silent = true })
-			----vim.api.nvim_set_keymap('n', '<leader>gd', ':Copilot disable<CR>', { silent = true })
-			----vim.api.nvim_set_keymap('i', '<c-p>', '<Plug>(copilot-suggest)', {})
-			------ vim.api.nvim_set_keymap('i', '<c-n>', '<Plug>(copilot-next)', { silent = true })
-			------ vim.api.nvim_set_keymap('i', '<c-l>', '<Plug>(copilot-previous)', { silent = true })
-			----vim.cmd('imap <silent><script><expr> <C-C> copilot#Accept("")')
-			----vim.cmd([[
-			----let g:copilot_filetypes = {
-			----\ 'TelescopePrompt': v:false,
-			----\ }
-			----]])
-		--end
-	--},
+	{
+		"github/copilot.vim",
+		enabled = copilot_enabled,
+		config = function()
+			vim.g.copilot_enabled = copilot_enabled
+			vim.g.copilot_no_tab_map = true
+			vim.g.copilot_assume_mapped = true
+			vim.api.nvim_set_keymap("i", "<C-o>", 'copilot#Accept("<CR>")', { silent = true, expr = true })
+
+			-- Use Colemak-aware keymaps if enabled
+			local use_colemak = ok and local_config.use_colemak or false
+			if use_colemak then
+				vim.api.nvim_set_keymap("i", "<C-u>", 'copilot#Previous()', { silent = true, expr = true })
+				vim.api.nvim_set_keymap("i", "<C-e>", 'copilot#Next()', { silent = true, expr = true })
+			else
+				vim.api.nvim_set_keymap("i", "<C-k>", 'copilot#Previous()', { silent = true, expr = true })
+				vim.api.nvim_set_keymap("i", "<C-j>", 'copilot#Next()', { silent = true, expr = true })
+			end
+		end
+	},
 	{
 		"yetone/avante.nvim",
-		event = "VeryLazy",
-		lazy = false,
-		version = false, -- Set this to "*" to always pull the latest release version, or set it to false to update to the latest code changes.
-		opts = {
-			provider = "qianwen",
-			vendors = {
-				qianwen = {
-					__inherited_from = "openai",
-					api_key_name = "DASHSCOPE_API_KEY",
-					endpoint = "https://dashscope.aliyuncs.com/compatible-mode/v1",
-					model = "qwen2.5-coder-32b-instruct",
-					disable_tools = true, -- disable tools!
-				},
-				ollama = {
-					__inherited_from = "openai",
-					api_key_name = "",
-					endpoint = "http://127.0.0.1:11434/v1",
-					model = "qwen2.5:14b",
-					disable_tools = false,
-				},
-			},
-			mappings = {
-				ask = "<leader>aa", -- ask
-				edit = "<leader>ae", -- edit
-				refresh = "<leader>ur", -- refresh
-			},
-			windows = {
-				---@type "right" | "left" | "top" | "bottom"
-				position = "right", -- the position of the sidebar
-				wrap = true,    -- similar to vim.o.wrap
-				width = 30,     -- default % based on available width
-				sidebar_header = {
-					enabled = true, -- true, false to enable/disable the header
-					align = "center", -- left, center, right for title
-					rounded = true,
-				},
-				input = {
-					prefix = "> ",
-					height = 8, -- Height of the input window in vertical layout
-				},
-				edit = {
-					border = "rounded",
-					start_insert = true, -- Start insert mode when opening the edit window
-				},
-				ask = {
-					floating = false, -- Open the 'AvanteAsk' prompt in a floating window
-					start_insert = true, -- Start insert mode when opening the ask window
-					border = "rounded",
-					---@type "ours" | "theirs"
-					focus_on_apply = "ours", -- which diff to focus after applying
-				},
-			},
-		},
 		-- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
-		build = "make",
-		-- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false" -- for windows
+		-- ⚠️ must add this setting! ! !
+		build = vim.fn.has("win32") ~= 0
+				and "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false"
+				or "make",
+		event = "VeryLazy",
+		version = false, -- Never set this value to "*"! Never!
+		---@module 'avante'
+		---@type avante.Config
+		opts = function()
+			-- Load provider settings from local config
+			local avante_provider = ok and local_config.avante_provider or "ollama"
+			local avante_providers = ok and local_config.avante_providers or {}
+
+			return {
+				-- add any opts here
+				-- this file can contain specific instructions for your project
+				instructions_file = "avante.md",
+				-- Provider from local.lua
+				provider = avante_provider,
+				providers = avante_providers,
+			}
+		end,
 		dependencies = {
-			"stevearc/dressing.nvim",
 			"nvim-lua/plenary.nvim",
 			"MunifTanjim/nui.nvim",
 			--- The below dependencies are optional,
-			"echasnovski/mini.pick",      -- for file_selector provider mini.pick
+			"echasnovski/mini.pick", -- for file_selector provider mini.pick
 			"nvim-telescope/telescope.nvim", -- for file_selector provider telescope
-			"hrsh7th/nvim-cmp",           -- autocompletion for avante commands and mentions
-			"ibhagwan/fzf-lua",           -- for file_selector provider fzf
+			"hrsh7th/nvim-cmp", -- autocompletion for avante commands and mentions
+			"ibhagwan/fzf-lua", -- for file_selector provider fzf
+			"stevearc/dressing.nvim", -- for input provider dressing
+			"folke/snacks.nvim", -- for input provider snacks
 			"nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
-			"zbirenbaum/copilot.lua",     -- for providers='copilot'
+			"zbirenbaum/copilot.lua", -- for providers='copilot'
 			{
 				-- support for image pasting
 				"HakonHarnes/img-clip.nvim",
@@ -120,5 +86,5 @@ return {
 				ft = { "markdown", "Avante" },
 			},
 		},
-	}
+	},
 }

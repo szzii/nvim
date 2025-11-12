@@ -247,7 +247,7 @@ return {
 
 	{
 		"theniceboy/joshuto.nvim",
-		very_lazy = true,
+		lazy = true,
 		cmd = "Joshuto",
 		keys = {
 			{ "<leader>2", ":Joshuto<CR>", mode = "n", noremap = true, silent = true, desc = 'Jushuto' },
@@ -261,5 +261,4 @@ return {
 			vim.g.joshuto_floating_window_winblend = 0
 		end
 	},
-
 }

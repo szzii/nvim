@@ -50,7 +50,7 @@ end
 
 local config = {
 	flags = {
-		debounce_text_changes = 80,
+		debounce_text_changes = 150,  -- Consistent with other LSPs
 		allow_incremental_sync = true,
 	},
 	root_dir = root_dir,
@@ -65,7 +65,11 @@ local config = {
 		'-Dosgi.bundles.defaultStartLevel=4',
 		'-Declipse.product=org.eclipse.jdt.ls.core.product',
 		'-Dlog.protocol=true',
-		'-Dlog.level=ALL',
+		'-Dlog.level=ERROR',  -- Reduce logging for better performance
+		'-Xmx2G',  -- Limit max heap size
+		'-Xms256m',  -- Initial heap size
+		'-XX:+UseG1GC',  -- Use G1 garbage collector
+		'-XX:+UseStringDeduplication',  -- Reduce memory usage
 		'-javaagent:' .. lombok_path,
 		'--add-modules=ALL-SYSTEM',
 		'--add-opens', 'java.base/java.util=ALL-UNNAMED',
@@ -80,8 +84,17 @@ local config = {
 	settings = {
 		java = {
 			home = '/usr/local/jdk-17.0.10',
+			-- Performance optimizations
+			maxConcurrentBuilds = 1,
+			import = {
+				gradle = {
+					enabled = true,
+					offline = { enabled = false },
+				},
+				maven = { enabled = true },
+			},
 			configuration = {
-				updateBuildConfiguration = "interactive",
+				updateBuildConfiguration = "automatic",  -- Change to automatic for better performance
 				runtimes = {
 					{
 						name = "JavaSE-1.8",
@@ -102,7 +115,7 @@ local config = {
 				--},
 			},
 			completion = {
-				maxResults = 30,
+				maxResults = 20,  -- Reduce for better performance
 				postfix = { enabled = true },
 				favoriteStaticMembers = {
 					"org.junit.Assert.*",
@@ -126,25 +139,46 @@ local config = {
 					"sun.*",
 				},
 			},
-			autobuild = { enabled = true },
-			eclipse = { downloadSources = true, },
-			saveActions = { organizeImports = true },
-			-- LSP Related
+			autobuild = { enabled = false },  -- Disable autobuild for better performance, build manually when needed
+			eclipse = { downloadSources = false, },  -- Disable for better performance
+			sources = {
+				organizeImports = {
+					starThreshold = 5,
+					staticStarThreshold = 5,
+				},
+			},
+			saveActions = { organizeImports = false },  -- Disable on save for better performance
+			-- LSP Related - all disabled for performance
 			implementationsCodeLens = { enabled = false },
-			referencesCodeLens = { enabled = false, },
+			referencesCodeLens = { enabled = false },
 			signatureHelp = { enabled = true },
 			inlayHints = {
 				parameterNames = { enabled = false },
 			},
-			maven = {
-				downloadSources = true,
-				updateSnapshots = true,
+			-- Disable validation for better performance
+			validation = {
+				enabled = true,
+				-- Only enable essential validations
+				incomplete_classpath = "warning",
 			},
-			-- On Save Cleanup
-			cleanup = {
-				actionsOnSave = {
-					"addOverride",
+			maven = {
+				downloadSources = false,  -- Disable for better performance
+				updateSnapshots = false,  -- Disable auto update
+			},
+			codeGeneration = {
+				toString = {
+					template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}"
 				},
+				useBlocks = true,
+			},
+			contentProvider = { preferred = 'fernflower' },
+			-- On Save Cleanup - disabled for performance
+			cleanup = {
+				actionsOnSave = {},  -- Disable all cleanup actions for better performance
+			},
+			-- Performance: Limit parallel downloads
+			server = {
+				launchMode = "Hybrid",
 			},
 		}
 	},

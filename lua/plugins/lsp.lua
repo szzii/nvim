@@ -3,11 +3,21 @@ return {
 		"neovim/nvim-lspconfig",
 		config = function()
 			vim.diagnostic.config({
-				virtual_text = true,
+				virtual_text = {
+					spacing = 4,
+					prefix = '●',
+					-- Only show virtual text for errors and warnings
+					severity = { min = vim.diagnostic.severity.WARN },
+				},
 				signs = true,
 				underline = true,
 				update_in_insert = false,
-				severity_sort = false,
+				severity_sort = true,
+				-- Reduce diagnostic update frequency
+				float = {
+					source = 'always',
+					border = 'rounded',
+				},
 			})
 
 			local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
@@ -186,11 +196,32 @@ return {
 					["<C-c>"] = cmp.mapping.abort(),
 				}),
 				sources = cmp.config.sources({
-					{ name = "nvim_lsp" },
-					{ name = "nvim_lsp_signature_help" },
-					{ name = "luasnip" },
-					{ name = "path" },
+					{ name = "nvim_lsp", priority = 1000 },
+					{ name = "nvim_lsp_signature_help", priority = 900 },
+					{ name = "luasnip", priority = 800 },
+					{ name = "path", priority = 700 },
+					{
+						name = "buffer",
+						priority = 500,
+						option = {
+							-- Limit buffer completion scope for better performance
+							get_bufnrs = function()
+								local buf = vim.api.nvim_get_current_buf()
+								local byte_size = vim.api.nvim_buf_get_offset(buf, vim.api.nvim_buf_line_count(buf))
+								if byte_size > 1024 * 1024 then -- 1MB
+									return {}
+								end
+								return { buf }
+							end,
+						},
+					},
 				}),
+				performance = {
+					debounce = 150,
+					throttle = 60,
+					fetching_timeout = 200,
+					max_view_entries = 30,
+				},
 			})
 			-- `/` cmdline setup.
 			cmp.setup.cmdline("/", {
@@ -234,18 +265,11 @@ return {
 	},
 	{
 		"williamboman/mason-lspconfig.nvim",
+		dependencies = {
+			"williamboman/mason.nvim",
+			"neovim/nvim-lspconfig",
+		},
 		config = function()
-			-- LSP settings (for overriding per client)
-
-			--local function save_format(bufnr)qq
-			--vim.api.nvim_create_autocmd("BufWritePre", {
-			--buffer = bufnr,
-			--callback = function()
-			--vim.lsp.buf.format({ async = false })
-			--end,
-			--})
-			--end
-
 			local function refresh_codelens(bufnr)
 				vim.api.nvim_create_autocmd("BufWritePost", {
 					buffer = bufnr,
@@ -260,42 +284,47 @@ return {
 			local handlers = {
 				function(server_name) -- default handler (optional)
 					require("lspconfig")[server_name].setup({
+						flags = {
+							debounce_text_changes = 150,  -- Reduce LSP request frequency
+						},
 						on_attach = function(client, bufnr)
-							if client.supports_method("textDocument/formatting") then
-								--save_format(bufnr)
-							end
-							if client.supports_method("textDocument/codeLens") then
-								pcall(vim.lsp.codelens.refresh)
-								refresh_codelens(bufnr)
-							end
+							-- Disable codelens auto-refresh for better performance
+							-- if client.supports_method("textDocument/codeLens") then
+							-- 	pcall(vim.lsp.codelens.refresh)
+							-- 	refresh_codelens(bufnr)
+							-- end
 						end,
 					})
 				end,
 				["tsserver"] = function()
 					require('lspconfig').tsserver.setup({
+						flags = {
+							debounce_text_changes = 150,
+						},
 						settings = {
 							typescript = {
 								inlayHints = {
-									includeInlayParameterNameHints = 'all',
+									-- Reduce inlay hints for better performance
+									includeInlayParameterNameHints = 'literals',  -- Only show for literals
 									includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-									includeInlayFunctionParameterTypeHints = true,
-									includeInlayVariableTypeHints = true,
+									includeInlayFunctionParameterTypeHints = false,
+									includeInlayVariableTypeHints = false,
 									includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-									includeInlayPropertyDeclarationTypeHints = true,
-									includeInlayFunctionLikeReturnTypeHints = true,
-									includeInlayEnumMemberValueHints = true,
+									includeInlayPropertyDeclarationTypeHints = false,
+									includeInlayFunctionLikeReturnTypeHints = false,
+									includeInlayEnumMemberValueHints = false,
 								}
 							},
 							javascript = {
 								inlayHints = {
-									includeInlayParameterNameHints = 'all',
+									includeInlayParameterNameHints = 'literals',
 									includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-									includeInlayFunctionParameterTypeHints = true,
-									includeInlayVariableTypeHints = true,
+									includeInlayFunctionParameterTypeHints = false,
+									includeInlayVariableTypeHints = false,
 									includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-									includeInlayPropertyDeclarationTypeHints = true,
-									includeInlayFunctionLikeReturnTypeHints = true,
-									includeInlayEnumMemberValueHints = true,
+									includeInlayPropertyDeclarationTypeHints = false,
+									includeInlayFunctionLikeReturnTypeHints = false,
+									includeInlayEnumMemberValueHints = false,
 								}
 							}
 						}
@@ -303,6 +332,9 @@ return {
 				end,
 				["pyright"] = function()
 					require("lspconfig").pyright.setup({
+						flags = {
+							debounce_text_changes = 150,
+						},
 						on_attach = function()
 						end,
 						settings = {
@@ -310,11 +342,15 @@ return {
 								analysis = {
 									autoImportCompletions = true,
 									autoSearchPaths = false,
-									diagnosticMode = "workspace",
+									-- Use openFilesOnly for better performance
+									diagnosticMode = "openFilesOnly",
 									useLibraryCodeForTypes = true,
 									logLevel = "Warning",
 									typeCheckingMode = "off",
-									--extraPaths = "/Users/szz/anaconda3/envs/cv/lib/python3.12/site-packages"
+									-- Limit indexing for better performance
+									indexing = true,
+									-- Disable some expensive checks
+									useLibraryCodeForTypesIfNoStubsPresent = false,
 								}
 							},
 							single_file_support = true,
@@ -323,114 +359,46 @@ return {
 				end,
 				["gopls"] = function()
 					require("lspconfig").gopls.setup({
+						flags = {
+							debounce_text_changes = 150,
+						},
 						on_attach = function()
 						end,
 						settings = {
 							gopls = {
 								hints = {
-									assignVariableTypes = true,
-									compositeLiteralFields = true,
-									constantValues = true,
-									functionTypeParameters = true,
-									parameterNames = true,
-									rangeVariableTypes = true,
+									-- Reduce hints for better performance
+									assignVariableTypes = false,
+									compositeLiteralFields = false,
+									constantValues = false,
+									functionTypeParameters = false,
+									parameterNames = true,  -- Keep only parameter names
+									rangeVariableTypes = false,
 								},
+								-- Performance optimizations
+								analyses = {
+									unusedparams = false,
+									shadow = false,
+								},
+								staticcheck = false,
 							},
 						},
 					})
 				end,
 			}
 
-			--require("lspconfig").nginx_ls.setup({})
-
-			require("mason-lspconfig").setup({
-				--ensure_installed = { "lua_ls", "rust_analyzer" },
-				automatic_installation = false,
-				handlers = handlers,
-			})
+			local ok, err = pcall(function()
+				require("mason-lspconfig").setup({
+					automatic_installation = false,
+					handlers = handlers,
+				})
+			end)
+			if not ok then
+				vim.notify("mason-lspconfig setup error: " .. tostring(err), vim.log.levels.WARN)
+			end
 		end,
 	},
 
-	--{
-		--"lvimuser/lsp-inlayhints.nvim",
-		--config = function()
-			--require("lsp-inlayhints").setup()
-			--vim.api.nvim_create_augroup("LspAttach_inlayhints", {})
-			--vim.api.nvim_create_autocmd("LspAttach", {
-				--group = "LspAttach_inlayhints",
-				--callback = function(args)
-					--if not (args.data and args.data.client_id) then
-						--return
-					--end
-
-					--local bufnr = args.buf
-					--local client = vim.lsp.get_client_by_id(args.data.client_id)
-					--require("lsp-inlayhints").on_attach(client, bufnr)
-				--end,
-			--})
-		--end,
-	--},
-	--{
-		--"RRethy/vim-illuminate",
-		--config = function()
-			---- default configuration
-			---- default configuration
-			--require('illuminate').configure({
-				---- providers: provider used to get references in the buffer, ordered by priority
-				--providers = {
-					--'lsp',
-					--'treesitter',
-					--'regex',
-				--},
-				---- delay: delay in milliseconds
-				--delay = 100,
-				---- filetype_overrides: filetype specific overrides.
-				---- The keys are strings to represent the filetype while the values are tables that
-				---- supports the same keys passed to .configure except for filetypes_denylist and filetypes_allowlist
-				--filetype_overrides = {},
-				---- filetypes_denylist: filetypes to not illuminate, this overrides filetypes_allowlist
-				--filetypes_denylist = {
-					--'dirbuf',
-					--'dirvish',
-					--'fugitive',
-				--},
-				---- filetypes_allowlist: filetypes to illuminate, this is overridden by filetypes_denylist
-				---- You must set filetypes_denylist = {} to override the defaults to allow filetypes_allowlist to take effect
-				--filetypes_allowlist = {},
-				---- modes_denylist: modes to not illuminate, this overrides modes_allowlist
-				---- See `:help mode()` for possible values
-				--modes_denylist = {},
-				---- modes_allowlist: modes to illuminate, this is overridden by modes_denylist
-				---- See `:help mode()` for possible values
-				--modes_allowlist = {},
-				---- providers_regex_syntax_denylist: syntax to not illuminate, this overrides providers_regex_syntax_allowlist
-				---- Only applies to the 'regex' provider
-				---- Use :echom synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')
-				--providers_regex_syntax_denylist = {},
-				---- providers_regex_syntax_allowlist: syntax to illuminate, this is overridden by providers_regex_syntax_denylist
-				---- Only applies to the 'regex' provider
-				---- Use :echom synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')
-				--providers_regex_syntax_allowlist = {},
-				---- under_cursor: whether or not to illuminate under the cursor
-				--under_cursor = true,
-				---- large_file_cutoff: number of lines at which to use large_file_config
-				---- The `under_cursor` option is disabled when this cutoff is hit
-				--large_file_cutoff = nil,
-				---- large_file_config: config to use for large files (based on large_file_cutoff).
-				---- Supports the same keys passed to .configure
-				---- If nil, vim-illuminate will be disabled for large files.
-				--large_file_overrides = nil,
-				---- min_count_to_highlight: minimum number of matches required to perform highlighting
-				--min_count_to_highlight = 1,
-				---- should_enable: a callback that overrides all other settings to
-				---- enable/disable illumination. This will be called a lot so don't do
-				---- anything expensive in it.
-				--should_enable = function(bufnr) return true end,
-				---- case_insensitive_regex: sets regex case sensitivity
-				--case_insensitive_regex = false,
-			--})
-		--end
-	--},
 	{
 		"simrat39/symbols-outline.nvim",
 		lazy = true,
@@ -502,22 +470,7 @@ return {
 			"nvim-lua/plenary.nvim",
 		},
 		config = function()
-			require("flutter-tools").setup {} -- use defaults
-
-			--require("flutter-tools").setup({
-				--lsp = {
-					--on_attach = function()
-					--end,
-					--settings = {
-						--showTodos = true,
-						--completeFunctionCalls = true,
-						--analysisExcludedFolders = { "<path-to-flutter-sdk-packages>" },
-						--renameFilesWithClasses = "prompt", -- "always"
-						--enableSnippets = true,
-						--updateImportsOnRename = true,
-					--},
-				--},
-			--})
+			require("flutter-tools").setup {}
 		end,
 	},
 }

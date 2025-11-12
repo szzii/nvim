@@ -1,49 +1,58 @@
 return {
 
 	{
-		"mfussenegger/nvim-dap-python",
-		config = function ()
-			require("dap-python").setup("/opt/homebrew/anaconda3/bin/python")
-		end
-	},
-	{
 		"mfussenegger/nvim-dap",
 		config = function()
 			vim.fn.sign_define('DapBreakpoint', {
-				text = ' ',
+				text = ' ',
 				texthl = 'DiagnosticError',
 				linehl = '',
 				numhl = 'DiagnosticError'
 			})
 			vim.fn.sign_define('DapLogPoint', {
-				text = ' ',
+				text = ' ',
 				texthl = 'DiagnosticInfo',
 				linehl = '',
 				numhl = 'DiagnosticInfo'
 			})
 
 			vim.fn.sign_define('DapStopped', {
-				text = ' ',
+				text = ' ',
 				texthl = 'DiagnosticError',
 				linehl = 'DiagnosticUnderlineError',
 				numhl = 'DiagnosticError'
 			})
 
-			require("dap-python").setup("python")
-
-			vim.keymap.set('n', '<F6>', function() require('dap').restart() end)
-			vim.keymap.set('n', '<F8>', function() require('dap').run_to_cursor() end)
-			vim.keymap.set('n', '<F9>', function() require('dap').step_back() end)
-			vim.keymap.set('n', '<F10>', function() require('dap').step_over() end)
-			vim.keymap.set('n', '<F11>', function() require('dap').step_into() end)
-			vim.keymap.set('n', '<F12>', function() require('dap').step_out() end)
+			vim.keymap.set('n', '<F6>', function() require('dap').restart() end, { desc = 'debug_restart' })
+			vim.keymap.set('n', '<F8>', function() require('dap').run_to_cursor() end, { desc = 'debug_run_to_cursor' })
+			vim.keymap.set('n', '<F9>', function() require('dap').step_back() end, { desc = 'debug_step_back' })
+			vim.keymap.set('n', '<F10>', function() require('dap').step_over() end, { desc = 'debug_step_over' })
+			vim.keymap.set('n', '<F11>', function() require('dap').step_into() end, { desc = 'debug_step_into' })
+			vim.keymap.set('n', '<F12>', function() require('dap').step_out() end, { desc = 'debug_step_out' })
 			vim.keymap.set('n', '<Leader>B',
-				function() require('dap').toggle_breakpoint(vim.fn.input('Condition: '), nil, nil) end,
-				{ desc = 'toggle_breakpoint' })
+				function() require('dap').set_breakpoint(vim.fn.input('Condition: '), nil, nil) end,
+				{ desc = 'conditional_breakpoint' })
 			vim.keymap.set('n', '<Leader>b', function() require('dap').toggle_breakpoint() end, { desc = 'toggle_breakpoint' })
 			vim.keymap.set({ 'n', 'v' }, '<Leader>H', function()
 				require('dap.ui.widgets').hover()
 			end, { desc = 'debug_hover' })
+		end
+	},
+	{
+		"mfussenegger/nvim-dap-python",
+		dependencies = { "mfussenegger/nvim-dap" },
+		ft = "python",
+		config = function()
+			-- Load Python path from local config
+			local ok, local_config = pcall(require, "local")
+			local python_path = ok and local_config.python_path or "/usr/bin/python3"
+
+			require("dap-python").setup(python_path)
+
+			-- Python specific keymaps
+			vim.keymap.set('n', '<leader>dn', function() require('dap-python').test_method() end, { desc = 'debug_test_method' })
+			vim.keymap.set('n', '<leader>df', function() require('dap-python').test_class() end, { desc = 'debug_test_class' })
+			vim.keymap.set('v', '<leader>ds', function() require('dap-python').debug_selection() end, { desc = 'debug_selection' })
 		end
 	},
 	{
@@ -60,6 +69,7 @@ return {
 				end,
 				mode = 'n',
 				silent = true,
+				desc = 'debug_close_and_terminate'
 			},
 			{
 				'<F5>',
@@ -73,6 +83,7 @@ return {
 				end,
 				mode = 'n',
 				silent = true,
+				desc = 'debug_continue'
 			},
 		},
 		config = function()
