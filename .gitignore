@@ -3,4 +3,3 @@ node_modules/*
 .DS*
 
 # Machine-specific configuration
-lua/local.lua
