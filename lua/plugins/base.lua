@@ -86,5 +86,43 @@ return {
 			vim.keymap.set('n', '<leader>1', ':Alpha<CR>', { noremap = true, silent = true })
 		end
 	},
+	{
+  "RRethy/vim-illuminate",
+  config = function()
+    require('illuminate').configure({
+      delay = 100,               -- 延迟 ms
+			providers = {
+        'lsp',
+        'treesitter',
+        'regex',
+			},
+      filetypes_denylist = { "NvimTree", "TelescopePrompt" },
+    })
+		    -- VSCode 风格淡色
+    local faint = "#3C3C3C"
+    vim.api.nvim_set_hl(0, "IlluminatedWordText",  { bg = faint })
+    vim.api.nvim_set_hl(0, "IlluminatedWordRead",  { bg = faint })
+    vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bg = faint })
+
+    -- 闪烁效果
+    local function flash()
+      vim.api.nvim_set_hl(0, "IlluminatedWordText",  { bg = "#4F4F4F" })
+      vim.api.nvim_set_hl(0, "IlluminatedWordRead",  { bg = "#4F4F4F" })
+      vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bg = "#4F4F4F" })
+
+      vim.defer_fn(function()
+        vim.api.nvim_set_hl(0, "IlluminatedWordText",  { bg = faint })
+        vim.api.nvim_set_hl(0, "IlluminatedWordRead",  { bg = faint })
+        vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bg = faint })
+      end, 150)
+    end
+
+    vim.api.nvim_create_autocmd("User", {
+      pattern = "Illuminated",
+      callback = flash,
+    })
+  end,
+}
+
 
 }
