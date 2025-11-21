@@ -331,17 +331,34 @@ return {
 					})
 				end,
 				["pyright"] = function()
+					-- Function to get Python path from conda or fallback
+					local function get_python_path()
+						local conda_prefix = os.getenv("CONDA_PREFIX")
+						if conda_prefix then
+							local conda_python = conda_prefix .. "/bin/python"
+							if vim.fn.executable(conda_python) == 1 then
+								return conda_python
+							end
+						end
+						local ok, local_config = pcall(require, "local")
+						return ok and local_config.python_path or "/usr/local/bin/python3"
+					end
+
 					require("lspconfig").pyright.setup({
 						flags = {
 							debounce_text_changes = 150,
 						},
+						on_init = function(client)
+							client.config.settings.python.pythonPath = get_python_path()
+						end,
 						on_attach = function()
 						end,
 						settings = {
 							python = {
+								pythonPath = get_python_path(),
 								analysis = {
 									autoImportCompletions = true,
-									autoSearchPaths = false,
+									autoSearchPaths = true,
 									-- Use openFilesOnly for better performance
 									diagnosticMode = "openFilesOnly",
 									useLibraryCodeForTypes = true,
@@ -356,6 +373,12 @@ return {
 							single_file_support = true,
 						}
 					})
+
+					-- Command to restart LSP with new Python environment
+					vim.api.nvim_create_user_command("PyrightSetEnv", function()
+						vim.cmd("LspRestart pyright")
+						vim.notify("Pyright restarted with: " .. get_python_path(), vim.log.levels.INFO)
+					end, { desc = "Restart Pyright with current conda env" })
 				end,
 				["gopls"] = function()
 					require("lspconfig").gopls.setup({

@@ -1,3 +1,9 @@
+-- Disable unused providers to avoid errors
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_node_provider = 0
+
 vim.opt.termguicolors = true
 vim.opt.autoread = true
 vim.opt.autowrite = true

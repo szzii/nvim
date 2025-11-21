@@ -4,20 +4,20 @@ return {
 		"mfussenegger/nvim-dap",
 		config = function()
 			vim.fn.sign_define('DapBreakpoint', {
-				text = ' ',
+				text = '●',
 				texthl = 'DiagnosticError',
 				linehl = '',
 				numhl = 'DiagnosticError'
 			})
 			vim.fn.sign_define('DapLogPoint', {
-				text = ' ',
+				text = '◆',
 				texthl = 'DiagnosticInfo',
 				linehl = '',
 				numhl = 'DiagnosticInfo'
 			})
 
 			vim.fn.sign_define('DapStopped', {
-				text = ' ',
+				text = '▶',
 				texthl = 'DiagnosticError',
 				linehl = 'DiagnosticUnderlineError',
 				numhl = 'DiagnosticError'
@@ -43,11 +43,33 @@ return {
 		dependencies = { "mfussenegger/nvim-dap" },
 		ft = "python",
 		config = function()
-			-- Load Python path from local config
-			local ok, local_config = pcall(require, "local")
-			local python_path = ok and local_config.python_path or "/usr/bin/python3"
+			-- Function to get Python path from conda or fallback
+			local function get_python_path()
+				-- Check for active conda environment
+				local conda_prefix = os.getenv("CONDA_PREFIX")
+				if conda_prefix then
+					local conda_python = conda_prefix .. "/bin/python"
+					if vim.fn.executable(conda_python) == 1 then
+						return conda_python
+					end
+				end
+				-- Fallback to local config or system python
+				local ok, local_config = pcall(require, "local")
+				return ok and local_config.python_path or "/usr/local/bin/python3"
+			end
 
-			require("dap-python").setup(python_path)
+			require("dap-python").setup(get_python_path())
+
+			-- Command to switch Python environment for debugging
+			vim.api.nvim_create_user_command("DapPythonSetEnv", function(opts)
+				local python_path = opts.args
+				if vim.fn.executable(python_path) == 1 then
+					require("dap-python").setup(python_path)
+					vim.notify("DAP Python set to: " .. python_path, vim.log.levels.INFO)
+				else
+					vim.notify("Invalid Python path: " .. python_path, vim.log.levels.ERROR)
+				end
+			end, { nargs = 1, desc = "Set Python path for DAP" })
 
 			-- Python specific keymaps
 			vim.keymap.set('n', '<leader>dn', function() require('dap-python').test_method() end, { desc = 'debug_test_method' })

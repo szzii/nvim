@@ -8,7 +8,7 @@ local M = {}
 M.use_colemak = true  -- Set to false if you use standard QWERTY layout
 
 -- Debug configurations
-M.python_path = "/usr/bin/python3"  -- Adjust for your system
+M.python_path = "/usr/local/bin/python3"  -- Adjust for your system
 
 -- AI/Copilot configuration
 M.copilot_enabled = true  -- Enable/disable GitHub Copilot
