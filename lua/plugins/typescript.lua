@@ -1,41 +1,4 @@
 return {
-	-- TypeScript tools and utilities
-	{
-		"pmizio/typescript-tools.nvim",
-		ft = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
-		dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
-		enabled = false, -- Set to true if you want to use this instead of ts_ls
-		config = function()
-			require("typescript-tools").setup({
-				on_attach = function(client, bufnr)
-					-- Custom keymaps for TypeScript tools
-					vim.keymap.set('n', '<leader>to', ':TSToolsOrganizeImports<CR>',
-						{ buffer = bufnr, desc = 'Organize Imports' })
-					vim.keymap.set('n', '<leader>ts', ':TSToolsSortImports<CR>',
-						{ buffer = bufnr, desc = 'Sort Imports' })
-					vim.keymap.set('n', '<leader>tu', ':TSToolsRemoveUnused<CR>',
-						{ buffer = bufnr, desc = 'Remove Unused' })
-					vim.keymap.set('n', '<leader>tf', ':TSToolsFixAll<CR>',
-						{ buffer = bufnr, desc = 'Fix All' })
-					vim.keymap.set('n', '<leader>ta', ':TSToolsAddMissingImports<CR>',
-						{ buffer = bufnr, desc = 'Add Missing Imports' })
-				end,
-				settings = {
-					-- Better TypeScript experience
-					tsserver_file_preferences = {
-						includeInlayParameterNameHints = "literals",
-						includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-						includeInlayFunctionParameterTypeHints = false,
-						includeInlayVariableTypeHints = false,
-						includeInlayPropertyDeclarationTypeHints = false,
-						includeInlayFunctionLikeReturnTypeHints = false,
-						includeInlayEnumMemberValueHints = false,
-					},
-				},
-			})
-		end,
-	},
-
 	-- Auto-close and auto-rename HTML tags
 	{
 		"windwp/nvim-ts-autotag",
@@ -45,50 +8,6 @@ return {
 				filetypes = {
 					'html', 'javascript', 'javascriptreact', 'typescript', 'typescriptreact',
 					'vue', 'svelte', 'xml',
-				},
-			})
-		end,
-	},
-
-	-- Better syntax highlighting for TypeScript
-	{
-		"nvim-treesitter/nvim-treesitter",
-		build = ":TSUpdate",
-		event = { "BufReadPost", "BufNewFile" },
-		config = function()
-			require("nvim-treesitter.configs").setup({
-				ensure_installed = {
-					"typescript",
-					"tsx",
-					"javascript",
-					"jsdoc",
-					"json",
-					"html",
-					"css",
-					"vim",
-					"lua",
-					"python",
-					"go",
-					"rust",
-					"markdown",
-					"markdown_inline",
-				},
-				highlight = {
-					enable = true,
-					additional_vim_regex_highlighting = false,
-				},
-				indent = {
-					enable = true,
-				},
-				-- Incremental selection
-				incremental_selection = {
-					enable = true,
-					keymaps = {
-						init_selection = "<CR>",
-						node_incremental = "<CR>",
-						scope_incremental = "<TAB>",
-						node_decremental = "<S-CR>",
-					},
 				},
 			})
 		end,
@@ -145,14 +64,23 @@ return {
 				return "eslint"
 			end
 
-			-- Auto lint on save (only if eslint exists)
+			-- Auto lint on save (only if eslint exists) with debounce
+			local lint_timer = nil
 			vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+				pattern = { "*.js", "*.jsx", "*.ts", "*.tsx" },
 				callback = function()
-					-- Check if eslint is available before running
-					local eslint_config = vim.fn.glob(".eslintrc*") ~= "" or vim.fn.glob("eslint.config.*") ~= ""
-					if eslint_config then
-						lint.try_lint()
+					-- Debounce: wait 300ms before linting
+					if lint_timer then
+						vim.fn.timer_stop(lint_timer)
 					end
+					lint_timer = vim.fn.timer_start(300, function()
+						-- Check if eslint is available before running
+						local eslint_config = vim.fn.glob(".eslintrc*") ~= "" or vim.fn.glob("eslint.config.*") ~= ""
+						if eslint_config then
+							lint.try_lint()
+						end
+						lint_timer = nil
+					end)
 				end,
 			})
 		end,

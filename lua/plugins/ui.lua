@@ -145,8 +145,21 @@ return {
 		},
 		config = function()
 			require("nvim-treesitter.configs").setup({
-				-- A list of parser names, or "all" (the five listed parsers should always be installed)
-				ensure_installed = "all",
+				-- Install only the languages you actually use
+				ensure_installed = {
+					"lua", "vim", "vimdoc",
+					"typescript", "tsx", "javascript", "jsdoc",
+					"python",
+					"go",
+					"java",
+					"rust",
+					"c", "cpp",
+					"html", "css", "scss",
+					"json", "jsonc", "yaml", "toml",
+					"markdown", "markdown_inline",
+					"bash", "diff", "git_config", "git_rebase", "gitcommit", "gitignore",
+					"dart",
+				},
 
 				sync_install = false,
 				auto_install = true,
@@ -154,6 +167,19 @@ return {
 				highlight = {
 					enable = true,
 					additional_vim_regex_highlighting = false,
+				},
+				indent = {
+					enable = true,
+				},
+				-- Incremental selection
+				incremental_selection = {
+					enable = true,
+					keymaps = {
+						init_selection = "<CR>",
+						node_incremental = "<CR>",
+						scope_incremental = "<TAB>",
+						node_decremental = "<S-CR>",
+					},
 				},
 			})
 		end,

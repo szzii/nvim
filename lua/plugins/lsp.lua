@@ -1,16 +1,23 @@
 return {
 	{
 		"neovim/nvim-lspconfig",
+		event = { "BufReadPre", "BufNewFile" },
+		dependencies = {
+			"williamboman/mason.nvim",
+			"williamboman/mason-lspconfig.nvim",
+		},
 		config = function()
+			local lsp_helpers = require("utils.lsp-helpers")
+
 			vim.diagnostic.config({
 				virtual_text = {
 					spacing = 4,
 					prefix = '●',
-					-- Only show virtual text for errors and warnings
-					severity = { min = vim.diagnostic.severity.WARN },
+					-- Only show virtual text for errors (performance optimization)
+					severity = { min = vim.diagnostic.severity.ERROR },
 				},
 				signs = true,
-				underline = true,
+				underline = false,  -- Disable underline for better performance
 				update_in_insert = false,
 				severity_sort = true,
 				-- Reduce diagnostic update frequency
@@ -77,6 +84,7 @@ return {
 	-- Autocompletion
 	{
 		"hrsh7th/nvim-cmp",
+		event = "InsertEnter",
 		dependencies = {
 			"hrsh7th/cmp-nvim-lsp",
 			"hrsh7th/cmp-path",
@@ -119,10 +127,20 @@ return {
 
 
 					local CustomLuaSnip = vim.api.nvim_create_augroup('CustomLuaSnip', { clear = true })
+					local luasnip_timer = nil
 					vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
 						pattern = "*",
 						group = CustomLuaSnip,
-						command = "lua require'luasnip'.unlink_current_if_deleted()"
+						callback = function()
+							-- Debounce: wait 500ms before unlinking
+							if luasnip_timer then
+								vim.fn.timer_stop(luasnip_timer)
+							end
+							luasnip_timer = vim.fn.timer_start(500, function()
+								require'luasnip'.unlink_current_if_deleted()
+								luasnip_timer = nil
+							end)
+						end
 					})
 				end
 			},
@@ -133,6 +151,7 @@ return {
 			local cmp = require("cmp")
 			local luasnip = require("luasnip")
 			local lspkind = require("lspkind")
+			local lsp_helpers = require("utils.lsp-helpers")
 
 			local has_words_before = function()
 				unpack = unpack or table.unpack
@@ -216,12 +235,7 @@ return {
 						},
 					},
 				}),
-				performance = {
-					debounce = 150,
-					throttle = 60,
-					fetching_timeout = 200,
-					max_view_entries = 30,
-				},
+				performance = lsp_helpers.performance,
 			})
 			-- `/` cmdline setup.
 			cmp.setup.cmdline("/", {
@@ -249,6 +263,7 @@ return {
 	},
 	{
 		"folke/neodev.nvim",
+		ft = "lua",
 		config = function()
 			-- IMPORTANT: make sure to setup neodev BEFORE lspconfig
 			require("neodev").setup({
@@ -258,6 +273,14 @@ return {
 	},
 	{
 		"williamboman/mason.nvim",
+		cmd = {
+			"Mason",
+			"MasonInstall",
+			"MasonUninstall",
+			"MasonUninstallAll",
+			"MasonLog",
+			"MasonUpdate",
+		},
 		build = ":MasonUpdate",
 		config = function()
 			require("mason").setup()
@@ -265,6 +288,7 @@ return {
 	},
 	{
 		"williamboman/mason-lspconfig.nvim",
+		event = { "BufReadPre", "BufNewFile" },
 		dependencies = {
 			"williamboman/mason.nvim",
 			"neovim/nvim-lspconfig",
@@ -284,24 +308,13 @@ return {
 			local handlers = {
 				function(server_name) -- default handler (optional)
 					require("lspconfig")[server_name].setup({
-						flags = {
-							debounce_text_changes = 150,  -- Reduce LSP request frequency
-						},
-						on_attach = function(client, bufnr)
-							-- Disable codelens auto-refresh for better performance
-							-- if client.supports_method("textDocument/codeLens") then
-							-- 	pcall(vim.lsp.codelens.refresh)
-							-- 	refresh_codelens(bufnr)
-							-- end
-						end,
+						flags = lsp_helpers.lsp_flags,
 					})
 				end,
 				["ts_ls"] = function()
 					local lspconfig = require('lspconfig')
 					lspconfig.ts_ls.setup({
-						flags = {
-							debounce_text_changes = 150,
-						},
+						flags = lsp_helpers.lsp_flags,
 						-- Support single file mode
 						single_file_support = true,
 						root_dir = function(filename)
@@ -323,17 +336,7 @@ return {
 						end,
 						settings = {
 							typescript = {
-								inlayHints = {
-									-- Reduce inlay hints for better performance
-									includeInlayParameterNameHints = 'literals',  -- Only show for literals
-									includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-									includeInlayFunctionParameterTypeHints = false,
-									includeInlayVariableTypeHints = false,
-									includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-									includeInlayPropertyDeclarationTypeHints = false,
-									includeInlayFunctionLikeReturnTypeHints = false,
-									includeInlayEnumMemberValueHints = false,
-								},
+								inlayHints = lsp_helpers.inlay_hints_off,
 								-- TypeScript specific settings
 								suggest = {
 									includeCompletionsForModuleExports = true,
@@ -343,16 +346,7 @@ return {
 								},
 							},
 							javascript = {
-								inlayHints = {
-									includeInlayParameterNameHints = 'literals',
-									includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-									includeInlayFunctionParameterTypeHints = false,
-									includeInlayVariableTypeHints = false,
-									includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-									includeInlayPropertyDeclarationTypeHints = false,
-									includeInlayFunctionLikeReturnTypeHints = false,
-									includeInlayEnumMemberValueHints = false,
-								},
+								inlayHints = lsp_helpers.inlay_hints_off,
 								suggest = {
 									includeCompletionsForModuleExports = true,
 								},
@@ -364,31 +358,16 @@ return {
 					})
 				end,
 				["pyright"] = function()
-					-- Function to get Python path from conda or fallback
-					local function get_python_path()
-						local conda_prefix = os.getenv("CONDA_PREFIX")
-						if conda_prefix then
-							local conda_python = conda_prefix .. "/bin/python"
-							if vim.fn.executable(conda_python) == 1 then
-								return conda_python
-							end
-						end
-						local ok, local_config = pcall(require, "local")
-						return ok and local_config.python_path or "/usr/local/bin/python3"
-					end
-
 					require("lspconfig").pyright.setup({
-						flags = {
-							debounce_text_changes = 150,
-						},
+						flags = lsp_helpers.lsp_flags,
 						on_init = function(client)
-							client.config.settings.python.pythonPath = get_python_path()
+							client.config.settings.python.pythonPath = lsp_helpers.get_python_path()
 						end,
 						on_attach = function()
 						end,
 						settings = {
 							python = {
-								pythonPath = get_python_path(),
+								pythonPath = lsp_helpers.get_python_path(),
 								analysis = {
 									autoImportCompletions = true,
 									autoSearchPaths = true,
@@ -410,14 +389,12 @@ return {
 					-- Command to restart LSP with new Python environment
 					vim.api.nvim_create_user_command("PyrightSetEnv", function()
 						vim.cmd("LspRestart pyright")
-						vim.notify("Pyright restarted with: " .. get_python_path(), vim.log.levels.INFO)
+						vim.notify("Pyright restarted with: " .. lsp_helpers.get_python_path(), vim.log.levels.INFO)
 					end, { desc = "Restart Pyright with current conda env" })
 				end,
 				["gopls"] = function()
 					require("lspconfig").gopls.setup({
-						flags = {
-							debounce_text_changes = 150,
-						},
+						flags = lsp_helpers.lsp_flags,
 						on_attach = function()
 						end,
 						settings = {

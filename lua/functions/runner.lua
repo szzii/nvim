@@ -1,5 +1,18 @@
 local Runner = {}
 
+-- Get Python path from conda or local config
+local function get_python_path()
+	local conda_prefix = os.getenv("CONDA_PREFIX")
+	if conda_prefix then
+		local conda_python = conda_prefix .. "/bin/python"
+		if vim.fn.executable(conda_python) == 1 then
+			return conda_python
+		end
+	end
+	local ok, local_config = pcall(require, "local")
+	return ok and local_config.python_path or "python3"
+end
+
 local function elementExists(arr, target)
 	for _, value in ipairs(arr) do
 		if value == target then
@@ -19,7 +32,7 @@ Runner.CompileRun = function()
 	elseif filetype == 'vue' then
 		vim.fn['asyncrun#run']("", { save = 1 }, "npm run dev")
 	elseif filetype == 'python' then
-			vim.fn['asyncrun#run']("", { save = 1 }, "/Users/szz/anaconda3/bin/python $(VIM_FILENAME)")
+		vim.fn['asyncrun#run']("", { save = 1 }, get_python_path() .. " $(VIM_FILENAME)")
 	elseif filetype == 'dart' then
 		vim.cmd("FlutterRun")
 	elseif filetype == 'lua' then
@@ -33,14 +46,6 @@ Runner.CompileRun = function()
 	if elementExists(webfiles, filetype) then
 		vim.fn['asyncrun#run']("", { save = 1 }, "npm start")
 	end
-	--if filetype == 'go' then
-	--local file_name = vim.fn.expand('%')
-	--if l:file =~# '^\f\+_test\.go$'
-	--:GoTestFunc
-	--elseif l:file =~# '^\f\+\.go$'
-	--:GoRun
-	--end
-	--end
 end
 
 -- TODO java-test and gradle

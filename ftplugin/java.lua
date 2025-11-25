@@ -26,27 +26,7 @@ vim.list_extend(
 local on_attach = function()
 	require('jdtls').setup_dap({ hotcodereplace = 'auto' })
 	require('jdtls.dap').setup_dap_main_class_configs()
-
-
-	--vim.api.nvim_create_autocmd("BufWritePre", {
-		--buffer = buffer,
-		--callback = function()
-			--vim.lsp.buf.format { async = false }
-		--end
-	--})
-
-	--vim.api.nvim_create_autocmd('BufWritePost', {
-	--buffer = bufnr,
-	--desc = 'refresh codelens',
-	--callback = function()
-	--pcall(vim.lsp.codelens.refresh)
-	--end,
-	--})
-
-	--pcall(vim.lsp.codelens.refresh)
 end
-
---os.execute("mkdir -p " .. workspace_dir .. " >> /dev/null")
 
 local config = {
 	flags = {
@@ -104,11 +84,6 @@ local config = {
 			},
 			format = {
 				enable = true,
-				--settings = {
-				---- https://github.com/google/styleguide/blob/gh-pages/eclipse-java-google-style.xml
-				--url = vim.fn.stdpath('data') .. "/eclipse/eclipse-java-google-style.xml",
-				--profile = "GoogleStyle",
-				--},
 			},
 			completion = {
 				maxResults = 20,  -- Reduce for better performance
