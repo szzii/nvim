@@ -296,11 +296,31 @@ return {
 						end,
 					})
 				end,
-				["tsserver"] = function()
-					require('lspconfig').tsserver.setup({
+				["ts_ls"] = function()
+					local lspconfig = require('lspconfig')
+					lspconfig.ts_ls.setup({
 						flags = {
 							debounce_text_changes = 150,
 						},
+						-- Support single file mode
+						single_file_support = true,
+						root_dir = function(filename)
+							-- Try to find project root, fallback to file directory
+							return lspconfig.util.root_pattern("package.json", "tsconfig.json", "jsconfig.json", ".git")(filename)
+								or vim.fn.fnamemodify(filename, ":p:h")
+						end,
+						init_options = {
+							preferences = {
+								-- Better import suggestions
+								importModuleSpecifierPreference = "relative",
+								importModuleSpecifierEnding = "minimal",
+							},
+						},
+						on_attach = function(client, bufnr)
+							-- Disable tsserver's formatting in favor of prettier/eslint
+							client.server_capabilities.documentFormattingProvider = false
+							client.server_capabilities.documentRangeFormattingProvider = false
+						end,
 						settings = {
 							typescript = {
 								inlayHints = {
@@ -313,7 +333,14 @@ return {
 									includeInlayPropertyDeclarationTypeHints = false,
 									includeInlayFunctionLikeReturnTypeHints = false,
 									includeInlayEnumMemberValueHints = false,
-								}
+								},
+								-- TypeScript specific settings
+								suggest = {
+									includeCompletionsForModuleExports = true,
+								},
+								format = {
+									enable = false,  -- Use external formatter
+								},
 							},
 							javascript = {
 								inlayHints = {
@@ -325,7 +352,13 @@ return {
 									includeInlayPropertyDeclarationTypeHints = false,
 									includeInlayFunctionLikeReturnTypeHints = false,
 									includeInlayEnumMemberValueHints = false,
-								}
+								},
+								suggest = {
+									includeCompletionsForModuleExports = true,
+								},
+								format = {
+									enable = false,  -- Use external formatter
+								},
 							}
 						}
 					})
@@ -412,7 +445,14 @@ return {
 
 			local ok, err = pcall(function()
 				require("mason-lspconfig").setup({
-					automatic_installation = false,
+					-- Auto install these LSP servers
+					ensure_installed = {
+						"ts_ls",           -- TypeScript/JavaScript
+						"pyright",         -- Python
+						"gopls",           -- Go
+						"lua_ls",          -- Lua
+					},
+					automatic_installation = true,
 					handlers = handlers,
 				})
 			end)
