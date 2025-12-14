@@ -37,7 +37,7 @@ end
 -- Universal keymaps (always applied)
 vim.keymap.set('', ';', ':', { noremap = true })
 vim.keymap.set('n', 'S', '<cmd>w<CR>', { silent = true })
-vim.keymap.set('n', 'F', ':lua vim.lsp.buf.format()<CR>', { silent = true })
+vim.keymap.set('n', 'F', function() require("conform").format({ lsp_fallback = true }) end, { silent = true, desc = "Format buffer" })
 vim.keymap.set('n', 'Q', '<cmd>q<CR>', { silent = true })
 vim.keymap.set('n', '<TAB>', '>>', { noremap = true })
 vim.keymap.set('x', '<TAB>', '>><ESC>', { noremap = true })

@@ -17,7 +17,7 @@ return {
 					severity = { min = vim.diagnostic.severity.ERROR },
 				},
 				signs = true,
-				underline = false,  -- Disable underline for better performance
+				underline = true,
 				update_in_insert = false,
 				severity_sort = true,
 				-- Reduce diagnostic update frequency

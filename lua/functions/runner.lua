@@ -37,6 +37,8 @@ Runner.CompileRun = function()
 		vim.cmd("FlutterRun")
 	elseif filetype == 'lua' then
 		vim.fn['asyncrun#run']("", { save = 1 }, "lua $(VIM_FILENAME)")
+	elseif filetype == 'typescript' or filetype == 'typescriptreact' then
+		vim.fn['asyncrun#run']("", { save = 1 }, "bun $(VIM_FILENAME)")
 	elseif filetype == 'c' then
 		vim.fn['asyncrun#run']("", { save = 1 }, "clang $(VIM_FILENAME) -o $(VIM_FILENOEXT) && ./$(VIM_FILENOEXT)")
 	elseif filetype == 'cpp' then

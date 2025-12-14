@@ -32,11 +32,8 @@ return {
 					scss = { "prettier" },
 					markdown = { "prettier" },
 				},
-				-- Format on save (optional, set to false if you prefer manual formatting)
-				format_on_save = {
-					timeout_ms = 500,
-					lsp_fallback = true,
-				},
+				-- Format on save disabled - use F key for manual formatting
+				format_on_save = false,
 			})
 		end,
 	},
