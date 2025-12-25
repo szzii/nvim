@@ -60,3 +60,7 @@ vim.opt.tw = 0
 vim.opt.viewoptions = "cursor,folds,unix"
 vim.opt.laststatus = 2
 vim.opt.undofile = true
+-- Create undo directory if it doesn't exist
+local undodir = vim.fn.stdpath('data') .. '/undo'
+vim.fn.mkdir(undodir, 'p')
+vim.opt.undodir = undodir

@@ -246,19 +246,14 @@ return {
 	},
 
 	{
-		"theniceboy/joshuto.nvim",
-		lazy = true,
-		cmd = "Joshuto",
+		"mikavilpas/yazi.nvim",
+		event = "VeryLazy",
 		keys = {
-			{ "<leader>2", ":Joshuto<CR>", mode = "n", noremap = true, silent = true, desc = 'Jushuto' },
+			{ "<leader>2", function() require("yazi").yazi() end, mode = "n", desc = "Yazi" },
 		},
-		config = function()
-			-- let g:joshuto_floating_window_winblend = 0
-			-- let g:joshuto_floating_window_scaling_factor = 1.0
-			-- let g:joshuto_use_neovim_remote = 1 " for neovim-remote support
-			vim.g.joshuto_floating_window_scaling_factor = 0.8
-			vim.g.joshuto_use_neovim_remote = 1
-			vim.g.joshuto_floating_window_winblend = 0
-		end
+		opts = {
+			open_for_directories = false,
+			floating_window_scaling_factor = 0.8,
+		},
 	},
 }

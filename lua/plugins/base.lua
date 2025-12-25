@@ -9,9 +9,6 @@ return {
 			vim.g.lastplace_open_folds = 1
 		end
 	},
-	{
-		"mbbill/undotree",
-	},
 
 	{
 		"petertriho/nvim-scrollbar",
@@ -42,19 +39,6 @@ return {
 		end,
 	},
 
-	{
-		"yianwillis/vimcdoc",
-		lazy = true,
-		ft = "vim"
-	},
-
-	{
-		"airblade/vim-rooter",
-		config = function()
-			vim.g.rooter_patterns = { '.git', 'Makefile', '*.sln', 'pom.xml', 'build.gradle', 'Cargo.toml', 'go.mod' }
-			vim.g.rooter_cd_cmd = 'lcd'
-		end
-	},
 	{
 		"folke/todo-comments.nvim",
 		dependencies = { "nvim-lua/plenary.nvim" },

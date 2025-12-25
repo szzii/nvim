@@ -33,15 +33,20 @@ return {
 		end
 	},
 	{
-		"preservim/nerdcommenter",
-		lazy = true,
-		init = function()
-			vim.g.NERDCreateDefaultMappings = 0
+		"numToStr/Comment.nvim",
+		config = function()
+			require("Comment").setup({
+				toggler = {
+					line = '<leader>c',
+				},
+				opleader = {
+					line = '<leader>c',
+				},
+			})
 		end,
 		keys = {
-			{ "<leader>c", "<Plug>NERDCommenterToggle", mode = { "n", "x" }, noremap = true, desc = 'Comment' },
-
-		}
+			{ "<leader>c", mode = { "n", "x" }, desc = 'Comment toggle' },
+		},
 	},
 
 	{
