@@ -105,27 +105,28 @@ vim.api.nvim_create_autocmd('FileType', {
 	end,
 })
 
--- Python LSP (Pyright)
+-- Python LSP (BasedPyright - 推荐)
 vim.api.nvim_create_autocmd('FileType', {
 	pattern = 'python',
 	callback = function(ev)
 		vim.lsp.start({
-			name = 'pyright',
-			cmd = { 'pyright-langserver', '--stdio' },
+			name = 'basedpyright',
+			cmd = { 'basedpyright-langserver', '--stdio' },
 			root_dir = find_root(ev.buf, { 'pyproject.toml', 'setup.py', '.git' }),
 			settings = {
-				python = {
-					pythonPath = lsp_helpers.get_python_path(),
+				basedpyright = {
 					analysis = {
 						autoImportCompletions = true,
 						autoSearchPaths = true,
 						diagnosticMode = 'openFilesOnly',
 						useLibraryCodeForTypes = true,
 						logLevel = 'Warning',
-						typeCheckingMode = 'off',
+						typeCheckingMode = 'standard', -- basedpyright 支持 'standard', 'strict', 'off'
 						indexing = true,
-						useLibraryCodeForTypesIfNoStubsPresent = false,
 					},
+				},
+				python = {
+					pythonPath = lsp_helpers.get_python_path(),
 				},
 			},
 			on_init = function(client)

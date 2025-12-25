@@ -193,44 +193,84 @@ return {
 
 			local dap = require("dap")
 
+			-- 检测是否使用 Bun
+			local function get_runtime()
+				-- 优先使用 Bun
+				if vim.fn.executable('bun') == 1 then
+					return 'bun'
+				end
+				return 'node'
+			end
+
+			local runtime = get_runtime()
+
 			-- TypeScript/JavaScript configurations
 			for _, language in ipairs({ "typescript", "javascript", "typescriptreact", "javascriptreact" }) do
 				dap.configurations[language] = {
+					-- 使用 Bun/Node 运行当前文件
 					{
 						type = "pwa-node",
 						request = "launch",
-						name = "Launch file",
-						program = "${file}",
+						name = "Launch file with " .. runtime:upper(),
+						runtimeExecutable = runtime,
+						runtimeArgs = {
+							"run",
+							"${file}",
+						},
 						cwd = "${workspaceFolder}",
+						sourceMaps = true,
+						protocol = "inspector",
 					},
+					-- 调试 Bun/Node 进程
 					{
 						type = "pwa-node",
 						request = "attach",
-						name = "Attach",
+						name = "Attach to process",
 						processId = require('dap.utils').pick_process,
 						cwd = "${workspaceFolder}",
+						sourceMaps = true,
 					},
+					-- 使用 Bun 运行测试
 					{
 						type = "pwa-node",
 						request = "launch",
-						name = "Debug Jest Tests",
-						-- Adjust to your jest path
-						runtimeExecutable = "node",
+						name = "Debug Bun Test",
+						runtimeExecutable = runtime,
 						runtimeArgs = {
-							"./node_modules/jest/bin/jest.js",
-							"--runInBand",
+							"test",
+							"--run",
 						},
 						rootPath = "${workspaceFolder}",
 						cwd = "${workspaceFolder}",
 						console = "integratedTerminal",
 						internalConsoleOptions = "neverOpen",
+						sourceMaps = true,
 					},
+					-- 使用 Node 运行 Jest（如果项目使用 Jest）
+					{
+						type = "pwa-node",
+						request = "launch",
+						name = "Debug Jest Tests",
+						runtimeExecutable = "node",
+						runtimeArgs = {
+							"./node_modules/.bin/jest",
+							"--runInBand",
+							"--no-cache",
+						},
+						rootPath = "${workspaceFolder}",
+						cwd = "${workspaceFolder}",
+						console = "integratedTerminal",
+						internalConsoleOptions = "neverOpen",
+						sourceMaps = true,
+					},
+					-- Chrome 调试
 					{
 						type = "pwa-chrome",
 						request = "launch",
 						name = "Launch Chrome",
 						url = "http://localhost:3000",
 						webRoot = "${workspaceFolder}",
+						sourceMaps = true,
 					},
 				}
 			end
@@ -239,24 +279,41 @@ return {
 			vim.api.nvim_create_autocmd("FileType", {
 				pattern = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
 				callback = function()
+					-- 调试当前文件 (使用 Bun)
+					vim.keymap.set('n', '<leader>df', function()
+						require('dap').run({
+							type = "pwa-node",
+							request = "launch",
+							name = "Launch file with " .. runtime:upper(),
+							runtimeExecutable = runtime,
+							runtimeArgs = {
+								"run",
+								vim.fn.expand("%:p"),
+							},
+							cwd = "${workspaceFolder}",
+							sourceMaps = true,
+							protocol = "inspector",
+						})
+					end, { buffer = true, desc = 'debug_file_with_bun' })
+
+					-- 调试 Bun 测试
 					vim.keymap.set('n', '<leader>dt', function()
 						require('dap').run({
 							type = "pwa-node",
 							request = "launch",
-							name = "Debug Jest Tests",
-							runtimeExecutable = "node",
+							name = "Debug Bun Test",
+							runtimeExecutable = runtime,
 							runtimeArgs = {
-								"./node_modules/jest/bin/jest.js",
-								"--runInBand",
-								"--no-coverage",
-								vim.fn.expand("%:p"),
+								"test",
+								"--run",
 							},
 							rootPath = "${workspaceFolder}",
 							cwd = "${workspaceFolder}",
 							console = "integratedTerminal",
 							internalConsoleOptions = "neverOpen",
+							sourceMaps = true,
 						})
-					end, { buffer = true, desc = 'debug_jest_current_file' })
+					end, { buffer = true, desc = 'debug_bun_test' })
 				end,
 			})
 		end
