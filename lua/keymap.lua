@@ -39,10 +39,13 @@ vim.keymap.set('', ';', ':', { noremap = true })
 vim.keymap.set('n', 'S', '<cmd>w<CR>', { silent = true })
 vim.keymap.set('n', 'F', function() require("conform").format({ lsp_fallback = true }) end, { silent = true, desc = "Format buffer" })
 vim.keymap.set('n', 'Q', '<cmd>q<CR>', { silent = true })
-vim.keymap.set('n', '<TAB>', '>>', { noremap = true })
-vim.keymap.set('x', '<TAB>', '>><ESC>', { noremap = true })
-vim.keymap.set('n', '<S-TAB>', '<<', { noremap = false })
-vim.keymap.set('x', '<S-TAB>', '<<<ESC>', { noremap = false })
+-- Indentation with Tab in visual/select/normal mode
+vim.api.nvim_set_keymap('n', '<TAB>', '>>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('x', '<TAB>', '>gv', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('s', '<TAB>', '>gv', { noremap = true, silent = true })  -- Select mode
+vim.api.nvim_set_keymap('n', '<S-TAB>', '<<', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('x', '<S-TAB>', '<gv', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('s', '<S-TAB>', '<gv', { noremap = true, silent = true })  -- Select mode
 
 vim.keymap.set('', '`', '~', { noremap = true })
 vim.keymap.set('v', 'Y', '"+y', { noremap = true })

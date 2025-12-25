@@ -177,7 +177,7 @@ return {
 					keymaps = {
 						init_selection = "<CR>",
 						node_incremental = "<CR>",
-						scope_incremental = "<TAB>",
+						scope_incremental = "<leader><TAB>",
 						node_decremental = "<S-CR>",
 					},
 				},
