@@ -20,12 +20,6 @@ local layout_keys = {
 		{ mode = 'n', from = 'l', to = 'u' },  -- undo
 		{ mode = '', from = 'k', to = 'n' },   -- next search
 		{ mode = '', from = 'K', to = 'N' },   -- previous search
-		-- Undotree
-		{ mode = 'n', from = 'L', to = vim.cmd.UndotreeToggle },
-	},
-	qwerty = {
-		-- Undotree
-		{ mode = 'n', from = 'U', to = vim.cmd.UndotreeToggle },
 	},
 }
 
@@ -35,6 +29,8 @@ for _, map in ipairs(keys) do
 	vim.keymap.set(map.mode, map.from, map.to, { noremap = true })
 end
 -- Universal keymaps (always applied)
+-- Redo with both Ctrl+r and Ctrl+R
+vim.keymap.set('n', '<C-r>', '<cmd>redo<CR>', { desc = 'Redo' })
 vim.keymap.set('', ';', ':', { noremap = true })
 vim.keymap.set('n', 'S', '<cmd>w<CR>', { silent = true })
 vim.keymap.set('n', 'F', function() require("conform").format({ lsp_fallback = true }) end, { silent = true, desc = "Format buffer" })
