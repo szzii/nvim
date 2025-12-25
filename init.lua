@@ -19,4 +19,7 @@ require("options")
 require("keymap")
 require("lazy").setup("plugins")
 
+-- 加载 LSP 配置
+require("config.lsp")
+
 vim.keymap.set('n', 'R', ':lua require("functions.runner").CompileRun()<CR>', { noremap = true, silent = true })
