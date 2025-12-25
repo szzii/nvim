@@ -1,6 +1,16 @@
 -- Neovim 0.11+ 原生 LSP 配置
 local lsp_helpers = require("utils.lsp-helpers")
 
+-- Root 辅助函数 - 确保始终返回有效目录
+local function find_root(bufnr, markers)
+	local root = vim.fs.root(bufnr, markers)
+	if root then
+		return root
+	end
+	-- Fallback to file directory
+	return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ':p:h')
+end
+
 -- ========== 诊断配置 ==========
 vim.diagnostic.config({
 	virtual_text = {
@@ -53,139 +63,127 @@ vim.api.nvim_create_autocmd("LspAttach", {
 	end,
 })
 
--- ========== LSP 服务器配置 ==========
+-- ========== 启用 LSP 服务器 ==========
 
 -- TypeScript/JavaScript LSP
-vim.lsp.config('ts_ls', {
-	cmd = { 'typescript-language-server', '--stdio' },
-	filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
-	root_dir = vim.fs.root(0, { 'package.json', 'tsconfig.json', 'jsconfig.json', '.git' })
-		or vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':p:h'),
-	settings = {
-		typescript = {
-			inlayHints = lsp_helpers.inlay_hints_off,
-			suggest = {
-				includeCompletionsForModuleExports = true,
+vim.api.nvim_create_autocmd('FileType', {
+	pattern = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+	callback = function(ev)
+		vim.lsp.start({
+			name = 'ts_ls',
+			cmd = { 'typescript-language-server', '--stdio' },
+			root_dir = find_root(ev.buf, { 'package.json', 'tsconfig.json', 'jsconfig.json', '.git' }),
+			settings = {
+				typescript = {
+					inlayHints = lsp_helpers.inlay_hints_off,
+					suggest = {
+						includeCompletionsForModuleExports = true,
+					},
+					format = {
+						enable = false,
+					},
+					preferences = {
+						importModuleSpecifierPreference = 'relative',
+						importModuleSpecifierEnding = 'minimal',
+					},
+				},
+				javascript = {
+					inlayHints = lsp_helpers.inlay_hints_off,
+					suggest = {
+						includeCompletionsForModuleExports = true,
+					},
+					format = {
+						enable = false,
+					},
+				},
 			},
-			format = {
-				enable = false,
-			},
-			preferences = {
-				importModuleSpecifierPreference = 'relative',
-				importModuleSpecifierEnding = 'minimal',
-			},
-		},
-		javascript = {
-			inlayHints = lsp_helpers.inlay_hints_off,
-			suggest = {
-				includeCompletionsForModuleExports = true,
-			},
-			format = {
-				enable = false,
-			},
-		},
-	},
-	on_attach = function(client)
-		client.server_capabilities.documentFormattingProvider = false
-		client.server_capabilities.documentRangeFormattingProvider = false
+			on_attach = function(client)
+				client.server_capabilities.documentFormattingProvider = false
+				client.server_capabilities.documentRangeFormattingProvider = false
+			end,
+		})
 	end,
 })
 
 -- Python LSP (Pyright)
-vim.lsp.config('pyright', {
-	cmd = { 'pyright-langserver', '--stdio' },
-	filetypes = { 'python' },
-	root_dir = vim.fs.root(0, { 'pyproject.toml', 'setup.py', '.git' })
-		or vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':p:h'),
-	settings = {
-		python = {
-			pythonPath = lsp_helpers.get_python_path(),
-			analysis = {
-				autoImportCompletions = true,
-				autoSearchPaths = true,
-				diagnosticMode = 'openFilesOnly',
-				useLibraryCodeForTypes = true,
-				logLevel = 'Warning',
-				typeCheckingMode = 'off',
-				indexing = true,
-				useLibraryCodeForTypesIfNoStubsPresent = false,
+vim.api.nvim_create_autocmd('FileType', {
+	pattern = 'python',
+	callback = function(ev)
+		vim.lsp.start({
+			name = 'pyright',
+			cmd = { 'pyright-langserver', '--stdio' },
+			root_dir = find_root(ev.buf, { 'pyproject.toml', 'setup.py', '.git' }),
+			settings = {
+				python = {
+					pythonPath = lsp_helpers.get_python_path(),
+					analysis = {
+						autoImportCompletions = true,
+						autoSearchPaths = true,
+						diagnosticMode = 'openFilesOnly',
+						useLibraryCodeForTypes = true,
+						logLevel = 'Warning',
+						typeCheckingMode = 'off',
+						indexing = true,
+						useLibraryCodeForTypesIfNoStubsPresent = false,
+					},
+				},
 			},
-		},
-	},
-	on_init = function(client)
-		client.config.settings.python.pythonPath = lsp_helpers.get_python_path()
+			on_init = function(client)
+				client.config.settings.python.pythonPath = lsp_helpers.get_python_path()
+			end,
+		})
 	end,
 })
 
 -- Go LSP (gopls)
-vim.lsp.config('gopls', {
-	cmd = { 'gopls' },
-	filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
-	root_dir = vim.fs.root(0, { 'go.work', 'go.mod', '.git' }),
-	settings = {
-		gopls = {
-			hints = {
-				assignVariableTypes = false,
-				compositeLiteralFields = false,
-				constantValues = false,
-				functionTypeParameters = false,
-				parameterNames = true,
-				rangeVariableTypes = false,
+vim.api.nvim_create_autocmd('FileType', {
+	pattern = { 'go', 'gomod', 'gowork', 'gotmpl' },
+	callback = function(ev)
+		vim.lsp.start({
+			name = 'gopls',
+			cmd = { 'gopls' },
+			root_dir = find_root(ev.buf, { 'go.work', 'go.mod', '.git' }),
+			settings = {
+				gopls = {
+					hints = {
+						assignVariableTypes = false,
+						compositeLiteralFields = false,
+						constantValues = false,
+						functionTypeParameters = false,
+						parameterNames = true,
+						rangeVariableTypes = false,
+					},
+					analyses = {
+						unusedparams = false,
+						shadow = false,
+					},
+					staticcheck = false,
+				},
 			},
-			analyses = {
-				unusedparams = false,
-				shadow = false,
-			},
-			staticcheck = false,
-		},
-	},
+		})
+	end,
 })
 
 -- Lua LSP
-vim.lsp.config('lua_ls', {
-	cmd = { 'lua-language-server' },
-	filetypes = { 'lua' },
-	root_dir = vim.fs.root(0, { '.git' }) or vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':p:h'),
-	settings = {
-		Lua = {
-			telemetry = { enable = false },
-			workspace = {
-				library = {
-					vim.env.VIMRUNTIME,
-					"${3rd}/luv/library"
-				},
-			},
-		},
-	},
-})
-
--- ========== 启用 LSP 服务器 ==========
-
-vim.api.nvim_create_autocmd('FileType', {
-	pattern = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
-	callback = function()
-		vim.lsp.enable('ts_ls')
-	end,
-})
-
-vim.api.nvim_create_autocmd('FileType', {
-	pattern = 'python',
-	callback = function()
-		vim.lsp.enable('pyright')
-	end,
-})
-
-vim.api.nvim_create_autocmd('FileType', {
-	pattern = { 'go', 'gomod', 'gowork', 'gotmpl' },
-	callback = function()
-		vim.lsp.enable('gopls')
-	end,
-})
-
 vim.api.nvim_create_autocmd('FileType', {
 	pattern = 'lua',
-	callback = function()
-		vim.lsp.enable('lua_ls')
+	callback = function(ev)
+		vim.lsp.start({
+			name = 'lua_ls',
+			cmd = { 'lua-language-server' },
+			root_dir = find_root(ev.buf, { '.git' }),
+			settings = {
+				Lua = {
+					telemetry = { enable = false },
+					workspace = {
+						library = {
+							vim.env.VIMRUNTIME,
+							"${3rd}/luv/library"
+						},
+					},
+				},
+			},
+		})
 	end,
 })
 
