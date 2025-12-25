@@ -137,7 +137,7 @@ return {
 								vim.fn.timer_stop(luasnip_timer)
 							end
 							luasnip_timer = vim.fn.timer_start(500, function()
-								require'luasnip'.unlink_current_if_deleted()
+								require 'luasnip'.unlink_current_if_deleted()
 								luasnip_timer = nil
 							end)
 						end
@@ -215,10 +215,10 @@ return {
 					["<C-c>"] = cmp.mapping.abort(),
 				}),
 				sources = cmp.config.sources({
-					{ name = "nvim_lsp", priority = 1000 },
+					{ name = "nvim_lsp",                priority = 1000 },
 					{ name = "nvim_lsp_signature_help", priority = 900 },
-					{ name = "luasnip", priority = 800 },
-					{ name = "path", priority = 700 },
+					{ name = "luasnip",                 priority = 800 },
+					{ name = "path",                    priority = 700 },
 					{
 						name = "buffer",
 						priority = 500,
@@ -320,7 +320,7 @@ return {
 						root_dir = function(filename)
 							-- Try to find project root, fallback to file directory
 							return lspconfig.util.root_pattern("package.json", "tsconfig.json", "jsconfig.json", ".git")(filename)
-								or vim.fn.fnamemodify(filename, ":p:h")
+									or vim.fn.fnamemodify(filename, ":p:h")
 						end,
 						init_options = {
 							preferences = {
@@ -342,7 +342,7 @@ return {
 									includeCompletionsForModuleExports = true,
 								},
 								format = {
-									enable = false,  -- Use external formatter
+									enable = false, -- Use external formatter
 								},
 							},
 							javascript = {
@@ -351,7 +351,7 @@ return {
 									includeCompletionsForModuleExports = true,
 								},
 								format = {
-									enable = false,  -- Use external formatter
+									enable = false, -- Use external formatter
 								},
 							}
 						}
@@ -405,7 +405,7 @@ return {
 									compositeLiteralFields = false,
 									constantValues = false,
 									functionTypeParameters = false,
-									parameterNames = true,  -- Keep only parameter names
+									parameterNames = true, -- Keep only parameter names
 									rangeVariableTypes = false,
 								},
 								-- Performance optimizations
@@ -424,10 +424,10 @@ return {
 				require("mason-lspconfig").setup({
 					-- Auto install these LSP servers
 					ensure_installed = {
-						"ts_ls",           -- TypeScript/JavaScript
-						"pyright",         -- Python
-						"gopls",           -- Go
-						"lua_ls",          -- Lua
+						"ts_ls", -- TypeScript/JavaScript
+						"pyright", -- Python
+						"gopls", -- Go
+						"lua_ls", -- Lua
 					},
 					automatic_installation = true,
 					handlers = handlers,
