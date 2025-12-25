@@ -111,6 +111,8 @@ return {
 					local types = require("luasnip.util.types")
 
 					luasnip.config.setup({
+						region_check_events = "InsertEnter",
+						delete_check_events = "TextChanged,InsertLeave",
 						ext_opts = {
 							[types.choiceNode] = {
 								active = {
