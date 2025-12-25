@@ -188,7 +188,24 @@ return {
 				mapping = cmp.mapping.preset.insert({
 					["<C-u>"] = cmp.mapping.scroll_docs(-4),
 					["<C-e>"] = cmp.mapping.scroll_docs(4),
-					['<CR>'] = cmp.mapping.confirm({ select = true }),
+					['<CR>'] = cmp.mapping(function(fallback)
+						if cmp.visible() then
+							-- 检查光标后的字符
+							local line = vim.api.nvim_get_current_line()
+							local col = vim.api.nvim_win_get_cursor(0)[2] + 1
+							local next_char = line:sub(col, col)
+
+							-- 确认补全
+							cmp.confirm({ select = true, behavior = cmp.ConfirmBehavior.Insert })
+
+							-- 如果光标后不是空格也不是行尾，添加空格
+							if next_char ~= '' and next_char ~= ' ' then
+								vim.api.nvim_feedkeys(' ', 'n', false)
+							end
+						else
+							fallback()
+						end
+					end, { 'i', 's' }),
 					["<Tab>"] = cmp.mapping(function(fallback)
 						if cmp.visible() then
 							cmp.select_next_item()
