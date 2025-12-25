@@ -8,25 +8,6 @@ local workspace_dir = '/Users/szz/.cache/jdtls/workspace/' .. vim.fn.fnamemodify
 local path_to_lsp_server = jdtls_path .. "/config_mac"
 local path_to_jar = path_to_plugins .. "org.eclipse.equinox.launcher_1.6.1000.v20250131-0606.jar"
 local lombok_path = jdtls_path .. "/lombok.jar"
-local mason_path = vim.fn.glob(vim.fn.stdpath("data") .. "/mason/")
-
-
-local bundles = {}
-
-vim.list_extend(bundles, vim.split(vim.fn.glob(mason_path .. "packages/java-test/extension/server/*.jar"), "\n"))
-
-vim.list_extend(
-	bundles,
-	vim.split(
-		vim.fn.glob(mason_path .. "packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar"),
-		"\n"
-	)
-)
-
-local on_attach = function()
-	require('jdtls').setup_dap({ hotcodereplace = 'auto' })
-	require('jdtls.dap').setup_dap_main_class_configs()
-end
 
 local config = {
 	flags = {
@@ -35,10 +16,6 @@ local config = {
 	},
 	root_dir = root_dir,
 	filetypes = { "java" },
-	init_options = {
-		bundles = bundles,
-	},
-	on_attach = on_attach,
 	cmd = {
 		'/Library/Java/JavaVirtualMachines/jdk-23.jdk/Contents/Home/bin/java',
 		'-Declipse.application=org.eclipse.jdt.ls.core.id1',

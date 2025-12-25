@@ -182,31 +182,6 @@ return {
 		end,
 	},
 
-
-	-- Mason: 用于安装 LSP 服务器
-	{
-		"williamboman/mason.nvim",
-		cmd = {
-			"Mason",
-			"MasonInstall",
-			"MasonUninstall",
-			"MasonUninstallAll",
-			"MasonLog",
-			"MasonUpdate",
-		},
-		build = ":MasonUpdate",
-		config = function()
-			require("mason").setup({
-				ensure_installed = {
-					"typescript-language-server",
-					"pyright",
-					"gopls",
-					"lua-language-server",
-				},
-			})
-		end,
-	},
-
 	{
 		"simrat39/symbols-outline.nvim",
 		lazy = true,

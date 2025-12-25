@@ -1,12 +1,6 @@
 -- Neovim 0.11+ 原生 LSP 配置
 local lsp_helpers = require("utils.lsp-helpers")
 
--- Mason 路径辅助函数
-local mason_bin = vim.fn.stdpath("data") .. "/mason/bin/"
-local function mason_exe(name)
-    return mason_bin .. name or vim.fn.exepath(name) or name
-end
-
 -- ========== 诊断配置 ==========
 vim.diagnostic.config({
 	virtual_text = {
@@ -63,7 +57,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 -- TypeScript/JavaScript LSP
 vim.lsp.config('ts_ls', {
-	cmd = { mason_exe('typescript-language-server'), '--stdio' },
+	cmd = { 'typescript-language-server', '--stdio' },
 	filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
 	root_dir = vim.fs.root(0, { 'package.json', 'tsconfig.json', 'jsconfig.json', '.git' })
 		or vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':p:h'),
@@ -99,7 +93,7 @@ vim.lsp.config('ts_ls', {
 
 -- Python LSP (Pyright)
 vim.lsp.config('pyright', {
-	cmd = { mason_exe('pyright-langserver'), '--stdio' },
+	cmd = { 'pyright-langserver', '--stdio' },
 	filetypes = { 'python' },
 	root_dir = vim.fs.root(0, { 'pyproject.toml', 'setup.py', '.git' })
 		or vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':p:h'),
@@ -125,7 +119,7 @@ vim.lsp.config('pyright', {
 
 -- Go LSP (gopls)
 vim.lsp.config('gopls', {
-	cmd = { mason_exe('gopls') },
+	cmd = { 'gopls' },
 	filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
 	root_dir = vim.fs.root(0, { 'go.work', 'go.mod', '.git' }),
 	settings = {
@@ -149,7 +143,7 @@ vim.lsp.config('gopls', {
 
 -- Lua LSP
 vim.lsp.config('lua_ls', {
-	cmd = { mason_exe('lua-language-server') },
+	cmd = { 'lua-language-server' },
 	filetypes = { 'lua' },
 	root_dir = vim.fs.root(0, { '.git' }) or vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':p:h'),
 	settings = {
