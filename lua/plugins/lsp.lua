@@ -44,12 +44,46 @@ return {
 					vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "diagnostic_list" })
 					vim.keymap.set('n', '<space>w', vim.diagnostic.open_float, { desc = "diagnostic_float" })
 
-					-- 自定义 LSP 功能键位
+					-- LSP 导航
 					vim.keymap.set("n", "<leader>d", vim.lsp.buf.definition, { buffer = ev.buf, desc = "definition" })
-					vim.keymap.set("n", "<leader>h", vim.lsp.buf.hover, { buffer = ev.buf, desc = "hover" })
-					vim.keymap.set("n", "<space>k", vim.lsp.buf.rename, { buffer = ev.buf, desc = "rename" })
 					vim.keymap.set("n", "<leader>D", vim.lsp.buf.type_definition, { buffer = ev.buf, desc = "type_definition" })
+					vim.keymap.set("n", "<leader>v", vim.lsp.buf.implementation, { buffer = ev.buf, desc = "implementation" })
+					vim.keymap.set("n", "<leader>R", vim.lsp.buf.references, { buffer = ev.buf, desc = "references" })
+					vim.keymap.set("n", "<leader>r", vim.lsp.buf.incoming_calls, {
+						buffer = ev.buf,
+						desc = "incoming_calls (callers)"
+					})
+
+					--代码操作
 					vim.keymap.set({ "n", "v" }, "<leader>z", vim.lsp.buf.code_action, { buffer = ev.buf, desc = "code_action" })
+					vim.keymap.set("n", "<space>k", vim.lsp.buf.rename, { buffer = ev.buf, desc = "rename" })
+
+					-- helper functions
+					vim.keymap.set("n", "<leader>h", vim.lsp.buf.hover, { buffer = ev.buf, desc = "hover" })
+
+					-- ========== Signature Help 签名帮助 ==========
+					vim.keymap.set("n", "<leader>m", vim.lsp.buf.signature_help, {
+						buffer = ev.buf,
+						desc = "signature_help"
+					})
+
+
+					-- 可选：配置自动触发（输入括号时）
+					if client.server_capabilities.signatureHelpProvider then
+						vim.api.nvim_create_autocmd("TextChangedI", {
+							buffer = ev.buf,
+							callback = function()
+								local line = vim.api.nvim_get_current_line()
+								local col = vim.api.nvim_win_get_cursor(0)[2]
+								local char = line:sub(col, col)
+
+								-- 输入 '(' 或 ',' 时自动触发
+								if char == "(" or char == "," then
+									vim.lsp.buf.signature_help()
+								end
+							end,
+						})
+					end
 				end,
 			})
 		end,
