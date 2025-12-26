@@ -176,4 +176,17 @@ return {
 			},
 		}
 	},
+
+	-- ========== 初始化选项（用于调试等扩展）==========
+	init_options = {
+		-- Java Debug 插件 bundles（如果已安装）
+		bundles = {},
+	},
+
+	-- ========== 其他配置 ==========
+	-- Java 调试需要这些配置
+	on_attach = function(client, bufnr)
+		-- nvim-jdtls 会在后台自动配置 DAP
+		-- 这里不需要额外的配置
+	end,
 }
