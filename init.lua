@@ -19,6 +19,9 @@ require("options")
 require("keymap")
 require("lazy").setup("plugins")
 
+-- 自动检测和切换项目根目录
+require("utils.project-root").setup()
+
 -- 启用 LSP 服务器（Neovim 0.11+ 新方式）
 -- 会自动加载 ~/.config/nvim/lsp/ 目录下的配置
 vim.lsp.enable('ts_ls')

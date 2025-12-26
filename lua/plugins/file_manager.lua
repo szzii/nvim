@@ -226,6 +226,24 @@ return {
 				filesystem = {
 					follow_current_file = true,
 					group_empty_dirs = true,
+					use_libuv_file_watcher = false, -- 性能优化
+					-- 项目根目录标记（与 project-root 模块保持一致）
+					root_markers = {
+						'.git',
+						'package.json',
+						'tsconfig.json',
+						'jsconfig.json',
+						'pyproject.toml',
+						'setup.py',
+						'go.mod',
+						'go.work',
+						'Cargo.toml',
+						'.luarc.json',
+						'pom.xml',
+						'build.gradle',
+						'settings.gradle',
+						'gradlew',
+					},
 					window = {
 						mappings = {
 							["h"] = "toggle_hidden",

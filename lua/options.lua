@@ -7,7 +7,8 @@ vim.g.loaded_node_provider = 0
 vim.opt.termguicolors = true
 vim.opt.autoread = true
 vim.opt.autowrite = true
-vim.opt.autochdir = true
+-- autochdir 由 project-root 模块智能管理（查找项目根目录而非文件目录）
+-- vim.opt.autochdir = true
 vim.opt.exrc = true
 vim.opt.secure = true
 vim.opt.encoding = 'utf-8'
