@@ -4,6 +4,12 @@ return {
 		"neovim/nvim-lspconfig",
 		event = { "BufReadPre", "BufNewFile" },
 		config = function()
+
+			local faint = "#4F4F4F"
+			vim.api.nvim_set_hl(0, "LspReferenceText", { bg = faint })
+			vim.api.nvim_set_hl(0, "LspReferenceRead", { bg = faint })
+			vim.api.nvim_set_hl(0, "LspReferenceWrite", { bg = faint })
+			
 			-- 诊断配置
 			vim.diagnostic.config({
 				virtual_text = {
@@ -13,10 +19,10 @@ return {
 				},
 				signs = {
 					text = {
-						[vim.diagnostic.severity.ERROR] = "",
-						[vim.diagnostic.severity.WARN] = "",
-						[vim.diagnostic.severity.HINT] = "",
-						[vim.diagnostic.severity.INFO] = "",
+						[vim.diagnostic.severity.ERROR] = "E",
+						[vim.diagnostic.severity.WARN] = "W",
+						[vim.diagnostic.severity.HINT] = "H",
+						[vim.diagnostic.severity.INFO] = "I",
 					},
 				},
 				underline = true,
@@ -36,6 +42,23 @@ return {
 					if client then
 						-- 禁用语义高亮（性能优化）
 						client.server_capabilities.semanticTokensProvider = nil
+					end
+
+					-- 启用 document highlight
+					if client.server_capabilities.documentHighlightProvider then
+						vim.lsp.buf.document_highlight()
+
+						-- Cursor 移动时自动更新高亮
+						vim.api.nvim_create_autocmd({"CursorHold", "CursorHoldI"}, {
+							buffer = ev.buf,
+							callback = vim.lsp.buf.document_highlight,
+						})
+
+						-- 清除高亮
+						vim.api.nvim_create_autocmd("CursorMoved", {
+							buffer = ev.buf,
+							callback = vim.lsp.buf.clear_references,
+						})
 					end
 
 					-- 诊断导航
