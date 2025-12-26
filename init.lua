@@ -26,6 +26,10 @@ vim.lsp.enable('basedpyright')
 vim.lsp.enable('gopls')
 vim.lsp.enable('lua_ls')
 
+-- jdtls 使用自定义配置（不在 PATH 中）
+vim.lsp.config('jdtls', require('lsp.jdtls'))
+vim.lsp.enable('jdtls')
+
 -- 加载 LSP 相关命令
 require("config.lsp-commands")
 

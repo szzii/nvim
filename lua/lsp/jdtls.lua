@@ -1,48 +1,49 @@
+-- Java LSP (JDTLS) 配置 - 使用标准 nvim-lspconfig 方式
+-- 注意：JDTLS 需要为每个项目配置独立的 workspace 目录
+
 local jdtls_path = vim.fn.stdpath('data') .. "/custom_lsp/jdtls"
 local path_to_plugins = jdtls_path .. "/plugins/"
-
-local root_markers = { "gradlew", ".git", "build.gradle" }
-local root_dir = require("jdtls.setup").find_root(root_markers)
-local workspace_dir = '/Users/szz/.cache/jdtls/workspace/' .. vim.fn.fnamemodify(root_dir, ':p:h:t')
-
 local path_to_lsp_server = jdtls_path .. "/config_mac"
-local path_to_jar = path_to_plugins .. "org.eclipse.equinox.launcher_1.6.1000.v20250131-0606.jar"
 local lombok_path = jdtls_path .. "/lombok.jar"
 
-local config = {
-	flags = {
-		debounce_text_changes = 150,  -- Consistent with other LSPs
-		allow_incremental_sync = true,
-	},
-	root_dir = root_dir,
-	filetypes = { "java" },
+-- 查找 launcher jar（兼容不同平台）
+local launcher_jars = vim.fn.glob(path_to_plugins .. "org.eclipse.equinox.launcher_*.jar", true, true)
+local path_to_jar = launcher_jars[1] or path_to_plugins .. "org.eclipse.equinox.launcher_1.2.1100.v20240722-2106.jar"
+
+-- Root 标记文件
+local root_markers = { "gradlew", ".git", "mvnw", "build.gradle", "pom.xml", "settings.gradle" }
+
+return {
+	-- JDTLS 命令
 	cmd = {
 		'/Library/Java/JavaVirtualMachines/jdk-23.jdk/Contents/Home/bin/java',
 		'-Declipse.application=org.eclipse.jdt.ls.core.id1',
 		'-Dosgi.bundles.defaultStartLevel=4',
 		'-Declipse.product=org.eclipse.jdt.ls.core.product',
 		'-Dlog.protocol=true',
-		'-Dlog.level=ERROR',  -- Reduce logging for better performance
-		'-Xmx2G',  -- Limit max heap size
-		'-Xms256m',  -- Initial heap size
-		'-XX:+UseG1GC',  -- Use G1 garbage collector
-		'-XX:+UseStringDeduplication',  -- Reduce memory usage
+		'-Dlog.level=ERROR',
+		'-Xmx2G',
+		'-Xms256m',
+		'-XX:+UseG1GC',
+		'-XX:+UseStringDeduplication',
 		'-javaagent:' .. lombok_path,
 		'--add-modules=ALL-SYSTEM',
 		'--add-opens', 'java.base/java.util=ALL-UNNAMED',
 		'--add-opens', 'java.base/java.lang=ALL-UNNAMED',
-
 		'-jar', path_to_jar,
 		'-configuration', path_to_lsp_server,
-		'-data', workspace_dir,
+		'-data', '/Users/szz/.cache/jdtls/workspace/workspace',
 	},
 
-	-- See https://github.com/eclipse/eclipse.jdt.ls/wiki/Running-the-JAVA-LS-server-from-the-command-line#initialize-request
+	filetypes = { "java" },
+
+	root_markers = root_markers,
+
 	settings = {
 		java = {
 			home = '/Library/Java/JavaVirtualMachines/jdk-1.8.jdk/Contents/Home',
-			-- Performance optimizations
-			maxConcurrentBuilds = 1,
+
+			-- 构建工具
 			import = {
 				gradle = {
 					enabled = true,
@@ -50,35 +51,33 @@ local config = {
 				},
 				maven = { enabled = true },
 			},
+
+			-- 项目配置
 			configuration = {
-				updateBuildConfiguration = "automatic",  -- Change to automatic for better performance
+				updateBuildConfiguration = "automatic",
 				runtimes = {
 					{
 						name = "JavaSE-1.8",
 						path = "/Library/Java/JavaVirtualMachines/jdk-1.8.jdk/Contents/Home",
+						default = true,
 					},
 				}
 			},
+
 			format = {
-				enable = true,
+				enabled = false,
 			},
+
 			completion = {
-				maxResults = 20,  -- Reduce for better performance
+				maxResults = 20,
 				postfix = { enabled = true },
 				favoriteStaticMembers = {
 					"org.junit.Assert.*",
 					"org.junit.Assume.*",
 					"org.junit.jupiter.api.Assertions.*",
 					"org.junit.jupiter.api.Assumptions.*",
-					"org.junit.jupiter.api.DynamicContainer.*",
-					"org.junit.jupiter.api.DynamicTest.*"
 				},
-				importOrder = {
-					"java",
-					"javax",
-					"com",
-					"org"
-				},
+				importOrder = { "java", "javax", "com", "org" },
 				filteredTypes = {
 					"com.sun.*",
 					"io.micrometer.shaded.*",
@@ -87,49 +86,53 @@ local config = {
 					"sun.*",
 				},
 			},
-			autobuild = { enabled = false },  -- Disable autobuild for better performance, build manually when needed
-			eclipse = { downloadSources = false, },  -- Disable for better performance
+
+			-- 性能优化
+			autobuild = { enabled = false },
+			eclipse = { downloadSources = false },
+			maven = {
+				downloadSources = false,
+				updateSnapshots = false,
+			},
+
 			sources = {
 				organizeImports = {
 					starThreshold = 5,
 					staticStarThreshold = 5,
 				},
 			},
-			saveActions = { organizeImports = false },  -- Disable on save for better performance
-			-- LSP Related - all disabled for performance
+			saveActions = { organizeImports = false },
+
+			-- Code Lens
 			implementationsCodeLens = { enabled = false },
 			referencesCodeLens = { enabled = false },
+
 			signatureHelp = { enabled = true },
 			inlayHints = {
 				parameterNames = { enabled = false },
 			},
-			-- Disable validation for better performance
+
 			validation = {
 				enabled = true,
-				-- Only enable essential validations
 				incomplete_classpath = "warning",
 			},
-			maven = {
-				downloadSources = false,  -- Disable for better performance
-				updateSnapshots = false,  -- Disable auto update
-			},
+
 			codeGeneration = {
 				toString = {
 					template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}"
 				},
 				useBlocks = true,
 			},
+
 			contentProvider = { preferred = 'fernflower' },
-			-- On Save Cleanup - disabled for performance
+
 			cleanup = {
-				actionsOnSave = {},  -- Disable all cleanup actions for better performance
+				actionsOnSave = {},
 			},
-			-- Performance: Limit parallel downloads
+
 			server = {
 				launchMode = "Hybrid",
 			},
 		}
 	},
 }
-
-require('jdtls').start_or_attach(config)
