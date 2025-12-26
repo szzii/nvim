@@ -165,22 +165,69 @@ vim.api.nvim_create_autocmd('FileType', {
 	end,
 })
 
--- Lua LSP
+-- Lua LSP (lua-language-server / LuaLS)
 vim.api.nvim_create_autocmd('FileType', {
 	pattern = 'lua',
 	callback = function(ev)
 		vim.lsp.start({
 			name = 'lua_ls',
 			cmd = { 'lua-language-server' },
-			root_dir = find_root(ev.buf, { '.git' }),
+			root_dir = find_root(ev.buf, { '.luarc.json', '.luarc.jsonc', '.git' }),
 			settings = {
 				Lua = {
 					telemetry = { enable = false },
+					runtime = {
+						version = 'LuaJIT',
+						path = vim.split(package.path, ';'),
+					},
+					diagnostics = {
+						globals = { 'vim' },
+						disable = { 'missing-fields' },
+						-- 更严格的诊断
+						enable = true,
+						unusedLocalExclude = { '_*' },
+					},
 					workspace = {
 						library = {
 							vim.env.VIMRUNTIME,
-							"${3rd}/luv/library"
+							"${3rd}/luv/library",
+							-- 添加 Neovim 配置目录到库路径
+							vim.fn.stdpath('config'),
+							-- 添加第三方库
+							"${3rd}/busted/library",
+							"${3rd}/luassert/library",
+							"${3rd}/nvim-api/library",
 						},
+						checkThirdParty = false,  -- 禁用第三方库检查以提升性能
+						maxPreload = 5000,
+						preloadFileSize = 1000,
+					},
+					completion = {
+						enable = true,
+						callSnippet = 'Replace',
+						keywordSnippet = 'Replace',
+						showWord = 'Enable',  -- 显示补全单词
+						autoRequire = true,
+						showParams = true,
+					},
+					hint = {
+						enable = true,
+						setType = true,
+						paramType = true,
+						paramName = 'All',
+						arrayIndex = 'Enable',
+						semicolon = 'Disable',
+					},
+					format = {
+						enable = false,  -- 使用 stylua 或其他格式化工具
+						defaultConfig = {
+							indent_size = '2',
+							indent_style = 'space',
+						},
+					},
+					-- 开发 Neovim 配置时的语义高亮
+					semantic = {
+						enable = false,  -- 禁用以提升性能
 					},
 				},
 			},
