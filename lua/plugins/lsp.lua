@@ -34,6 +34,16 @@ return {
 				},
 			})
 
+			-- 配置 Signature Help 窗口不获取焦点
+			vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
+				vim.lsp.handlers.signature_help,
+				{
+					focusable = false,  -- 窗口不能获取焦点
+					border = 'rounded',
+					silent = true,
+				}
+			)
+
 			-- 创建统一的 augroup 管理 LSP document highlight（避免内存泄漏）
 			local doc_highlight_augroup = vim.api.nvim_create_augroup("LSPDocumentHighlight", { clear = true })
 			local signature_timers = {}  -- 用于 signature help 防抖
@@ -97,27 +107,50 @@ return {
 					})
 
 
-					-- 可选：配置自动触发（输入括号时）- 添加防抖优化
+					-- Signature Help 自动触发（智能模式：避免干扰补全）
 					if client.server_capabilities.signatureHelpProvider then
 						vim.api.nvim_create_autocmd("TextChangedI", {
 							buffer = ev.buf,
 							callback = function()
+								-- 检测是否有补全菜单正在显示，如果有则不触发 signature help
+								local cmp_info = vim.b.completion_info or {}
+								local cmp_visible = require("cmp") and require("cmp").core.view:visible() or false
+
+								if cmp_visible then
+									-- 补全菜单显示中，清除定时器（如果有的话）
+									if signature_timers[ev.buf] then
+										vim.fn.timer_stop(signature_timers[ev.buf])
+										signature_timers[ev.buf] = nil
+									end
+									return
+								end
+
 								local line = vim.api.nvim_get_current_line()
 								local col = vim.api.nvim_win_get_cursor(0)[2]
 								local char = line:sub(col, col)
 
-								-- 输入 '(' 或 ',' 时自动触发（带防抖）
-								if char == "(" or char == "," then
+								-- 只在输入 ',' 时触发（'(' 通常会触发补全）
+								if char == "," then
 									-- 清除该 buffer 的旧定时器
 									if signature_timers[ev.buf] then
 										vim.fn.timer_stop(signature_timers[ev.buf])
 									end
 
-									-- 200ms 防抖，减少不必要的 LSP 请求
-									signature_timers[ev.buf] = vim.fn.timer_start(200, function()
-										vim.lsp.buf.signature_help()
+									-- 300ms 防抖，等待用户停止输入
+									signature_timers[ev.buf] = vim.fn.timer_start(300, function()
+										-- 再次检查补全菜单状态
+										cmp_visible = require("cmp") and require("cmp").core.view:visible() or false
+										if not cmp_visible then
+											vim.lsp.buf.signature_help()
+										end
 										signature_timers[ev.buf] = nil
 									end)
+								elseif char ~= "(" and char ~= "," then
+									-- 输入其他字符时清除定时器
+									if signature_timers[ev.buf] then
+										vim.fn.timer_stop(signature_timers[ev.buf])
+										signature_timers[ev.buf] = nil
+									end
 								end
 							end,
 						})
