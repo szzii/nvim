@@ -34,6 +34,10 @@ return {
 				},
 			})
 
+			-- 创建统一的 augroup 管理 LSP document highlight（避免内存泄漏）
+			local doc_highlight_augroup = vim.api.nvim_create_augroup("LSPDocumentHighlight", { clear = true })
+			local signature_timers = {}  -- 用于 signature help 防抖
+
 			-- LSP Attach 时的键位映射
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("UserLspConfig", {}),
@@ -44,18 +48,20 @@ return {
 						client.server_capabilities.semanticTokensProvider = nil
 					end
 
-					-- 启用 document highlight
+					-- 启用 document highlight（使用统一的 augroup 避免重复创建）
 					if client.server_capabilities.documentHighlightProvider then
 						vim.lsp.buf.document_highlight()
 
 						-- Cursor 移动时自动更新高亮
 						vim.api.nvim_create_autocmd({"CursorHold", "CursorHoldI"}, {
+							group = doc_highlight_augroup,
 							buffer = ev.buf,
 							callback = vim.lsp.buf.document_highlight,
 						})
 
 						-- 清除高亮
 						vim.api.nvim_create_autocmd("CursorMoved", {
+							group = doc_highlight_augroup,
 							buffer = ev.buf,
 							callback = vim.lsp.buf.clear_references,
 						})
@@ -91,7 +97,7 @@ return {
 					})
 
 
-					-- 可选：配置自动触发（输入括号时）
+					-- 可选：配置自动触发（输入括号时）- 添加防抖优化
 					if client.server_capabilities.signatureHelpProvider then
 						vim.api.nvim_create_autocmd("TextChangedI", {
 							buffer = ev.buf,
@@ -100,9 +106,29 @@ return {
 								local col = vim.api.nvim_win_get_cursor(0)[2]
 								local char = line:sub(col, col)
 
-								-- 输入 '(' 或 ',' 时自动触发
+								-- 输入 '(' 或 ',' 时自动触发（带防抖）
 								if char == "(" or char == "," then
-									vim.lsp.buf.signature_help()
+									-- 清除该 buffer 的旧定时器
+									if signature_timers[ev.buf] then
+										vim.fn.timer_stop(signature_timers[ev.buf])
+									end
+
+									-- 200ms 防抖，减少不必要的 LSP 请求
+									signature_timers[ev.buf] = vim.fn.timer_start(200, function()
+										vim.lsp.buf.signature_help()
+										signature_timers[ev.buf] = nil
+									end)
+								end
+							end,
+						})
+
+						-- buffer 关闭时清理定时器
+						vim.api.nvim_create_autocmd("BufUnload", {
+							buffer = ev.buf,
+							callback = function()
+								if signature_timers[ev.buf] then
+									vim.fn.timer_stop(signature_timers[ev.buf])
+									signature_timers[ev.buf] = nil
 								end
 							end,
 						})

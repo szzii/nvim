@@ -2,6 +2,7 @@ return {
 
 	{
 		"ethanholz/nvim-lastplace",
+		event = "BufReadPre",  -- 延迟加载优化
 		config = function()
 			require 'nvim-lastplace'.setup {}
 			vim.g.lastplace_ignore_buftype = "quickfix,nofile,help"
@@ -12,6 +13,7 @@ return {
 
 	{
 		"petertriho/nvim-scrollbar",
+		event = "BufReadPost",  -- 延迟加载优化
 		dependencies = {
 			'kevinhwang91/nvim-hlslens',
 		},
@@ -54,6 +56,7 @@ return {
 					"--with-filename",
 					"--line-number",
 					"--column",
+					"--max-depth=5",  -- 性能优化：限制搜索深度
 				},
 				-- regex that will be used to match keywords.
 				-- don't replace the (KEYWORDS) placeholder
@@ -63,7 +66,11 @@ return {
 	},
 	{
 		"goolord/alpha-nvim",
-		event = "VimEnter",
+		event = function()  -- 条件加载：只在空目录启动时加载
+			if vim.fn.argc() == 0 then
+				return "VimEnter"
+			end
+		end,
 		dependencies = { 'nvim-tree/nvim-web-devicons' },
 		config = function()
 			require 'alpha'.setup(require 'alpha.themes.startify'.config)

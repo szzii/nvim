@@ -60,6 +60,10 @@ return {
 		"iamcco/markdown-preview.nvim",
 		lazy = true,
 		ft = { "markdown" },
-		build = "cd app && yarn install",
+		build = function()  -- 条件构建：只在有 yarn 时执行
+			if vim.fn.executable("yarn") == 1 then
+				return "cd app && yarn install"
+			end
+		end,
 	},
 }

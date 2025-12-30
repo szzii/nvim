@@ -21,9 +21,9 @@ return {
 					always_divide_middle = true,
 					globalstatus = false,
 					refresh = {
-						statusline = 1000,
-						tabline = 1000,
-						winbar = 1000,
+						statusline = 100,
+						tabline = 100,
+						winbar = 100,
 					},
 				},
 				sections = {
@@ -54,6 +54,10 @@ return {
 					numbers = function(opts)
 						return string.format('%s|%s', opts.id, opts.raise(opts.ordinal))
 					end,
+					-- 性能优化：限制 buffer 名称长度
+					max_name_length = 18,
+					tab_size = 18,
+					truncate_names = true,
 				},
 				highlights = {
 					fill = {
@@ -166,6 +170,14 @@ return {
 
 				highlight = {
 					enable = true,
+					-- 大文件性能保护：超过 100KB 的文件禁用 Treesitter
+					disable = function(lang, buf)
+						local max_filesize = 100 * 1024 -- 100KB
+						local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+						if ok and stats and stats.size > max_filesize then
+							return true
+						end
+					end,
 					additional_vim_regex_highlighting = false,
 				},
 				indent = {

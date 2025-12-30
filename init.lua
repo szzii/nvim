@@ -17,7 +17,26 @@ vim.opt.rtp:prepend(lazypath)
 
 require("options")
 require("keymap")
-require("lazy").setup("plugins")
+require("lazy").setup("plugins", {
+	performance = {
+		rtp = {
+			-- 禁用未使用的内置插件以提升性能
+			disabled_plugins = {
+				"gzip",
+				"tarPlugin",
+				"tohtml",
+				"tutor",
+				"zipPlugin",
+				"netrwPlugin",  -- 已使用 neo-tree
+			},
+		},
+	},
+})
+
+-- 性能分析快捷键（查看插件加载时间）
+vim.keymap.set("n", "<leader>pp", function()
+	require("lazy").profile()
+end, { desc = "Lazy profile" })
 
 -- 自动检测和切换项目根目录
 require("utils.project-root").setup()
