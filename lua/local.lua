@@ -5,14 +5,14 @@
 local M = {}
 
 -- Keyboard layout configuration
-M.use_colemak = true  -- Set to false if you use standard QWERTY layout
+M.use_colemak = true -- Set to false if you use standard QWERTY layout
 
 -- Debug configurations
-M.python_path = "/usr/local/bin/python3"  -- Adjust for your system
+M.python_path = "/usr/local/bin/python3" -- Adjust for your system
 
 -- AI/Copilot configuration
-M.copilot_enabled = true  -- Enable/disable GitHub Copilot
-M.avante_provider = "qianwen"  -- Options: "qianwen", "ollama", "openai", etc.
+M.copilot_enabled = false     -- Enable/disable GitHub Copilot
+M.avante_provider = "qianwen" -- Options: "qianwen", "ollama", "openai", etc.
 M.avante_providers = {
 	qianwen = {
 		__inherited_from = "openai",
