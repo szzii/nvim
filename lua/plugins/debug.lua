@@ -93,16 +93,28 @@ return {
 				silent = true,
 				desc = 'debug_close_and_terminate'
 			},
-			{
-				'<F5>',
-				function()
-					require("dapui").open()
-					if vim.bo.filetype == 'lua' then
-						require "osv".run_this()
-					else
-						require('dap').continue()
-					end
-				end,
+				{
+					'<F5>',
+					function()
+						require("dapui").open()
+						if vim.bo.filetype == 'lua' then
+							require "osv".run_this()
+						elseif vim.bo.filetype == 'java' then
+							local ok_jdtls_dap, jdtls_dap = pcall(require, "jdtls.dap")
+							if ok_jdtls_dap then
+								jdtls_dap.setup_dap_main_class_configs({
+									verbose = true,
+									on_ready = function()
+										require('dap').continue()
+									end,
+								})
+							else
+								require('dap').continue()
+							end
+						else
+							require('dap').continue()
+						end
+					end,
 				mode = 'n',
 				silent = true,
 				desc = 'debug_continue'

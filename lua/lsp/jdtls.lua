@@ -1,12 +1,46 @@
 -- Java LSP (JDTLS) 配置 - 使用标准 nvim-lspconfig 方式
 -- 注意：JDTLS 需要为每个项目配置独立的 workspace 目录
 
-local jdtls_path = vim.fn.stdpath('data') .. "/custom_lsp/jdtls"
+local custom_lsp_path = vim.fn.stdpath('data') .. "/custom_lsp"
+local lazy_path = vim.fn.stdpath('data') .. "/lazy"
+local mason_path = vim.fn.stdpath('data') .. "/mason"
+local mason_share_path = mason_path .. "/share"
+local jdtls_path = custom_lsp_path .. "/jdtls"
 local path_to_plugins = jdtls_path .. "/plugins/"
-local path_to_lsp_server = jdtls_path .. "/config_mac"
 local lombok_path = jdtls_path .. "/lombok.jar"
 local jdk21_home = "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home"
 local jdk8_home = "/Library/Java/JavaVirtualMachines/amazon-corretto-8.jdk/Contents/Home"
+local java_debug_path = lazy_path .. "/java-debug"
+local java_test_path = lazy_path .. "/vscode-java-test"
+local mason_java_debug_path = mason_share_path .. "/java-debug-adapter"
+local mason_java_test_path = mason_share_path .. "/java-test"
+
+local system = vim.uv.os_uname()
+
+local function first_existing_path(paths)
+	for _, path in ipairs(paths) do
+		if vim.uv.fs_stat(path) then
+			return path
+		end
+	end
+	return paths[1]
+end
+
+local lsp_server_candidates = {}
+if system.sysname == "Darwin" then
+	if system.machine == "arm64" then
+		table.insert(lsp_server_candidates, jdtls_path .. "/config_mac_arm")
+	end
+	table.insert(lsp_server_candidates, jdtls_path .. "/config_mac")
+elseif system.sysname == "Linux" then
+	if system.machine == "aarch64" then
+		table.insert(lsp_server_candidates, jdtls_path .. "/config_linux_arm")
+	end
+	table.insert(lsp_server_candidates, jdtls_path .. "/config_linux")
+end
+table.insert(lsp_server_candidates, jdtls_path .. "/config_mac")
+
+local path_to_lsp_server = first_existing_path(lsp_server_candidates)
 
 -- 查找 launcher jar（兼容不同平台）
 local launcher_jars = vim.fn.glob(path_to_plugins .. "org.eclipse.equinox.launcher_*.jar", true, true)
@@ -15,8 +49,41 @@ local path_to_jar = launcher_jars[1] or path_to_plugins .. "org.eclipse.equinox.
 -- Root 标记文件
 local root_markers = { "gradlew", ".git", "mvnw", "build.gradle", "pom.xml", "settings.gradle" }
 
-local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
-local workspace_dir = vim.fn.expand("/Users/szz/.cache/jdtls/workspace/" .. project_name)
+local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:t")
+local workspace_dir = vim.fn.stdpath("cache") .. "/jdtls/workspace/" .. project_name
+
+local function extend_bundles(bundles, seen, pattern, excludes)
+	for _, jar in ipairs(vim.fn.glob(pattern, true, true)) do
+		local filename = vim.fn.fnamemodify(jar, ":t")
+		if not (excludes and excludes[filename]) and not seen[jar] then
+			table.insert(bundles, jar)
+			seen[jar] = true
+		end
+	end
+end
+
+local bundles = {}
+local seen_bundles = {}
+extend_bundles(bundles, seen_bundles, mason_java_debug_path .. "/com.microsoft.java.debug.plugin*.jar")
+extend_bundles(bundles, seen_bundles, java_debug_path .. "/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar")
+extend_bundles(bundles, seen_bundles, java_debug_path .. "/extension/server/com.microsoft.java.debug.plugin-*.jar")
+extend_bundles(bundles, seen_bundles, custom_lsp_path .. "/java-debug/com.microsoft.java.debug.plugin-*.jar")
+extend_bundles(bundles, seen_bundles, custom_lsp_path .. "/java-debug/extension/server/com.microsoft.java.debug.plugin-*.jar")
+extend_bundles(bundles, seen_bundles, custom_lsp_path .. "/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar")
+
+local excluded_java_test_jars = {
+	["com.microsoft.java.test.runner-jar-with-dependencies.jar"] = true,
+	["jacocoagent.jar"] = true,
+}
+extend_bundles(bundles, seen_bundles, mason_java_test_path .. "/*.jar", excluded_java_test_jars)
+extend_bundles(bundles, seen_bundles, java_test_path .. "/server/*.jar", excluded_java_test_jars)
+extend_bundles(bundles, seen_bundles, java_test_path .. "/extension/server/*.jar", excluded_java_test_jars)
+extend_bundles(bundles, seen_bundles, custom_lsp_path .. "/vscode-java-test/server/*.jar", excluded_java_test_jars)
+extend_bundles(bundles, seen_bundles, custom_lsp_path .. "/vscode-java-test/extension/server/*.jar", excluded_java_test_jars)
+
+local has_java_test_bundles = vim.iter(bundles):any(function(jar)
+	return jar:match("java%.test")
+end)
 
 return {
 	-- JDTLS 命令（性能优化版本）
@@ -93,7 +160,7 @@ return {
 
 			-- 项目配置
 				configuration = {
-					updateBuildConfiguration = "interactive",  -- 改为交互式（避免自动构建）
+					updateBuildConfiguration = "automatic",  -- 调试前确保 classpath/输出目录及时刷新
 					runtimes = {
 						{
 							name = "JavaSE-1.8",
@@ -133,7 +200,7 @@ return {
 			},
 
 			-- ========== 更多性能优化 ==========
-			autobuild = { enabled = false },  -- 禁用自动构建
+			autobuild = { enabled = true },  -- 调试依赖已编译产物，关闭后容易出现“找不到主类”
 			eclipse = {
 				downloadSources = false,  -- 不下载源码
 			},
@@ -181,21 +248,59 @@ return {
 
 			-- ========== 服务器模式 ==========
 			server = {
-				launchMode = "LightWeight",  -- 使用轻量级模式（更快启动）
+				launchMode = "Hybrid",  -- 保留较快启动，同时允许 debug/test 进入完整模式
 			},
 		}
 	},
 
 	-- ========== 初始化选项（用于调试等扩展）==========
 	init_options = {
-		-- Java Debug 插件 bundles（如果已安装）
-		bundles = {},
+		-- Java Debug / Java Test 插件 bundles（从 custom_lsp 目录自动发现）
+		bundles = bundles,
 	},
 
 	-- ========== 其他配置 ==========
 	-- Java 调试需要这些配置
 	on_attach = function(client, bufnr)
-		-- nvim-jdtls 会在后台自动配置 DAP
-		-- 这里不需要额外的配置
+		if client.name ~= "jdtls" then
+			return
+		end
+
+		local ok_jdtls, jdtls = pcall(require, "jdtls")
+		local ok_jdtls_dap, jdtls_dap = pcall(require, "jdtls.dap")
+		local ok_dap, dap = pcall(require, "dap")
+
+		if ok_jdtls and ok_jdtls_dap and ok_dap then
+			jdtls.setup_dap({
+				hotcodereplace = "auto",
+			})
+
+			vim.keymap.set("n", "<leader>df", function()
+				jdtls_dap.setup_dap_main_class_configs({
+					verbose = true,
+					on_ready = function()
+						dap.continue()
+					end,
+				})
+			end, { buffer = bufnr, desc = "debug_java_main_class" })
+
+			if has_java_test_bundles then
+				vim.keymap.set("n", "<leader>dt", function()
+					jdtls.test_nearest_method()
+				end, { buffer = bufnr, desc = "debug_java_test_method" })
+
+				vim.keymap.set("n", "<leader>dT", function()
+					jdtls.test_class()
+				end, { buffer = bufnr, desc = "debug_java_test_class" })
+			end
+
+			vim.keymap.set("n", "<leader>dc", function()
+				jdtls.compile("full")
+			end, { buffer = bufnr, desc = "debug_java_compile_full" })
+
+			vim.keymap.set("n", "<leader>dr", function()
+				dap.restart()
+			end, { buffer = bufnr, desc = "debug_java_restart" })
+		end
 	end,
 }
