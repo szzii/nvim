@@ -186,7 +186,27 @@ return {
 		"simrat39/symbols-outline.nvim",
 		lazy = true,
 		keys = {
-			{ "<leader>p", ":SymbolsOutline<CR>", mode = "n", silent = true, noremap = true, desc = 'SymbolsOutline' }
+			{
+				"<leader>p",
+				function()
+					require("lazy").load({ plugins = { "symbols-outline.nvim" } })
+					local outline = require("symbols-outline")
+					if outline.view and outline.view:is_open() then
+						vim.cmd("SymbolsOutlineClose")
+						return
+					end
+					local providers = require("symbols-outline.providers.init")
+					if not providers.has_provider() then
+						vim.notify("当前 buffer 没有可用的 symbols provider", vim.log.levels.WARN)
+						return
+					end
+					vim.cmd("SymbolsOutlineOpen")
+				end,
+				mode = "n",
+				silent = true,
+				noremap = true,
+				desc = "SymbolsOutline",
+			},
 		},
 		config = function()
 			require("symbols-outline").setup {

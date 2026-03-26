@@ -25,7 +25,7 @@ return {
 						[vim.diagnostic.severity.INFO] = "I",
 					},
 				},
-				underline = true,
+				underline = false,
 				update_in_insert = false,
 				severity_sort = true,
 				float = {

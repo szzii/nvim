@@ -8,7 +8,7 @@ local M = {}
 M.use_colemak = true  -- Set to false if you use standard QWERTY layout
 
 -- Debug configurations
-M.python_path = "/usr/local/bin/python3"  -- Adjust for your system
+M.python_path = vim.fn.exepath("python3") ~= "" and vim.fn.exepath("python3") or "/usr/bin/python3"
 
 -- AI/Copilot configuration
 M.copilot_enabled = true  -- Enable/disable GitHub Copilot

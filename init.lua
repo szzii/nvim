@@ -1,6 +1,16 @@
 vim.g.mapleader = ' '
 vim.g.showbreak = '+++ '
 
+local nvim_root = vim.fn.fnamemodify(vim.fn.resolve(vim.v.progpath), ":p:h:h")
+local builtin_parser_dir = nvim_root .. "/lib/nvim/parser"
+
+if vim.uv.fs_stat(builtin_parser_dir .. "/vim.so") then
+	vim.treesitter.language.add("vim", { path = builtin_parser_dir .. "/vim.so" })
+end
+if vim.uv.fs_stat(builtin_parser_dir .. "/vimdoc.so") then
+	vim.treesitter.language.add("vimdoc", { path = builtin_parser_dir .. "/vimdoc.so" })
+end
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
 	vim.fn.system({
