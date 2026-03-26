@@ -48,40 +48,40 @@ return {
 			local doc_highlight_augroup = vim.api.nvim_create_augroup("LSPDocumentHighlight", { clear = true })
 			local signature_timers = {}  -- 用于 signature help 防抖
 
-			-- LSP Attach 时的键位映射
-			vim.api.nvim_create_autocmd("LspAttach", {
-				group = vim.api.nvim_create_augroup("UserLspConfig", {}),
-				callback = function(ev)
-					local client = vim.lsp.get_client_by_id(ev.data.client_id)
-					if client then
-						-- 禁用语义高亮（性能优化）
-						client.server_capabilities.semanticTokensProvider = nil
-					end
+				-- LSP Attach 时的键位映射
+				vim.api.nvim_create_autocmd("LspAttach", {
+					group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+					callback = function(ev)
+						local client = vim.lsp.get_client_by_id(ev.data.client_id)
+						if client and client.name ~= "jdtls" then
+							-- 保留 jdtls 的语义高亮，其他 LSP 继续禁用以控制性能开销
+							client.server_capabilities.semanticTokensProvider = nil
+						end
 
-					-- 启用 document highlight（使用统一的 augroup 避免重复创建）
-					if client.server_capabilities.documentHighlightProvider then
-						vim.lsp.buf.document_highlight()
+						-- 启用 document highlight（使用统一的 augroup 避免重复创建）
+						if client.server_capabilities.documentHighlightProvider then
+							vim.lsp.buf.document_highlight()
 
-						-- Cursor 移动时自动更新高亮
-						vim.api.nvim_create_autocmd({"CursorHold", "CursorHoldI"}, {
-							group = doc_highlight_augroup,
-							buffer = ev.buf,
-							callback = vim.lsp.buf.document_highlight,
-						})
+							-- Cursor 移动时自动更新高亮
+							vim.api.nvim_create_autocmd({"CursorHold", "CursorHoldI"}, {
+								group = doc_highlight_augroup,
+								buffer = ev.buf,
+								callback = vim.lsp.buf.document_highlight,
+							})
 
-						-- 清除高亮
-						vim.api.nvim_create_autocmd("CursorMoved", {
-							group = doc_highlight_augroup,
-							buffer = ev.buf,
-							callback = vim.lsp.buf.clear_references,
-						})
-					end
+							-- 清除高亮
+							vim.api.nvim_create_autocmd("CursorMoved", {
+								group = doc_highlight_augroup,
+								buffer = ev.buf,
+								callback = vim.lsp.buf.clear_references,
+							})
+						end
 
-					-- 诊断导航
-					vim.keymap.set("n", "<leader>[", vim.diagnostic.goto_prev, { desc = "diagnostic_goto_prev" })
-					vim.keymap.set("n", "<leader>]", vim.diagnostic.goto_next, { desc = "diagnostic_goto_next" })
-					vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "diagnostic_list" })
-					vim.keymap.set('n', '<space>w', vim.diagnostic.open_float, { desc = "diagnostic_float" })
+						-- 诊断导航
+						vim.keymap.set("n", "<leader>[", vim.diagnostic.goto_prev, { desc = "diagnostic_goto_prev" })
+						vim.keymap.set("n", "<leader>]", vim.diagnostic.goto_next, { desc = "diagnostic_goto_next" })
+						vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "diagnostic_list" })
+						vim.keymap.set('n', '<space>w', vim.diagnostic.open_float, { desc = "diagnostic_float" })
 
 					-- LSP 导航
 					vim.keymap.set("n", "<leader>d", vim.lsp.buf.definition, { buffer = ev.buf, desc = "definition" })

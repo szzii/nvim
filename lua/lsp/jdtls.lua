@@ -5,18 +5,23 @@ local jdtls_path = vim.fn.stdpath('data') .. "/custom_lsp/jdtls"
 local path_to_plugins = jdtls_path .. "/plugins/"
 local path_to_lsp_server = jdtls_path .. "/config_mac"
 local lombok_path = jdtls_path .. "/lombok.jar"
+local jdk21_home = "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home"
+local jdk8_home = "/Library/Java/JavaVirtualMachines/amazon-corretto-8.jdk/Contents/Home"
 
 -- 查找 launcher jar（兼容不同平台）
 local launcher_jars = vim.fn.glob(path_to_plugins .. "org.eclipse.equinox.launcher_*.jar", true, true)
-local path_to_jar = launcher_jars[1] or path_to_plugins .. "org.eclipse.equinox.launcher_1.2.1100.v20240722-2106.jar"
+local path_to_jar = launcher_jars[1] or path_to_plugins .. "org.eclipse.equinox.launcher_1.7.100.v20251111-0406.jar"
 
 -- Root 标记文件
 local root_markers = { "gradlew", ".git", "mvnw", "build.gradle", "pom.xml", "settings.gradle" }
 
+local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
+local workspace_dir = vim.fn.expand("/Users/szz/.cache/jdtls/workspace/" .. project_name)
+
 return {
 	-- JDTLS 命令（性能优化版本）
 	cmd = {
-		'/Library/Java/JavaVirtualMachines/jdk-23.jdk/Contents/Home/bin/java',
+		jdk21_home .. '/bin/java',
 
 		-- ========== Eclipse JDT.LS 配置 ==========
 		'-Declipse.application=org.eclipse.jdt.ls.core.id1',
@@ -57,16 +62,16 @@ return {
 		-- ========== JDTLS 启动参数 ==========
 		'-jar', path_to_jar,
 		'-configuration', path_to_lsp_server,
-		'-data', '/Users/szz/.cache/jdtls/workspace/workspace',
+		'-data', workspace_dir,
 	},
 
 	filetypes = { "java" },
 
 	root_markers = root_markers,
 
-	settings = {
-		java = {
-			home = '/Library/Java/JavaVirtualMachines/jdk-1.8.jdk/Contents/Home',
+		settings = {
+			java = {
+				home = jdk21_home,
 
 			-- ========== 性能优化配置 ==========
 			maxConcurrentBuilds = 1,      -- 限制并发构建数
@@ -87,16 +92,20 @@ return {
 			},
 
 			-- 项目配置
-			configuration = {
-				updateBuildConfiguration = "interactive",  -- 改为交互式（避免自动构建）
-				runtimes = {
-					{
-						name = "JavaSE-1.8",
-						path = "/Library/Java/JavaVirtualMachines/jdk-1.8.jdk/Contents/Home",
-						default = true,
-					},
-				}
-			},
+				configuration = {
+					updateBuildConfiguration = "interactive",  -- 改为交互式（避免自动构建）
+					runtimes = {
+						{
+							name = "JavaSE-1.8",
+							path = jdk8_home,
+						},
+						{
+							name = "JavaSE-21",
+							path = jdk21_home,
+							default = true,
+						},
+					}
+				},
 
 			-- ========== 格式化（禁用以提升速度）==========
 			format = {
