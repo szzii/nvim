@@ -1,0 +1,3 @@
+[submodule "vscode.nvim"]
+	path = vscode.nvim
+	url = https://github.com/szzii/vscode.nvim.git

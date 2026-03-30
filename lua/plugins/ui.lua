@@ -1,10 +1,15 @@
+local vscode_plugin = {
+	dir = vim.fn.stdpath("config") .. "/vscode.nvim",
+	name = "vscode.nvim",
+}
+
 return {
 
 	{ "nvim-tree/nvim-web-devicons", lazy = true },
 	{
 		"nvim-lualine/lualine.nvim",
 		dependencies = {
-			"szzii/vscode.nvim",
+			vscode_plugin,
 		},
 		config = function()
 			-- Load theme from local config
@@ -320,7 +325,8 @@ return {
 
 
 	{
-		"szzii/vscode.nvim",
+		dir = vscode_plugin.dir,
+		name = vscode_plugin.name,
 		config = function()
 			-- Load theme transparency from local config
 			local ok, local_config = pcall(require, "local")
@@ -329,98 +335,43 @@ return {
 			require("vscode").setup({
 				transparent = transparent,
 				italic_comments = true,
+				italic_keywords = true,
+				italic_parameters = true,
+				bold_types = true,
+				bold_functions = false,
+				bold_constants = true,
 				group_overrides = {
-				StatusLine = { bg = "NONE" },
-				StatusLineNC = { bg = "NONE" },
-				lualine_a_normal = { bg = "NONE" },
-				lualine_b_normal = { bg = "NONE" },
-				lualine_c_normal = { bg = "NONE" },
-				lualine_x_normal = { bg = "NONE" },
-				lualine_y_normal = { bg = "NONE" },
-				lualine_z_normal = { bg = "NONE" },
-				lualine_a_insert = { bg = "NONE" },
-				lualine_b_insert = { bg = "NONE" },
-				lualine_c_insert = { bg = "NONE" },
-				lualine_x_insert = { bg = "NONE" },
-				lualine_y_insert = { bg = "NONE" },
-				lualine_z_insert = { bg = "NONE" },
-				lualine_a_visual = { bg = "NONE" },
-				lualine_b_visual = { bg = "NONE" },
-				lualine_c_visual = { bg = "NONE" },
-				lualine_x_visual = { bg = "NONE" },
-				lualine_y_visual = { bg = "NONE" },
-				lualine_z_visual = { bg = "NONE" },
-				lualine_a_replace = { bg = "NONE" },
-				lualine_b_replace = { bg = "NONE" },
-				lualine_c_replace = { bg = "NONE" },
-				lualine_x_replace = { bg = "NONE" },
-				lualine_y_replace = { bg = "NONE" },
-				lualine_z_replace = { bg = "NONE" },
-				lualine_a_command = { bg = "NONE" },
-				lualine_b_command = { bg = "NONE" },
-				lualine_c_command = { bg = "NONE" },
-				lualine_x_command = { bg = "NONE" },
-				lualine_y_command = { bg = "NONE" },
-				lualine_z_command = { bg = "NONE" },
-				lualine_a_terminal = { bg = "NONE" },
-				lualine_b_terminal = { bg = "NONE" },
-				lualine_c_terminal = { bg = "NONE" },
-				lualine_x_terminal = { bg = "NONE" },
-				lualine_y_terminal = { bg = "NONE" },
-				lualine_z_terminal = { bg = "NONE" },
-				Search = { bg = "#65FF58", fg = "#26120F", bold = true },
-				CursorLineNr = { fg = "white" },
-				CursorLine = { bold = true, bg = "#222222" },
-				NormalFloat = { bg = "NONE" },
-				LspInlayHint = { bg = "NONE", fg = "#d4af37", italic = true },
-				["@variable"] = { fg = "#F5ECEB" },
-				["@variable.global"] = { fg = "#FFC66D" },
-				["@parameter"] = { fg = "#F5ECEB" },
-				["@field"] = { fg = "#F5ECEB" },
-				["@constant"] = { italic = true },
-				["@annotation"] = { fg = "#d4af37" },
-				["@attribute"] = { fg = "#d4af37" },
-				["@keyword.modifier.java"] = { link = "@keyword" },
-				["@keyword.exception.java"] = { link = "@keyword" },
-				["@keyword.type.java"] = { link = "@keyword" },
-				BufferTabpageFill = { bg = "NONE" },
-				BufferCurrent = { fg = "white", bg = "NONE", bold = true },
-				BufferCurrentIndex = { fg = "white", bg = "NONE" },
-				BufferCurrentMod = { fg = "#d7ba7d", bg = "NONE", bold = true },
-				BufferCurrentSign = { fg = "grey", bg = "NONE" },
-				BufferCurrentIcon = { bg = "NONE" },
-				BufferCurrentTarget = { bg = "NONE" },
-
-				BufferInactive = { fg = "#808080", bg = "NONE" },
-				BufferInactiveIndex = { fg = "#808080", bg = "NONE" },
-				BufferInactiveMod = { fg = "#808080", bg = "NONE" },
-				BufferInactiveSign = { bg = "NONE" },
-				BufferInactiveTarget = { bg = "NONE" },
-				BufferLineFill = { bg = "NONE" },
-				BufferLineBackground = { bg = "NONE" },
-				BufferLineBufferVisible = { bg = "NONE" },
-				BufferLineBufferSelected = { bg = "NONE", bold = true },
-				BufferLineSeparator = { bg = "NONE" },
-				BufferLineSeparatorVisible = { bg = "NONE" },
-				BufferLineSeparatorSelected = { bg = "NONE" },
-				BufferLineTabSeparator = { bg = "NONE" },
-				BufferLineTabSeparatorSelected = { bg = "NONE" },
-				TabLine = { bg = "NONE" },
-				TabLineFill = { bg = "NONE" },
-				TabLineSel = { bg = "NONE" },
-				BufferLineBufferSelected = { bold = true },
-				BufferLineDevIconLuaInactive = { fg = "grey" },
-				BufferLineInfo = { fg = "grey" },
-				BufferLineNumbers = { fg = "grey" },
-				BufferLineCloseButton = { fg = "grey" },
-				LeapMatch = { fg = "yellow" },
-				LeapBackdrop = { fg = "grey" },
-				NeoTreeCursorLine = { bg = "#5a5a5a" },
-				WhichKeyFloat = { bg = "NONE" },
+					["@variable"] = { fg = "#D7DAE0" },
+					["@variable.global"] = { fg = "#E5C07B", italic = true },
+					["@parameter"] = { fg = "#B9D7FF", italic = true },
+					["@variable.parameter"] = { fg = "#B9D7FF", italic = true },
+					["@field"] = { fg = "#D7DAE0" },
+					["@property"] = { fg = "#D7DAE0" },
+					["@constant"] = { italic = true, bold = true },
+					["@constant.builtin"] = { italic = true, bold = true },
+					BufferLineBufferSelected = { bold = true },
+					BufferLineDevIconLuaInactive = { fg = "#7D8590" },
+					BufferLineInfo = { fg = "#7D8590" },
+					BufferLineNumbers = { fg = "#7D8590" },
+					BufferLineCloseButton = { fg = "#7D8590" },
 				},
 			})
 		end,
 	},
+	-- { 
+	-- 	"catppuccin/nvim",
+	-- 	name = "catppuccin",
+	-- 	priority = 1000,
+	-- 	config = function()
+	-- 		require("catppuccin").setup({
+	-- 				flavour = "mocha", -- latte, frappe, macchiato, mocha
+	-- 				transparent_background = true, -- disables setting the background color.
+	-- 		})
+	--
+	-- 		-- setup must be called before loading
+	-- 		vim.cmd.colorscheme "catppuccin-nvim"
+	-- 	end
+	-- },
 	{
 		"nvim-zh/colorful-winsep.nvim",
 		config = true,
