@@ -3,8 +3,18 @@ local lsp_helpers = require("utils.lsp-helpers")
 
 return {
 	cmd = { 'typescript-language-server', '--stdio' },
-	filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
-	root_markers = { 'package.json', 'tsconfig.json', 'jsconfig.json', '.git' },
+	filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'javascript.jsx', 'typescript.tsx' },
+	root_markers = {
+		'bun.lock',
+		'bun.lockb',
+		'package.json',
+		'tsconfig.json',
+		'jsconfig.json',
+		'astro.config.mjs',
+		'astro.config.ts',
+		'turbo.json',
+		'.git',
+	},
 	settings = {
 		typescript = {
 			inlayHints = lsp_helpers.inlay_hints_off,
@@ -17,6 +27,7 @@ return {
 			preferences = {
 				importModuleSpecifierPreference = 'relative',
 				importModuleSpecifierEnding = 'minimal',
+				includePackageJsonAutoImports = 'on',
 			},
 		},
 		javascript = {

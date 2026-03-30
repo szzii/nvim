@@ -21,15 +21,16 @@ return {
 		config = function()
 			require("conform").setup({
 				formatters_by_ft = {
-					javascript = { "prettier" },
-					javascriptreact = { "prettier" },
-					typescript = { "prettier" },
-					typescriptreact = { "prettier" },
-					json = { "prettier" },
-					jsonc = { "prettier" },
+					javascript = { "biome", "prettier" },
+					javascriptreact = { "biome", "prettier" },
+					typescript = { "biome", "prettier" },
+					typescriptreact = { "biome", "prettier" },
+					json = { "biome", "prettier" },
+					jsonc = { "biome", "prettier" },
+					css = { "biome", "prettier" },
+					scss = { "biome", "prettier" },
+					astro = { "prettier" },
 					html = { "prettier" },
-					css = { "prettier" },
-					scss = { "prettier" },
 					markdown = { "prettier" },
 				},
 				-- Format on save disabled - use F key for manual formatting

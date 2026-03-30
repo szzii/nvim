@@ -53,10 +53,6 @@ return {
 					group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 					callback = function(ev)
 						local client = vim.lsp.get_client_by_id(ev.data.client_id)
-						if client and client.name ~= "jdtls" then
-							-- 保留 jdtls 的语义高亮，其他 LSP 继续禁用以控制性能开销
-							client.server_capabilities.semanticTokensProvider = nil
-						end
 
 						-- 启用 document highlight（使用统一的 augroup 避免重复创建）
 						if client.server_capabilities.documentHighlightProvider then

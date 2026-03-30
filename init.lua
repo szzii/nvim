@@ -52,11 +52,21 @@ end, { desc = "Lazy profile" })
 require("utils.project-root").setup()
 
 -- 启用 LSP 服务器（Neovim 0.11+ 新方式）
--- 会自动加载 ~/.config/nvim/lsp/ 目录下的配置
+vim.lsp.config('ts_ls', require('lsp.ts_ls'))
+vim.lsp.config('biome', require('lsp.biome'))
+vim.lsp.config('basedpyright', require('lsp.basedpyright'))
+vim.lsp.config('gopls', require('lsp.gopls'))
+vim.lsp.config('lua_ls', require('lsp.lua_ls'))
+vim.lsp.config('tailwindcss', require('lsp.tailwindcss'))
+vim.lsp.config('astro', require('lsp.astro'))
+
 vim.lsp.enable('ts_ls')
+vim.lsp.enable('biome')
 vim.lsp.enable('basedpyright')
 vim.lsp.enable('gopls')
 vim.lsp.enable('lua_ls')
+vim.lsp.enable('tailwindcss')
+vim.lsp.enable('astro')
 
 -- jdtls 使用自定义配置（不在 PATH 中）
 vim.lsp.config('jdtls', require('lsp.jdtls'))

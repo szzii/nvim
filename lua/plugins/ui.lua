@@ -328,7 +328,6 @@ return {
 		dir = vscode_plugin.dir,
 		name = vscode_plugin.name,
 		config = function()
-			-- Load theme transparency from local config
 			local ok, local_config = pcall(require, "local")
 			local transparent = ok and local_config.theme and local_config.theme.transparent or true
 
@@ -337,7 +336,7 @@ return {
 				italic_comments = true,
 				italic_keywords = true,
 				italic_parameters = false,
-				bold_types = true,
+				bold_types = false,
 				bold_functions = false,
 				bold_constants = false,
 				group_overrides = {
@@ -345,9 +344,17 @@ return {
 					["@variable.global"] = { fg = "#F5F7FA" },
 					["@parameter"] = { fg = "#8CCBFF" },
 					["@variable.parameter"] = { fg = "#8CCBFF" },
-					["@variable.member"] = { fg = "#C6E6FF" },
+					["@variable.member"] = { fg = "#F5F7FA" },
 					["@field"] = { fg = "#F5F7FA" },
 					["@property"] = { fg = "#F5F7FA" },
+					["@lsp.type.property"] = { fg = "#5FD7FF" },
+					["@lsp.type.field"] = { fg = "#5FD7FF" },
+					["@lsp.typemod.variable.declaration"] = { fg = "#F5F7FA" },
+					["@lsp.typemod.variable.definition"] = { fg = "#F5F7FA" },
+					["@lsp.typemod.property.declaration"] = { fg = "#F5F7FA" },
+					["@lsp.typemod.field.declaration"] = { fg = "#F5F7FA" },
+					["@lsp.typemod.property.definition"] = { fg = "#F5F7FA" },
+					["@lsp.typemod.field.definition"] = { fg = "#F5F7FA" },
 					["@constant"] = { fg = "#F2E6A8", italic = true },
 					["@constant.builtin"] = { fg = "#F2E6A8", italic = true },
 					BufferLineBufferSelected = { bold = true },
