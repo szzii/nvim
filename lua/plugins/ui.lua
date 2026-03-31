@@ -1,7 +1,3 @@
-local vscode_plugin = {
-	dir = vim.fn.stdpath("config") .. "/vscode.nvim",
-	name = "vscode.nvim",
-}
 
 return {
 
@@ -237,7 +233,7 @@ return {
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
 		config = function()
-			require("nvim-treesitter").setup({
+			require("nvim-treesitter.configs").setup({
 				-- Install only the languages you actually use
 				ensure_installed = {
 					"lua", "vim", "vimdoc",
@@ -324,48 +320,21 @@ return {
 	},
 
 
-	{
-		dir = vscode_plugin.dir,
-		name = vscode_plugin.name,
-		config = function()
-			local ok, local_config = pcall(require, "local")
-			local transparent = ok and local_config.theme and local_config.theme.transparent or true
+	
+  {
+    "szzii/vscode.nvim",
+    config = function()
+      -- Load theme transparency from local config
+      local ok, local_config = pcall(require, "local")
+      local transparent = ok and local_config.theme and local_config.theme.transparent or true
 
-			require("vscode").setup({
-				transparent = transparent,
-				italic_comments = true,
-				italic_keywords = true,
-				italic_parameters = false,
-				bold_types = false,
-				bold_functions = false,
-				bold_constants = false,
-				group_overrides = {
-					["@variable"] = { fg = "#F5F7FA" },
-					["@variable.global"] = { fg = "#F5F7FA" },
-					["@parameter"] = { fg = "#8CCBFF" },
-					["@variable.parameter"] = { fg = "#8CCBFF" },
-					["@variable.member"] = { fg = "#F5F7FA" },
-					["@field"] = { fg = "#F5F7FA" },
-					["@property"] = { fg = "#F5F7FA" },
-					["@lsp.type.property"] = { fg = "#5FD7FF" },
-					["@lsp.type.field"] = { fg = "#5FD7FF" },
-					["@lsp.typemod.variable.declaration"] = { fg = "#F5F7FA" },
-					["@lsp.typemod.variable.definition"] = { fg = "#F5F7FA" },
-					["@lsp.typemod.property.declaration"] = { fg = "#F5F7FA" },
-					["@lsp.typemod.field.declaration"] = { fg = "#F5F7FA" },
-					["@lsp.typemod.property.definition"] = { fg = "#F5F7FA" },
-					["@lsp.typemod.field.definition"] = { fg = "#F5F7FA" },
-					["@constant"] = { fg = "#F2E6A8", italic = true },
-					["@constant.builtin"] = { fg = "#F2E6A8", italic = true },
-					BufferLineBufferSelected = { bold = true },
-					BufferLineDevIconLuaInactive = { fg = "#7D8590" },
-					BufferLineInfo = { fg = "#7D8590" },
-					BufferLineNumbers = { fg = "#7D8590" },
-					BufferLineCloseButton = { fg = "#7D8590" },
-				},
-			})
-		end,
-	},
+      require("vscode").setup({
+        transparent = transparent,
+      })
+    end,
+  },
+
+
 	-- { 
 	-- 	"catppuccin/nvim",
 	-- 	name = "catppuccin",
